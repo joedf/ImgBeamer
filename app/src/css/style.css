@@ -1,0 +1,14 @@
+body {
+	background: #1a1a1a;
+}
+
+.box {
+	border: 1px solid #fff;
+	background-color: #0f052e;
+}
+
+.layout {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+}
