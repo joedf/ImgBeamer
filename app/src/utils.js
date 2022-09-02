@@ -1,3 +1,25 @@
+// makes a new stage with a layer added, and some settings
+function newStageTemplate(parentContainer, w, h) {
+	var $e = $('<div/>').addClass('box').appendTo(parentContainer);
+	var stage = new Konva.Stage({
+		container: $e.get(0),
+		width: w,
+		height: h
+	});
+
+	// then create layer and to stage
+	var layer = new Konva.Layer();
+
+	// antialiasing
+	var ctx = layer.getContext();
+	ctx.imageSmoothingEnabled = false;
+
+	// add and push
+	stage.add(layer);
+
+	return stage;
+}
+
 function get_avg_pixel_rgba(raw) {
 	var blanks = 0;
 	var d = raw.data;
@@ -35,4 +57,82 @@ function get_avg_pixel_rgba(raw) {
 	console.log("avg px=", avg.toString());
 
 	return avg;
+}
+
+// based on solution1 from:
+// https://longviewcoder.com/2021/12/08/konva-a-better-grid/
+function drawGrid(gridLayer, rect, rows, cols, lineColor) {
+
+	if (typeof lineColor == 'undefined' || lineColor == null || lineColor.length < 1)
+		lineColor = 'rgba(255, 255, 255, 0.8)';
+
+	var startX = rect.x();
+	var startY = rect.y();
+
+	var stepSizeX = rect.width() / cols;
+	var stepSizeY = rect.height() / rows;
+ 
+	const xSize= gridLayer.width(), // stage.width(), 
+			ySize= gridLayer.height(), // stage.height(),
+			xSteps = Math.round(xSize/ stepSizeX), 
+			ySteps = Math.round(ySize / stepSizeY);
+
+	// draw vertical lines
+	for (let i = 0; i <= xSteps; i++) {
+		gridLayer.add(
+			new Konva.Line({
+				x: startX + (i * stepSizeX),
+				points: [0, 0, 0, ySize],
+				stroke: lineColor,
+				strokeWidth: 1,
+			})
+		);
+	}
+	//draw Horizontal lines
+	for (let i = 0; i <= ySteps; i++) {
+		gridLayer.add(
+			new Konva.Line({
+				y: startY + (i * stepSizeY),
+				points: [0, 0, xSize, 0],
+				stroke: lineColor,
+				strokeWidth: 1,
+			})
+		);
+	}
+
+	gridLayer.batchDraw();
+
+	var cellInfo = {
+		width: stepSizeX,
+		height: stepSizeY,
+	};
+
+	return cellInfo;
+}
+
+// originally based from drawGrid() ...
+function repeatDrawOnGrid(layer, rect, shape, rows, cols) {
+	var startX = rect.x();
+	var startY = rect.y();
+
+	var stepSizeX = rect.width() / cols;
+	var stepSizeY = rect.height() / rows;
+
+	var cellCenterX = stepSizeX / 2;
+	var cellCenterY = stepSizeY / 2;
+
+	// interate over X
+	for (let i = 0; i < cols; i++) {
+		// interate over Y
+		for (let j = 0; j < rows; j++) {
+			var shapeCopy = shape.clone();
+
+			shapeCopy.x(startX + (i * stepSizeX) + cellCenterX);
+			shapeCopy.y(startY + (j * stepSizeY) + cellCenterY);
+
+			layer.add( shapeCopy );
+		}
+	}
+
+	layer.batchDraw();
 }

@@ -9,22 +9,7 @@ var mc = $('#main-container');
 // first create the stages
 var stages = [];
 for (let i = 0; i < nStages; i++) {
-	var e = $('<div/>').addClass('box').appendTo(mc);
-	var stage = new Konva.Stage({
-		container: e.get(0),
-		width: sz,
-		height: sz
-	});
-
-	// then create layer and to stage
-	var layer = new Konva.Layer();
-
-	// antialiasing
-	var ctx = layer.getContext();
-	ctx.imageSmoothingEnabled = false;
-
-	// add and push
-	stage.add(layer);
+	var stage = newStageTemplate(mc, sz, sz);
 	stages.push(stage);
 }
 
@@ -189,5 +174,32 @@ function OnImageLoaded(image, beam, stages){
 		1, 1).data.toString());
 		
 	updateAvgCircle();
-}
 
+	// draw probe layout
+	var s6 = stages[5];
+	var s6l = s6.getLayers()[0];
+
+	var grc = image.clone();
+	s6l.add(grc);
+	s6l.draw();
+
+	var s6lg = new Konva.Layer();
+	s6.add(s6lg);
+
+	var tRows = 4;
+	var tCols = 6;
+	
+	var cell = drawGrid(s6lg, grc, tRows, tCols);
+	
+	var s6lb = new Konva.Layer();
+	s6.add(s6lb);
+
+	var newCircle = new Konva.Circle({
+		radius: (Math.min(cell.width, cell.height)/2) * .8,
+		fill: 'rgba(255,0,0,.4)',
+		strokeWidth: 1,
+		stroke: 'red'
+	});
+	
+	repeatDrawOnGrid(s6lb, grc, newCircle, tRows, tCols);
+}
