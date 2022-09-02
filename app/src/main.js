@@ -1,4 +1,4 @@
-const INPUT_IMAGE = 'src/testimages/grains1c.png';
+const INPUT_IMAGE = 'src/testimages/grains1b.png';
 const COMPOSITE_OP = 'source-in';
 // const COMPOSITE_OP = 'destination-in';
 
@@ -58,21 +58,30 @@ s1l.draw();
 
 /////////////////////
 
-var max = sz;
-var img_width = 1800, img_height = 1350;
-var ratio = (img_width > img_height ? (img_height / max) : (img_width / max)) // fill
-// fit: var ratio = (img_width > img_height ? (img_width / max) : (img_height / max))
-
 var grains1 = null;
 
 var imageObj = new Image();
 imageObj.onload = function () {
+	
+	var max = sz;
+
+	console.log("img natural size:", imageObj.naturalWidth, imageObj.naturalHeight);
+
+	var img_width = imageObj.naturalWidth;
+	var img_height = imageObj.naturalHeight;
+
+	// var ratio = (img_width > img_height ? (img_height / max) : (img_width / max)) // fill
+	var ratio = (img_width > img_height ? (img_width / max) : (img_height / max)) // fit
+
+	var iw = img_width/ratio;
+	var ih = img_height/ratio;
+
 	grains1 = new Konva.Image({
-		x: 0,
-		y: 0,
+		x: (max - iw)/2,
+		y: (max - ih)/2,
 		image: imageObj,
-		width: img_width/ratio,
-		height: img_height/ratio,
+		width: iw, 
+		height: ih,
 	});
 
 	// add the shape to the layer
