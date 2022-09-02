@@ -28,7 +28,6 @@ for (let i = 0; i < nStages; i++) {
 	stages.push(stage);
 }
 
-
 // create our shape
 var circle = new Konva.Circle({
 	x: stage.width() / 2,
@@ -87,21 +86,20 @@ imageObj.onload = function () {
 	// add the shape to the layer
 	stages[1].getLayers()[0].add(grains1);
 
-	step3();
+	OnImageLoaded(grains1, circle, stages);
 };
 imageObj.src = INPUT_IMAGE;
 
 
-function step3(){
+function OnImageLoaded(image, beam, stages){
 	var s3 = stages[2];
+	var s3l = s3.getLayers()[0];
 
 	// Give yellow box border to indicate interactive
 	$(s3.getContainer()).css('border-color','yellow')
 
-	var s3l = s3.getLayers()[0];
-	// needed for layers only - listening=false? clonedLayer = layer.clone({ listening: false });
-	var cc = circle.clone();
-	var gr = grains1.clone();
+	var cc = beam.clone();
+	var gr = image.clone();
 	gr.draggable(true);
 	
 	gr.globalCompositeOperation(COMPOSITE_OP);
@@ -110,6 +108,28 @@ function step3(){
 	s3l.add(gr);
 
 	s3l.draw();
+
+	var updateAvgCircle = function(){
+		var s3lcx = stages[2].getLayers()[0].getContext();
+		var allPx = s3lcx.getImageData(0, 0, s3lcx.canvas.width, s3lcx.canvas.height);
+		var avgPx = get_avg_pixel_rgba(allPx);
+	
+		var s5l = stages[4].getLayers()[0];
+	
+		var avgCircle = null;
+		if (s5l.getChildren().length <= 0){
+			avgCircle = circle.clone();
+			s5l.add(avgCircle);
+		} else {
+			avgCircle = s5l.getChildren()[0];
+		}
+	
+		var avgColor = "rgba("+ avgPx.join(',') +")";
+		avgCircle.stroke(avgColor);
+		avgCircle.fill(avgColor);
+	
+		s5l.draw();
+	};
 
 	gr.on('mouseup', function() {
 		updateAvgCircle();
@@ -159,7 +179,7 @@ function step3(){
 		});
 		
 		s4l.add(kcc);
-	})
+	});
 
 	var s3lcx = s3l.getContext();
 	console.log("p:[0, 0]", s3lcx.getImageData(0, 0, 1, 1).data.toString());
@@ -168,28 +188,6 @@ function step3(){
 		s3lcx.canvas.height / 2,
 		1, 1).data.toString());
 		
-		updateAvgCircle();
-}
-	
-function updateAvgCircle(){
-	var s3lcx = stages[2].getLayers()[0].getContext();
-	var allPx = s3lcx.getImageData(0, 0, s3lcx.canvas.width, s3lcx.canvas.height);
-	var avgPx = get_avg_pixel_rgba(allPx);
-
-	var s5l = stages[4].getLayers()[0];
-
-	var avgCircle = null;
-	if (s5l.getChildren().length <= 0){
-		avgCircle = circle.clone();
-		s5l.add(avgCircle);
-	} else {
-		avgCircle = s5l.getChildren()[0];
-	}
-
-	var avgColor = "rgba("+ avgPx.join(',') +")";
-	avgCircle.stroke(avgColor);
-	avgCircle.fill(avgColor);
-
-	s5l.draw();
+	updateAvgCircle();
 }
 
