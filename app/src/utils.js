@@ -20,6 +20,24 @@ function newStageTemplate(parentContainer, w, h) {
 	return stage;
 }
 
+// scales the give shape, and moves it to preserve original center
+function scaleOnCenter(stage, shape, oldScale, newScale){
+	// could be expanded to do both x and y scaling
+	shape.scale({x: newScale, y: newScale});
+	var stageCenter = {
+		x: stage.width()/2 - stage.x(),
+		y: stage.height()/2 - stage.y()
+	};
+	var oldPos = {
+		x: (stageCenter.x - shape.x()) / oldScale,
+		y: (stageCenter.y - shape.y()) / oldScale,
+	};
+	shape.position({
+		x: stageCenter.x - oldPos.x * newScale,
+		y: stageCenter.y - oldPos.y * newScale,
+	});
+}
+
 function get_avg_pixel_rgba(raw) {
 	var blanks = 0;
 	var d = raw.data;

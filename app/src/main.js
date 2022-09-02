@@ -3,7 +3,8 @@ const COMPOSITE_OP = 'source-in';
 // const COMPOSITE_OP = 'destination-in';
 
 const nStages = 6;
-var sz = 300;
+// var sz = 300;
+var sz = (document.body.clientWidth / 4) - (4 * 5);
 var mc = $('#main-container');
 
 // first create the stages
@@ -42,7 +43,7 @@ s1l.draw();
 
 /////////////////////
 
-var grains1 = null;
+var G_MAIN_GRAIN_ORIGINAL = null;
 
 var imageObj = new Image();
 imageObj.onload = function () {
@@ -60,7 +61,7 @@ imageObj.onload = function () {
 	var iw = img_width/ratio;
 	var ih = img_height/ratio;
 
-	grains1 = new Konva.Image({
+	G_MAIN_GRAIN_ORIGINAL = new Konva.Image({
 		x: (max - iw)/2,
 		y: (max - ih)/2,
 		image: imageObj,
@@ -69,11 +70,13 @@ imageObj.onload = function () {
 	});
 
 	// add the shape to the layer
-	stages[1].getLayers()[0].add(grains1);
+	stages[1].getLayers()[0].add(G_MAIN_GRAIN_ORIGINAL);
 
-	OnImageLoaded(grains1, circle, stages);
+	OnImageLoaded(G_MAIN_GRAIN_ORIGINAL, circle, stages);
 };
 imageObj.src = INPUT_IMAGE;
+
+var G_MAIN_GRAIN = null;
 
 
 function OnImageLoaded(image, beam, stages){
@@ -91,6 +94,12 @@ function OnImageLoaded(image, beam, stages){
 
 	s3l.add(cc);
 	s3l.add(gr);
+
+	// "pre-zoom" a bit, and start with center position
+	scaleOnCenter(s3, gr, 1, 4);
+
+	// keep a global reference
+	G_MAIN_GRAIN = gr;
 
 	s3l.draw();
 
@@ -117,7 +126,7 @@ function OnImageLoaded(image, beam, stages){
 	};
 
 	gr.on('mouseup', function() {
-		updateAvgCircle();
+		doUpdate();
 	});
 
 	gr.on('wheel', function(e){
@@ -149,9 +158,12 @@ function OnImageLoaded(image, beam, stages){
 		gr.position(newPos);
 
 
-		updateAvgCircle();
+		doUpdate();
 	});
 
+	// a test on composition operation on stage 4
+	// hide for now
+	$(stages[3].getContainer()).hide();
 	var final = s3l.toImage({pixelRatio: devicePixelRatio}).then(function(cnvComposite){
 		var s4l = stages[3].getLayers()[0];
 		
@@ -172,34 +184,74 @@ function OnImageLoaded(image, beam, stages){
 		s3lcx.canvas.width / 2,
 		s3lcx.canvas.height / 2,
 		1, 1).data.toString());
-		
-	updateAvgCircle();
 
-	// draw probe layout
+	// draw bg image for probe layout only once
 	var s6 = stages[5];
 	var s6l = s6.getLayers()[0];
 
-	var grc = image.clone();
+	var grc = G_MAIN_GRAIN_ORIGINAL.clone();
 	s6l.add(grc);
 	s6l.draw();
 
-	var s6lg = new Konva.Layer();
-	s6.add(s6lg);
+	var updateProbeLayout = function(){
+		// draws probe layout
 
-	var tRows = 4;
-	var tCols = 6;
-	
-	var cell = drawGrid(s6lg, grc, tRows, tCols);
-	
-	var s6lb = new Konva.Layer();
-	s6.add(s6lb);
+		// get stage layers
+		var s6layers = s6.getLayers();
 
-	var newCircle = new Konva.Circle({
-		radius: (Math.min(cell.width, cell.height)/2) * .8,
-		fill: 'rgba(255,0,0,.4)',
-		strokeWidth: 1,
-		stroke: 'red'
-	});
-	
-	repeatDrawOnGrid(s6lb, grc, newCircle, tRows, tCols);
+		// get the over-layer, create if not already added
+		var s6lg = null;
+		var gridDrawn = false;
+		if (s6layers.length < 2) {
+			s6lg = new Konva.Layer();
+			s6.add(s6lg);
+		} else {
+			s6lg = s6layers[1];
+			gridDrawn = true; // assume we drew it already
+		}
+
+		// get probe layer, make a new if not already there
+		var s6lb = null;
+		if (s6layers.length < 3) {
+			s6lb = new Konva.Layer();
+			s6.add(s6lb);
+		} else {
+			s6lb = s6layers[2];
+		}
+
+		///////////////////////////////
+		// Do drawing work ...
+
+		var tRows = 4;
+		var tCols = 6;
+
+		// get the user scaled gr
+		var grs = G_MAIN_GRAIN;
+		
+		// draw grid on base/source image
+		if (!gridDrawn)
+			drawGrid(s6lg, grc, tRows, tCols);
+		
+		// clear the probe layer
+		s6lb.destroyChildren();
+
+		var probe = new Konva.Ellipse({
+			radius : {
+				x : (cc.width() / grs.scaleX()) / 2, //(cell.width/2) * .8,
+				y : (cc.height() / grs.scaleY()) / 2 //(cell.height/2) * .8
+			},
+			fill: 'rgba(255,0,0,.4)',
+			strokeWidth: 1,
+			stroke: 'red'
+		});
+		
+		repeatDrawOnGrid(s6lb, grc, probe, tRows, tCols);
+	}
+
+	var doUpdate = function(){
+		updateAvgCircle();
+		updateProbeLayout();
+	};
+
+	doUpdate();
 }
