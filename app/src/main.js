@@ -143,32 +143,6 @@ function step3(){
 		updateAvgCircle();
 	});
 
-	/*
-	var rect = new Konva.Rect({
-		x: 50,
-		y: 50,
-		// stroke: 'red',
-		width: 100,
-		height: 100,
-		fill: 'red',
-		draggable: true,
-		globalCompositeOperation: 'xor',
-	});
-	*/
-
-	// step 4
-	/*
-	var s4l = stages[3].getLayers()[0];
-	// var final = stages[2].toDataURL({ pixelRatio: 3 });
-	var final = stages[2].toImage();
-	var i = new Konva.Image({image: final});
-	s4l.add(i);
-	*/
-	
-
-	// hide for now
-	$(stages[3].getContainer()).hide()
-
 	var final = s3l.toImage({pixelRatio: devicePixelRatio}).then(function(cnvComposite){
 		var s4l = stages[3].getLayers()[0];
 		
@@ -182,17 +156,6 @@ function step3(){
 		
 		s4l.add(kcc);
 	})
-	
-	/*
-	// method 2
-	var pImg = $('<img/>').addClass('box out').appendTo(mc);
-	var finalB64 = s3l.toDataURL({ pixelRatio: devicePixelRatio });
-	pImg.attr({
-		src: finalB64,
-		width: sz,
-		height: sz,
-	});
-	*/
 
 	var s3lcx = s3l.getContext();
 	console.log("p:[0, 0]", s3lcx.getImageData(0, 0, 1, 1).data.toString());
@@ -202,7 +165,7 @@ function step3(){
 		1, 1).data.toString());
 		
 		updateAvgCircle();
-	}
+}
 	
 function updateAvgCircle(){
 	var s3lcx = stages[2].getLayers()[0].getContext();
