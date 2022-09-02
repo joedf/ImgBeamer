@@ -154,3 +154,7 @@ function repeatDrawOnGrid(layer, rect, shape, rows, cols) {
 
 	layer.batchDraw();
 }
+
+function computeResampled(stage, image, probe, rows, cols,){
+	console.warn("computeResampled() not implemented yet.");
+}

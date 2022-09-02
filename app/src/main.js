@@ -1,8 +1,10 @@
 const INPUT_IMAGE = 'src/testimages/grains1b.png';
 const COMPOSITE_OP = 'source-in';
 // const COMPOSITE_OP = 'destination-in';
+const G_IMAGE_ROWS = 4;
+const G_IMAGE_COLUMNS = 6;
 
-const nStages = 6;
+const nStages = 7;
 // var sz = 300;
 var sz = (document.body.clientWidth / 4) - (4 * 5);
 var mc = $('#main-container');
@@ -227,8 +229,8 @@ function OnImageLoaded(image, beam, stages){
 		///////////////////////////////
 		// Do drawing work ...
 
-		var tRows = 4;
-		var tCols = 6;
+		var tRows = G_IMAGE_ROWS;
+		var tCols = G_IMAGE_COLUMNS;
 
 		// get the user scaled gr
 		var grs = G_MAIN_GRAIN;
@@ -253,9 +255,28 @@ function OnImageLoaded(image, beam, stages){
 		repeatDrawOnGrid(s6lb, grc, probe, tRows, tCols);
 	}
 
+	// compute resampled image
+	var s7 = stages[6];
+	var rImageBase = G_MAIN_GRAIN_ORIGINAL.clone();
+	$(s7.getContainer()).css('border-color', 'lime');
+
+	var updateResampled = function(){
+		var grs = G_MAIN_GRAIN; // user-scaled
+		var probe = new Konva.Ellipse({
+			radius : {
+				x : (cc.width() / grs.scaleX()) / 2,
+				y : (cc.height() / grs.scaleY()) / 2
+			},
+			fill: 'white'
+		});
+
+		computeResampled(s7, rImageBase, probe, G_IMAGE_ROWS, G_IMAGE_COLUMNS);
+	}
+
 	var doUpdate = function(){
 		updateAvgCircle();
 		updateProbeLayout();
+		updateResampled();
 	};
 
 	doUpdate();
