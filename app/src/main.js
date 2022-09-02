@@ -109,9 +109,10 @@ function OnImageLoaded(image, beam, stages){
 		var s3lcx = stages[2].getLayers()[0].getContext();
 		var allPx = s3lcx.getImageData(0, 0, s3lcx.canvas.width, s3lcx.canvas.height);
 		var avgPx = get_avg_pixel_rgba(allPx);
-	
-		var s5l = stages[4].getLayers()[0];
-	
+
+		var s5 = stages[4];
+		var s5l = s5.getLayers()[0];
+
 		var avgCircle = null;
 		if (s5l.getChildren().length <= 0){
 			avgCircle = circle.clone();
@@ -119,11 +120,13 @@ function OnImageLoaded(image, beam, stages){
 		} else {
 			avgCircle = s5l.getChildren()[0];
 		}
-	
+
 		var avgColor = "rgba("+ avgPx.join(',') +")";
 		avgCircle.stroke(avgColor);
 		avgCircle.fill(avgColor);
-	
+
+		s5.getContainer().setAttribute('pixel_value', avgColor);
+
 		s5l.draw();
 	};
 

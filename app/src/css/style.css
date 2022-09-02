@@ -5,6 +5,17 @@ body {
 .box {
 	border: 1px solid #fff;
 	background-color: #000;
+	position: relative;
+}
+
+.box::after {
+	content: attr(pixel_value);
+	color: yellow;
+	font-family: monospace;
+	float: right;
+	position: absolute;
+	bottom: .5em;
+	right: .5em;
 }
 
 .layout {
