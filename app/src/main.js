@@ -137,6 +137,11 @@ function OnImageLoaded(image, beam, stages){
 		// stop default scrolling
 		e.evt.preventDefault();
 
+		// Do half rate scaling, if shift is pressed
+		if (e.evt.shiftKey) {
+			scaleBy = 1 +((scaleBy-1) / 2);
+		}
+
 		var oldScale = gr.scaleX();
 		var pointer = stage.getPointerPosition();
 
