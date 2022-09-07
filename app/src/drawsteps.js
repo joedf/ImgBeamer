@@ -38,6 +38,8 @@ function drawBaseImage(stage, oImg, size, doFill = false) {
 
 	stage.getLayers()[0].add(kImage);
 
+	stage.draw();
+
 	return kImage;
 }
 

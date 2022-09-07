@@ -3,6 +3,10 @@ const COMPOSITE_OP = 'source-in';
 // const COMPOSITE_OP = 'destination-in';
 var G_UpdateResampled = null;
 
+
+Konva.autoDrawEnabled = false;
+
+
 const nStages = 7;
 // var sz = 300;
 var sz = (document.body.clientWidth / 4) - (4 * 5);
@@ -69,6 +73,10 @@ function OnImageLoaded(image, beam, stages){
 		doUpdate();
 	});
 
+	G_MAIN_GRAIN.on('dragmove', function() {
+		stages[2].draw();
+	});
+
 	G_MAIN_GRAIN.on('wheel', function(e){
 		// modified from https://konvajs.org/docs/sandbox/Zooming_Relative_To_Pointer.html 
 		var stage = stages[2];
@@ -102,6 +110,7 @@ function OnImageLoaded(image, beam, stages){
 		};
 		G_MAIN_GRAIN.position(newPos);
 
+		stage.draw();
 
 		doUpdate();
 	});
