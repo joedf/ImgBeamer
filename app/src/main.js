@@ -16,18 +16,7 @@ for (let i = 0; i < nStages; i++) {
 	stages.push(stage);
 }
 
-// create our shape
-var circle = new Konva.Circle({
-	x: stage.width() / 2,
-	y: stage.height() / 2,
-	radius: 70,
-	fill: 'white',
-	strokeWidth: 0,
-});
-
-var s1l = stages[0].getLayers()[0];
-s1l.add(circle);
-s1l.draw();
+var G_BASE_BEAM = drawBaseBeam(stages[0]);
 
 /////////////////////
 
@@ -36,63 +25,24 @@ var G_MAIN_GRAIN_ORIGINAL = null;
 loadImage(INPUT_IMAGE, function(event){
 	var imageObj = event.target;
 
-	var max = sz;
-
-	console.log("img natural size:", imageObj.naturalWidth, imageObj.naturalHeight);
-	var img_width = imageObj.naturalWidth, img_height = imageObj.naturalHeight;
-
-	// image ratio to "fit" in canvas
-	var doFill = false;
-	var ratio = (img_width > img_height ? (img_width / max) : (img_height / max)) // fit
-	if (doFill){
-		ratio = (img_width > img_height ? (img_height / max) : (img_width / max)) // fill
-	}
-
-	var iw = img_width/ratio, ih = img_height/ratio;
-	G_MAIN_GRAIN_ORIGINAL = new Konva.Image({
-		x: (max - iw)/2,
-		y: (max - ih)/2,
-		image: imageObj,
-		width: iw, 
-		height: ih,
-	});
-
-	stages[1].getLayers()[0].add(G_MAIN_GRAIN_ORIGINAL);
-
-	OnImageLoaded(G_MAIN_GRAIN_ORIGINAL, circle, stages);
+	G_MAIN_GRAIN_ORIGINAL = drawBaseImage(stages[1], imageObj, sz);
+	
+	OnImageLoaded(G_MAIN_GRAIN_ORIGINAL, G_BASE_BEAM, stages);
 });
 
 var G_MAIN_GRAIN = null;
 
 
 function OnImageLoaded(image, beam, stages){
+
 	var s3 = stages[2];
 	var s3l = s3.getLayers()[0];
-	s3l.listening(true);
-
-	// Give yellow box border to indicate interactive
-	$(s3.getContainer()).css('border-color','yellow')
-
-	var cc = beam.clone();
-	var gr = image.clone();
-	gr.draggable(true);
-	
-	gr.globalCompositeOperation(COMPOSITE_OP);
-
-	s3l.add(cc);
-	s3l.add(gr);
-
-	// "pre-zoom" a bit, and start with center position
-	scaleOnCenter(s3, gr, 1, 4);
-
-	// keep a global reference
-	G_MAIN_GRAIN = gr;
-
-	s3l.draw();
+	var _t = drawBaseComposite(s3, image, beam);
+	G_MAIN_GRAIN = _t[0], cc = _t[1];
 
 	var updateAvgCircle = function(){
-		var s3lcx = stages[2].getLayers()[0].getContext();
-		var allPx = s3lcx.getImageData(0, 0, s3lcx.canvas.width, s3lcx.canvas.height);
+		var pCtx = s3l.getContext();
+		var allPx = pCtx.getImageData(0, 0, pCtx.canvas.width, pCtx.canvas.height);
 		var avgPx = get_avg_pixel_rgba(allPx);
 
 		var s4 = stages[3];
@@ -100,7 +50,7 @@ function OnImageLoaded(image, beam, stages){
 
 		var avgCircle = null;
 		if (s4l.getChildren().length <= 0){
-			avgCircle = circle.clone();
+			avgCircle = beam.clone();
 			s4l.add(avgCircle);
 		} else {
 			avgCircle = s4l.getChildren()[0];
@@ -115,13 +65,13 @@ function OnImageLoaded(image, beam, stages){
 		s4l.draw();
 	};
 
-	gr.on('mouseup', function() {
+	G_MAIN_GRAIN.on('mouseup', function() {
 		doUpdate();
 	});
 
-	gr.on('wheel', function(e){
+	G_MAIN_GRAIN.on('wheel', function(e){
 		// modified from https://konvajs.org/docs/sandbox/Zooming_Relative_To_Pointer.html 
-		var stage = s3;
+		var stage = stages[2];
 		var scaleBy = 1.2;
 
 		// stop default scrolling
@@ -132,36 +82,29 @@ function OnImageLoaded(image, beam, stages){
 			scaleBy = 1 +((scaleBy-1) / 2);
 		}
 
-		var oldScale = gr.scaleX();
+		var oldScale = G_MAIN_GRAIN.scaleX();
 		var pointer = stage.getPointerPosition();
 
 		var mousePointTo = {
-			x: (pointer.x - gr.x()) / oldScale,
-			y: (pointer.y - gr.y()) / oldScale,
+			x: (pointer.x - G_MAIN_GRAIN.x()) / oldScale,
+			y: (pointer.y - G_MAIN_GRAIN.y()) / oldScale,
 		};
 
 		// how to scale? Zoom in? Or zoom out?
 		let direction = e.evt.deltaY > 0 ? -1 : 1;
 
 		var newScale = direction > 0 ? oldScale * scaleBy : oldScale / scaleBy;
-		gr.scale({ x: newScale, y: newScale });
+		G_MAIN_GRAIN.scale({ x: newScale, y: newScale });
 
 		var newPos = {
 			x: pointer.x - mousePointTo.x * newScale,
 			y: pointer.y - mousePointTo.y * newScale,
 		};
-		gr.position(newPos);
+		G_MAIN_GRAIN.position(newPos);
 
 
 		doUpdate();
 	});
-
-	var s3lcx = s3l.getContext();
-	console.log("p:[0, 0]", s3lcx.getImageData(0, 0, 1, 1).data.toString());
-	console.log("p:["+(s3lcx.canvas.width/2)+", "+(s3lcx.canvas.height/2)+"]", s3lcx.getImageData(
-		s3lcx.canvas.width / 2,
-		s3lcx.canvas.height / 2,
-		1, 1).data.toString());
 
 	// draw bg image for probe layout only once
 	var s5 = stages[4];
