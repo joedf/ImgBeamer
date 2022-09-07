@@ -9,22 +9,61 @@
 		<link rel="stylesheet" href="src/css/style.css">
 		<script src="src/3rd-party/konva/konva.js"></script>
 		<script src="src/3rd-party/jquery-3.6.1.min.js"></script>
+		<script src="src/3rd-party/jquery-ui-1.13.2/jquery-ui.min.js"></script>
+		<script src="src/3rd-party/jsinheritance.js"></script>
 	</head>
 	<body>
 		<div class="layout" id="main-container"></div>
-		
-		<details>
-			<summary style="cursor: pointer; user-select: none;">References or people to look at...</summary>
-			<ul>
-				<li><a href="https://www.physik.hu-berlin.de/en/sem/software/software_qstem">sem/software/software_qstem</a></li>
-				<li><a href="https://scialli.utk.edu/david-joy-retires/">david-joy-retires</a></li>
-				<li><a href="https://sunypoly.edu/faculty-and-staff/eric-lifshin.html">eric-lifshin.html</a></li>
-				<li><a href="https://www.nist.gov/people/andras-e-vladar">andras-e-vladar</a></li>
-				<li><a href="https://www.nist.gov/publications/assessing-scanning-electron-microscopy-stereophotogrammetry-algorithms-virtual-test">algorithms-virtual-test</a></li>
-			</ul>
-		</details>
+
+		<div id="options-anchor">
+			<div id="options">
+				<details open>
+					<summary>Configuration Panel</summary>
+					<table>
+						<tr>
+							<td>Rows</td>
+							<td><input type="number" id="iRows" placeholder="4"></td>
+						</tr>
+						<tr>
+							<td>Columns</td>
+							<td><input type="number" id="iCols" placeholder="6"></td>
+						</tr>
+						<tr>
+							<td><button id="generateFinal">Generate</button></td>
+							<td><button id="openInNewTab">Open in new tab</button></td>
+						</tr>
+					</table>
+				</details>
+				
+				<details>
+					<summary style="cursor: pointer; user-select: none;">References or people to look at...</summary>
+					<ul>
+						<li><a href="https://www.physik.hu-berlin.de/en/sem/software/software_qstem">sem/software/software_qstem</a></li>
+						<li><a href="https://scialli.utk.edu/david-joy-retires/">david-joy-retires</a></li>
+						<li><a href="https://sunypoly.edu/faculty-and-staff/eric-lifshin.html">eric-lifshin.html</a></li>
+						<li><a href="https://www.nist.gov/people/andras-e-vladar">andras-e-vladar</a></li>
+						<li><a href="https://www.nist.gov/publications/assessing-scanning-electron-microscopy-stereophotogrammetry-algorithms-virtual-test">algorithms-virtual-test</a></li>
+					</ul>
+				</details>
+			</div>
+		</div>
 
 		<script src="src/utils.js"></script>
+		<script src="src/drawsteps.js"></script>
 		<script src="src/main.js"></script>
+
+		<script>
+			$("#options").draggable();
+
+			var stageFinal = stages[7];
+
+			$('#generateFinal').click(function(e){
+				G_UpdateResampled();
+			});
+			$('#openInNewTab').click(function(e){
+				var url = stageFinal.toDataURL({pixelRatio:2});
+				window.open(url, '_blank').focus();
+			});
+		</script>
 	</body>
 </html>

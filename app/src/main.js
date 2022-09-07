@@ -1,13 +1,13 @@
 const INPUT_IMAGE = 'src/testimages/grains1b.png';
 const COMPOSITE_OP = 'source-in';
 // const COMPOSITE_OP = 'destination-in';
-const G_IMAGE_ROWS = 4;
-const G_IMAGE_COLUMNS = 6;
+var G_UpdateResampled = null;
 
 const nStages = 7;
 // var sz = 300;
 var sz = (document.body.clientWidth / 4) - (4 * 5);
 var mc = $('#main-container');
+
 
 // first create the stages
 var stages = [];
@@ -21,48 +21,34 @@ var circle = new Konva.Circle({
 	x: stage.width() / 2,
 	y: stage.height() / 2,
 	radius: 70,
-	fill: 'cyan',
-
-	/*
-	fillRadialGradientStartRadius: 0,
-	fillRadialGradientEndRadius: 70,
-	fillRadialGradientStartPoint: { x: 0, y: 0 },
-	fillRadialGradientEndPoint: { x: 0, y: 0 },
-	fillRadialGradientColorStops: [0, 'cyan', 1, 'black'],
-	*/
-
-	// stroke: 'red',
+	fill: 'white',
 	strokeWidth: 0,
 });
 
 var s1l = stages[0].getLayers()[0];
-
-// add the shape to the layer
 s1l.add(circle);
-
-// draw the image
 s1l.draw();
 
 /////////////////////
 
 var G_MAIN_GRAIN_ORIGINAL = null;
 
-var imageObj = new Image();
-imageObj.onload = function () {
-	
+loadImage(INPUT_IMAGE, function(event){
+	var imageObj = event.target;
+
 	var max = sz;
 
 	console.log("img natural size:", imageObj.naturalWidth, imageObj.naturalHeight);
+	var img_width = imageObj.naturalWidth, img_height = imageObj.naturalHeight;
 
-	var img_width = imageObj.naturalWidth;
-	var img_height = imageObj.naturalHeight;
-
-	// var ratio = (img_width > img_height ? (img_height / max) : (img_width / max)) // fill
+	// image ratio to "fit" in canvas
+	var doFill = false;
 	var ratio = (img_width > img_height ? (img_width / max) : (img_height / max)) // fit
+	if (doFill){
+		ratio = (img_width > img_height ? (img_height / max) : (img_width / max)) // fill
+	}
 
-	var iw = img_width/ratio;
-	var ih = img_height/ratio;
-
+	var iw = img_width/ratio, ih = img_height/ratio;
 	G_MAIN_GRAIN_ORIGINAL = new Konva.Image({
 		x: (max - iw)/2,
 		y: (max - ih)/2,
@@ -71,12 +57,10 @@ imageObj.onload = function () {
 		height: ih,
 	});
 
-	// add the shape to the layer
 	stages[1].getLayers()[0].add(G_MAIN_GRAIN_ORIGINAL);
 
 	OnImageLoaded(G_MAIN_GRAIN_ORIGINAL, circle, stages);
-};
-imageObj.src = INPUT_IMAGE;
+});
 
 var G_MAIN_GRAIN = null;
 
@@ -84,6 +68,7 @@ var G_MAIN_GRAIN = null;
 function OnImageLoaded(image, beam, stages){
 	var s3 = stages[2];
 	var s3l = s3.getLayers()[0];
+	s3l.listening(true);
 
 	// Give yellow box border to indicate interactive
 	$(s3.getContainer()).css('border-color','yellow')
@@ -110,24 +95,24 @@ function OnImageLoaded(image, beam, stages){
 		var allPx = s3lcx.getImageData(0, 0, s3lcx.canvas.width, s3lcx.canvas.height);
 		var avgPx = get_avg_pixel_rgba(allPx);
 
-		var s5 = stages[4];
-		var s5l = s5.getLayers()[0];
+		var s4 = stages[3];
+		var s4l = s4.getLayers()[0];
 
 		var avgCircle = null;
-		if (s5l.getChildren().length <= 0){
+		if (s4l.getChildren().length <= 0){
 			avgCircle = circle.clone();
-			s5l.add(avgCircle);
+			s4l.add(avgCircle);
 		} else {
-			avgCircle = s5l.getChildren()[0];
+			avgCircle = s4l.getChildren()[0];
 		}
 
 		var avgColor = "rgba("+ avgPx.join(',') +")";
 		avgCircle.stroke(avgColor);
 		avgCircle.fill(avgColor);
 
-		s5.getContainer().setAttribute('pixel_value', avgColor);
+		s4.getContainer().setAttribute('pixel_value', avgColor);
 
-		s5l.draw();
+		s4l.draw();
 	};
 
 	gr.on('mouseup', function() {
@@ -171,23 +156,6 @@ function OnImageLoaded(image, beam, stages){
 		doUpdate();
 	});
 
-	// a test on composition operation on stage 4
-	// hide for now
-	$(stages[3].getContainer()).hide();
-	var final = s3l.toImage({pixelRatio: devicePixelRatio}).then(function(cnvComposite){
-		var s4l = stages[3].getLayers()[0];
-		
-		var kcc = new Konva.Image({
-			x: 0,
-			y: 0,
-			image: cnvComposite,
-			width: sz,
-			height: sz,
-		});
-		
-		s4l.add(kcc);
-	});
-
 	var s3lcx = s3l.getContext();
 	console.log("p:[0, 0]", s3lcx.getImageData(0, 0, 1, 1).data.toString());
 	console.log("p:["+(s3lcx.canvas.width/2)+", "+(s3lcx.canvas.height/2)+"]", s3lcx.getImageData(
@@ -196,54 +164,57 @@ function OnImageLoaded(image, beam, stages){
 		1, 1).data.toString());
 
 	// draw bg image for probe layout only once
-	var s6 = stages[5];
-	var s6l = s6.getLayers()[0];
+	var s5 = stages[4];
+	var s5l = s5.getLayers()[0];
 
 	var grc = G_MAIN_GRAIN_ORIGINAL.clone();
-	s6l.add(grc);
-	s6l.draw();
+	s5l.add(grc);
+	s5l.draw();
 
 	var updateProbeLayout = function(){
 		// draws probe layout
 
 		// get stage layers
-		var s6layers = s6.getLayers();
+		var s5layers = s5.getLayers();
 
 		// get the over-layer, create if not already added
-		var s6lg = null;
+		var s5lg = null;
 		var gridDrawn = false;
-		if (s6layers.length < 2) {
-			s6lg = new Konva.Layer();
-			s6.add(s6lg);
+		if (s5layers.length < 2) {
+			s5lg = new Konva.Layer();
+			s5.add(s5lg);
 		} else {
-			s6lg = s6layers[1];
+			s5lg = s5layers[1];
 			gridDrawn = true; // assume we drew it already
 		}
 
 		// get probe layer, make a new if not already there
-		var s6lb = null;
-		if (s6layers.length < 3) {
-			s6lb = new Konva.Layer();
-			s6.add(s6lb);
+		var s5lb = null;
+		if (s5layers.length < 3) {
+			s5lb = new Konva.Layer();
+			s5.add(s5lb);
 		} else {
-			s6lb = s6layers[2];
+			s5lb = s5layers[2];
 		}
 
 		///////////////////////////////
 		// Do drawing work ...
 
-		var tRows = G_IMAGE_ROWS;
-		var tCols = G_IMAGE_COLUMNS;
+		var tRows = getRowsInput();
+		var tCols = getColsInput();
 
 		// get the user scaled gr
 		var grs = G_MAIN_GRAIN;
 		
+		// uncomment to draw grid only once
+		gridDrawn = false; s5lg.destroyChildren();
+
 		// draw grid on base/source image
 		if (!gridDrawn)
-			drawGrid(s6lg, grc, tRows, tCols);
+			drawGrid(s5lg, grc, tRows, tCols);
 		
 		// clear the probe layer
-		s6lb.destroyChildren();
+		s5lb.destroyChildren();
 
 		var probe = new Konva.Ellipse({
 			radius : {
@@ -255,31 +226,69 @@ function OnImageLoaded(image, beam, stages){
 			stroke: 'red'
 		});
 		
-		repeatDrawOnGrid(s6lb, grc, probe, tRows, tCols);
+		repeatDrawOnGrid(s5lb, grc, probe, tRows, tCols);
 	}
 
 	// compute resampled image
+	var s6 = stages[5];
+	// $(s6.getContainer()).css('border-color', 'lime');
+	// prep a canvas and context
+	var _imgObj = G_MAIN_GRAIN_ORIGINAL.image();
+	var processingStage = createOffscreenStage(_imgObj.naturalWidth, _imgObj.naturalHeight, 2);
+	var rImageBase = new Konva.Image({
+		x: 0, y: 0, image: _imgObj,
+		width: _imgObj.naturalWidth, 
+		height: _imgObj.naturalHeight,
+	});
+	processingStage.getLayers()[0].add(rImageBase);
+	rImageBase.cache();
+
+
+
+	var s6l = s6.getLayers()[0];
+	var s6l2 = new Konva.Layer({listening:false}); s6.add(s6l2);
+
+	var tempFastImg = G_MAIN_GRAIN_ORIGINAL.clone();
+
+	s6.draw();
+
+
 	var s7 = stages[6];
-	var rImageBase = G_MAIN_GRAIN_ORIGINAL.clone();
 	$(s7.getContainer()).css('border-color', 'lime');
 
-	var updateResampled = function(){
+
+	G_UpdateResampled = function(internallyCalled){
+		var rows = getRowsInput();
+		var cols = getColsInput();
+
+		if (internallyCalled && (rows*cols > 64)) {
+			console.warn('automatic preview disable for 64+ grid cells.');
+			return;
+		}
+
 		var grs = G_MAIN_GRAIN; // user-scaled
 		var probe = new Konva.Ellipse({
 			radius : {
 				x : (cc.width() / grs.scaleX()) / 2,
 				y : (cc.height() / grs.scaleY()) / 2
 			},
-			fill: 'white'
+			fill: 'white',
+			listening: false,
 		});
 
-		computeResampled(s7, rImageBase, probe, G_IMAGE_ROWS, G_IMAGE_COLUMNS);
+		// probe.globalCompositeOperation(COMPOSITE_OP);
+		// probe.globalCompositeOperation("source-over");
+
+		// computeResampled(s6, processingStage, rImageBase, probe, getRowsInput(), getColsInput());
+		computeResampledPreview(s6, null, tempFastImg, probe, rows, cols);
+
+		computeResampled(s6, s7, tempFastImg, probe, rows, cols);
 	}
 
 	var doUpdate = function(){
 		updateAvgCircle();
 		updateProbeLayout();
-		updateResampled();
+		G_UpdateResampled(true);
 	};
 
 	doUpdate();

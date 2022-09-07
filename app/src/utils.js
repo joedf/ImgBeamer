@@ -8,7 +8,9 @@ function newStageTemplate(parentContainer, w, h) {
 	});
 
 	// then create layer and to stage
-	var layer = new Konva.Layer();
+	var layer = new Konva.Layer({
+		listening: false // faster render
+	});
 
 	// antialiasing
 	var ctx = layer.getContext();
@@ -19,6 +21,52 @@ function newStageTemplate(parentContainer, w, h) {
 
 	return stage;
 }
+
+function loadImage(url, callback) {
+	var imageObj = new Image();
+	imageObj.onload = callback;
+	imageObj.src = INPUT_IMAGE;
+}
+
+function createOffscreenStage(width, height, layers) {
+	// create canvas
+	var canvas = document.createElement('canvas');
+	canvas.width = width;
+	canvas.height = height;
+
+	// create Konva stage
+	var stage = new Konva.Stage({
+		container: canvas,
+		width: width,
+		height: height
+	});
+
+	// then create layers and to stage
+	for (let i = 0; i < layers; i++) {
+		var layer = new Konva.Layer({
+			listening: false // faster render
+		});
+
+		// antialiasing
+		var ctx = layer.getContext();
+		ctx.imageSmoothingEnabled = false;
+
+		// add and push
+		stage.add(layer);
+	}
+
+	return stage;
+}
+
+function getInputValueInt($e){
+	var v = parseInt($e.val());
+	if (isNaN(v))
+		return parseInt($e.attr('placeholder'));
+	return v;
+}
+
+function getRowsInput(){ return getInputValueInt($('#iRows')); }
+function getColsInput(){ return getInputValueInt($('#iCols')); }
 
 // scales the give shape, and moves it to preserve original center
 function scaleOnCenter(stage, shape, oldScale, newScale){
@@ -61,7 +109,7 @@ function get_avg_pixel_rgba(raw) {
 
 	var total = raw.width * raw.height;
 	// or eq... var total = d.length / 4;
-	var fills = total - blanks;
+	var fills = Math.max(1, total - blanks);
 
 	var avg = [
 		Math.round(sum[0] / fills),
@@ -74,6 +122,31 @@ function get_avg_pixel_rgba(raw) {
 	console.log(blanks, total, percent);
 	console.log("avg px=", avg.toString());
 
+	return avg;
+}
+
+function get_avg_pixel_gs(raw) {
+	var blanks = 0;
+	var d = raw.data;
+
+	var sum = 0;
+
+	// Optimization note, with greyscale we only need to process one component...
+	for (var i = 0; i < d.length; i += 4) {
+		const px = d[i];
+		const a = d[i+3];
+
+		if (px === 0 && a === 0) {
+			blanks += 1;
+		} else {
+			sum += px;
+		}
+	}
+
+	var total = raw.width * raw.height;
+	var fills = Math.max(1, total - blanks);
+
+	var avg = sum / fills;
 	return avg;
 }
 
@@ -92,8 +165,8 @@ function drawGrid(gridLayer, rect, rows, cols, lineColor) {
  
 	const xSize= gridLayer.width(), // stage.width(), 
 			ySize= gridLayer.height(), // stage.height(),
-			xSteps = Math.round(xSize/ stepSizeX), 
-			ySteps = Math.round(ySize / stepSizeY);
+			xSteps = cols; //Math.round(xSize/ stepSizeX), 
+			ySteps = rows; //Math.round(ySize / stepSizeY);
 
 	// draw vertical lines
 	for (let i = 0; i <= xSteps; i++) {
@@ -155,6 +228,89 @@ function repeatDrawOnGrid(layer, rect, shape, rows, cols) {
 	layer.batchDraw();
 }
 
-function computeResampled(stage, image, probe, rows, cols,){
-	console.warn("computeResampled() not implemented yet.");
+
+function computeResampledPreview(previewStage, processingStage, image, probe, rows, cols){
+	var previewLayer = previewStage.getLayers()[0];
+	previewLayer.destroyChildren();
+
+	var gr = image.clone();
+	gr.globalCompositeOperation(COMPOSITE_OP);
+
+	repeatDrawOnGrid(previewLayer, image, probe, rows, cols);
+	previewLayer.add(gr);
+}
+
+function computeResampled(sourceStage, destStage, image, probe, rows, cols){
+	var destLayer = destStage.getLayers()[0];
+	destLayer.destroyChildren(); 
+
+	var layer = sourceStage.getLayers()[0];
+	layer.cache();
+	var ctx = layer.getContext();
+
+
+	var lRatio = ctx.canvas.pixelRatio;
+
+	
+	// process each grid cell
+	var startX = image.x(), startY = image.y();
+	var stepSizeX = image.width() / cols, stepSizeY = image.height() / rows;
+
+	var test = 0;
+
+	// interate over X
+	for (let i = 0; i < cols; i++) {
+		// interate over Y
+		for (let j = 0; j < rows; j++) {
+			var cellX = startX + (i * stepSizeX);
+			var cellY = startY + (j * stepSizeY);
+			var cellW = stepSizeX;
+			var cellH = stepSizeY;
+
+			var pxData = ctx.getImageData(
+				cellX * lRatio,
+				cellY * lRatio,
+				cellW * lRatio,
+				cellH * lRatio
+			);
+
+			if (!test) {
+				// var avgPx = get_avg_pixel_rgba(pxData);
+				// var avgColor = "rgba("+ avgPx.join(',') +")";
+				var avg = get_avg_pixel_gs(pxData);
+				var avgColor = "rgba("+[avg,avg,avg,1].join(',')+")";
+
+				var cPixel = new Konva.Rect({
+					listening: false,
+					x: cellX,
+					y: cellY,
+					width: cellW,
+					height: cellH,
+					fill: avgColor,
+				});
+
+				destLayer.add(cPixel);
+
+			} else {
+				const canvas = document.createElement('canvas');
+				canvas.width = cellW * lRatio;
+				canvas.height = cellH * lRatio;
+				canvas.getContext('2d').putImageData(pxData, 0, 0);
+				const cPixel = new Konva.Image({
+					image: canvas,
+					listening: false,
+					x: cellX,
+					y: cellY,
+					width: cellW,
+					height: cellH,
+				});
+
+				destLayer.add(cPixel);
+			}
+		}
+	}
+
+	if (test) {
+		drawGrid(destLayer, image, rows, cols);
+	}
 }
