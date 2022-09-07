@@ -235,6 +235,8 @@ function OnImageLoaded(image, beam, stages){
 		computeResampledPreview(s6, null, tempFastImg, probe, rows, cols);
 
 		computeResampled(s6, s7, tempFastImg, probe, rows, cols);
+
+		s7.draw();
 	}
 
 	var doUpdate = function(){
