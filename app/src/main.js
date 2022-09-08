@@ -36,9 +36,6 @@ loadImage(INPUT_IMAGE, function(event){
 	OnImageLoaded(G_MAIN_GRAIN_ORIGINAL, G_BASE_BEAM, stages);
 });
 
-var G_MAIN_GRAIN = null;
-
-
 function OnImageLoaded(image, beam, stages){
 
 	var doUpdate = function(){
@@ -48,23 +45,22 @@ function OnImageLoaded(image, beam, stages){
 	};
 
 	var s3 = stages[2];
-	G_MAIN_GRAIN = drawBaseComposite(s3, image, beam, doUpdate);
-	var cc = beam.clone();
+	var userScaledImage = drawBaseComposite(s3, image, beam, doUpdate);
 
 	var s4 = stages[3];
-	var updateAvgCircle = drawAvgCircle(s3, s4, beam, G_MAIN_GRAIN);
+	var updateAvgCircle = drawAvgCircle(s3, s4, beam, userScaledImage);
 
 	var s5 = stages[4];
-	var updateProbeLayout = drawProbeLayout(s5, G_MAIN_GRAIN_ORIGINAL.clone(), G_MAIN_GRAIN, beam.clone());
+	var updateProbeLayout = drawProbeLayout(s5, G_MAIN_GRAIN_ORIGINAL.clone(), userScaledImage, beam.clone());
 
 	// compute resampled image
 	var s6 = stages[5];
-	var updateProbeLayoutSamplingPreview = drawProbeLayoutSampling(s6, G_MAIN_GRAIN_ORIGINAL, G_MAIN_GRAIN, beam);
+	var updateProbeLayoutSamplingPreview = drawProbeLayoutSampling(s6, G_MAIN_GRAIN_ORIGINAL, userScaledImage, beam);
 
 
 	var s7 = stages[6];
 	$(s7.getContainer()).css('border-color', 'lime');
-	var updateResampled = drawResampled(s6, s7, G_MAIN_GRAIN_ORIGINAL, G_MAIN_GRAIN, beam);
+	var updateResampled = drawResampled(s6, s7, G_MAIN_GRAIN_ORIGINAL, userScaledImage, beam);
 
 	var updateResamplingSteps = function(internallyCalled){
 		var rows = getRowsInput();
