@@ -260,8 +260,6 @@ function computeResampled(sourceStage, destStage, image, probe, rows, cols){
 	var startX = image.x(), startY = image.y();
 	var stepSizeX = image.width() / cols, stepSizeY = image.height() / rows;
 
-	var test = 0;
-
 	// interate over X
 	for (let i = 0; i < cols; i++) {
 		// interate over Y
@@ -278,7 +276,7 @@ function computeResampled(sourceStage, destStage, image, probe, rows, cols){
 				cellH * lRatio
 			);
 
-			if (!test) {
+			if (!G_DEBUG) {
 				// var avgPx = get_avg_pixel_rgba(pxData);
 				// var avgColor = "rgba("+ avgPx.join(',') +")";
 				var avg = get_avg_pixel_gs(pxData);
@@ -314,7 +312,7 @@ function computeResampled(sourceStage, destStage, image, probe, rows, cols){
 		}
 	}
 
-	if (test) {
+	if (G_DEBUG) {
 		drawGrid(destLayer, image, rows, cols);
 	}
 }

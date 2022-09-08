@@ -1,3 +1,5 @@
+const G_DEBUG = false;
+
 const INPUT_IMAGE = 'src/testimages/grains1b.png';
 const COMPOSITE_OP = 'source-in';
 // const COMPOSITE_OP = 'destination-in';
