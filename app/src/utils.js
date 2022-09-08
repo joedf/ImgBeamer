@@ -70,19 +70,23 @@ function getColsInput(){ return getInputValueInt($('#iCols')); }
 
 // scales the give shape, and moves it to preserve original center
 function scaleOnCenter(stage, shape, oldScale, newScale){
-	// could be expanded to do both x and y scaling
-	shape.scale({x: newScale, y: newScale});
 	var stageCenter = {
 		x: stage.width()/2 - stage.x(),
 		y: stage.height()/2 - stage.y()
 	};
+	return scaleCenteredOnPoint(stageCenter, shape, oldScale, newScale);
+}
+
+function scaleCenteredOnPoint(point, shape, oldScale, newScale){
+	// could be expanded to do both x and y scaling
+	shape.scale({x: newScale, y: newScale});
 	var oldPos = {
-		x: (stageCenter.x - shape.x()) / oldScale,
-		y: (stageCenter.y - shape.y()) / oldScale,
+		x: (point.x - shape.x()) / oldScale,
+		y: (point.y - shape.y()) / oldScale,
 	};
 	shape.position({
-		x: stageCenter.x - oldPos.x * newScale,
-		y: stageCenter.y - oldPos.y * newScale,
+		x: point.x - oldPos.x * newScale,
+		y: point.y - oldPos.y * newScale,
 	});
 }
 
@@ -249,7 +253,7 @@ function computeResampled(sourceStage, destStage, image, probe, rows, cols){
 	var ctx = layer.getContext();
 
 
-	var lRatio = ctx.canvas.pixelRatio;
+	var lRatio = ctx.getCanvas().pixelRatio;
 
 	
 	// process each grid cell

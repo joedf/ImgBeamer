@@ -67,6 +67,33 @@ function drawBaseComposite(stage, sImage, sBeam) {
 	return [image, beam];
 }
 
-function drawAvgCircle(sourceStage, destStage, sBeam, sImage, updateCallback) {
+function drawAvgCircle(sourceStage, destStage, sBeam, updateCallback) {
+	var sourceLayer = sourceStage.getLayers()[0];
+	var destLayer = destStage.getLayers()[0];
 
+	var updateAvgCircle = function(){
+		var pCtx = sourceLayer.getContext();
+		var allPx = pCtx.getImageData(0, 0, pCtx.canvas.width, pCtx.canvas.height);
+		var avgPx = get_avg_pixel_rgba(allPx);
+
+		var avgCircle = null;
+		if (destLayer.getChildren().length <= 0){
+			avgCircle = sBeam.clone();
+			destLayer.add(avgCircle);
+		} else {
+			avgCircle = destLayer.getChildren()[0];
+		}
+
+		var avgColor = "rgba("+ avgPx.join(',') +")";
+		avgCircle.stroke(avgColor);
+		avgCircle.fill(avgColor);
+
+		destStage.getContainer().setAttribute('pixel_value', avgColor);
+
+		destLayer.draw();
+	};
+
+	updateAvgCircle();
+
+	return updateAvgCircle;
 }
