@@ -39,105 +39,21 @@ var G_MAIN_GRAIN = null;
 
 function OnImageLoaded(image, beam, stages){
 
+	var doUpdate = function(){
+		updateAvgCircle();
+		updateProbeLayout();
+		G_UpdateResampled(true);
+	};
+
 	var s3 = stages[2];
-	var s3l = s3.getLayers()[0];
-	var _t = drawBaseComposite(s3, image, beam);
-	G_MAIN_GRAIN = _t[0], cc = _t[1];
+	G_MAIN_GRAIN = drawBaseComposite(s3, image, beam, doUpdate);
+	var cc = beam.clone();
 
-	var updateAvgCircle = drawAvgCircle(s3, stages[3], beam);
+	var s4 = stages[3];
+	var updateAvgCircle = drawAvgCircle(s3, s4, beam, G_MAIN_GRAIN);
 
-	G_MAIN_GRAIN.on('mouseup', function() { doUpdate(); });
-	G_MAIN_GRAIN.on('dragmove', function() { stages[2].draw(); });
-	G_MAIN_GRAIN.on('wheel', function(e){
-		// modified from https://konvajs.org/docs/sandbox/Zooming_Relative_To_Pointer.html 
-		var stage = stages[2];
-		var scaleBy = 1.2;
-
-		e.evt.preventDefault(); // stop default scrolling
-
-		// Do half rate scaling, if shift is pressed
-		if (e.evt.shiftKey) {
-			scaleBy = 1 +((scaleBy-1) / 2);
-		}
-
-		// how to scale? Zoom in? Or zoom out?
-		let direction = e.evt.deltaY > 0 ? -1 : 1;
-		var oldScale = G_MAIN_GRAIN.scaleX();
-		var pointer = stage.getPointerPosition();
-		var newScale = direction > 0 ? oldScale * scaleBy : oldScale / scaleBy;
-		
-		scaleCenteredOnPoint(pointer, G_MAIN_GRAIN, oldScale, newScale);
-
-		stage.draw();
-
-		doUpdate();
-	});
-
-	// draw bg image for probe layout only once
 	var s5 = stages[4];
-	var s5l = s5.getLayers()[0];
-
-	var grc = G_MAIN_GRAIN_ORIGINAL.clone();
-	s5l.add(grc);
-	s5l.draw();
-
-	var updateProbeLayout = function(){
-		// draws probe layout
-
-		// get stage layers
-		var s5layers = s5.getLayers();
-
-		// get the over-layer, create if not already added
-		var s5lg = null;
-		var gridDrawn = false;
-		if (s5layers.length < 2) {
-			s5lg = new Konva.Layer();
-			s5.add(s5lg);
-		} else {
-			s5lg = s5layers[1];
-			gridDrawn = true; // assume we drew it already
-		}
-
-		// get probe layer, make a new if not already there
-		var s5lb = null;
-		if (s5layers.length < 3) {
-			s5lb = new Konva.Layer();
-			s5.add(s5lb);
-		} else {
-			s5lb = s5layers[2];
-		}
-
-		///////////////////////////////
-		// Do drawing work ...
-
-		var tRows = getRowsInput();
-		var tCols = getColsInput();
-
-		// get the user scaled gr
-		var grs = G_MAIN_GRAIN;
-		
-		// uncomment to draw grid only once
-		gridDrawn = false; s5lg.destroyChildren();
-
-		// draw grid on base/source image
-		if (!gridDrawn)
-			drawGrid(s5lg, grc, tRows, tCols);
-		
-		// clear the probe layer
-		s5lb.destroyChildren();
-
-		var probe = new Konva.Ellipse({
-			radius : {
-				x : (cc.width() / grs.scaleX()) / 2, //(cell.width/2) * .8,
-				y : (cc.height() / grs.scaleY()) / 2 //(cell.height/2) * .8
-			},
-			fill: 'rgba(255,0,0,.4)',
-			strokeWidth: 1,
-			stroke: 'red'
-		});
-		
-		repeatDrawOnGrid(s5lb, grc, probe, tRows, tCols);
-	}
+	var updateProbeLayout = drawProbeLayout(s5, G_MAIN_GRAIN_ORIGINAL.clone(), G_MAIN_GRAIN, beam.clone());
 
 	// compute resampled image
 	var s6 = stages[5];
@@ -152,7 +68,6 @@ function OnImageLoaded(image, beam, stages){
 	});
 	processingStage.getLayers()[0].add(rImageBase);
 	rImageBase.cache();
-
 
 
 	var s6l = s6.getLayers()[0];
@@ -192,12 +107,6 @@ function OnImageLoaded(image, beam, stages){
 
 		s7.draw();
 	}
-
-	var doUpdate = function(){
-		updateAvgCircle();
-		updateProbeLayout();
-		G_UpdateResampled(true);
-	};
 
 	doUpdate();
 }
