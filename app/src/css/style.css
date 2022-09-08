@@ -26,6 +26,13 @@ body {
 	gap: 10px;
 }
 
+#loadspinner {
+	width: 16px;
+	position: relative;
+	top: .2em;
+	float: right;
+}
+
 #options {
 	padding: .5em;
 	background: rgba(0,0,0,0.6);

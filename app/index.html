@@ -29,7 +29,16 @@
 						</tr>
 						<tr>
 							<td><button id="generateFinal">Generate</button></td>
-							<td><button id="openInNewTab">Open in new tab</button></td>
+							<td>
+								<button id="openInNewTab">Open in new tab</button>
+								<svg id="loadspinner"
+									style="display:none"
+									xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid" viewBox="0 0 16 16">
+									<circle fill="none" stroke="#00d8ff" stroke-dasharray="28.274333882308138 11.42477796076938" cx="8" cy="8" r="6" stroke-width="2">
+									<animateTransform attributeName="transform" type="rotate" repeatCount="indefinite" keyTimes="0;1" values="0 8 8;360 8 8" dur="1s"></animateTransform>
+									</circle>
+								</svg>
+							</td>
 						</tr>
 					</table>
 				</details>
@@ -57,7 +66,12 @@
 			var stageFinal = stages[6];
 
 			$('#generateFinal').click(function(e){
-				G_UpdateResampled();
+				$('#loadspinner').show();
+				
+				setTimeout(function(){
+					G_UpdateResampled(false);
+					$('#loadspinner').hide();
+				}, 250);
 			});
 			$('#openInNewTab').click(function(e){
 				var url = stageFinal.toDataURL({pixelRatio:2});

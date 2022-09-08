@@ -123,8 +123,11 @@ function get_avg_pixel_rgba(raw) {
 	];
 
 	var percent = (blanks / total) * 100;
-	console.log(blanks, total, percent);
-	console.log("avg px=", avg.toString());
+
+	if (G_DEBUG) {
+		console.log(blanks, total, percent);
+		console.log("avg px=", avg.toString());
+	}
 
 	return avg;
 }
@@ -150,7 +153,8 @@ function get_avg_pixel_gs(raw) {
 	var total = raw.width * raw.height;
 	var fills = Math.max(1, total - blanks);
 
-	var avg = sum / fills;
+	var avg = Math.round(sum / fills);
+	
 	return avg;
 }
 

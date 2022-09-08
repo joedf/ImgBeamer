@@ -18,7 +18,9 @@ function drawBaseBeam(stage) {
 function drawBaseImage(stage, oImg, size, doFill = false) {
 	var max = size;
 
-	console.log("img natural size:", oImg.naturalWidth, oImg.naturalHeight);
+	if (G_DEBUG)
+		console.log("img natural size:", oImg.naturalWidth, oImg.naturalHeight);
+	
 	var img_width = oImg.naturalWidth, img_height = oImg.naturalHeight;
 
 	// image ratio to "fit" in canvas
@@ -106,7 +108,8 @@ function drawAvgCircle(sourceStage, destStage, sBeam) {
 	var updateAvgCircle = function(){
 		var pCtx = sourceLayer.getContext();
 		var allPx = pCtx.getImageData(0, 0, pCtx.canvas.width, pCtx.canvas.height);
-		var avgPx = get_avg_pixel_rgba(allPx);
+		// var avgPx = get_avg_pixel_rgba(allPx);
+		var avgPx = get_avg_pixel_gs(allPx); avgPx = [avgPx,avgPx,avgPx,1];
 
 		var avgCircle = null;
 		if (destLayer.getChildren().length <= 0){
