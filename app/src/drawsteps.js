@@ -194,3 +194,72 @@ function drawProbeLayout(drawStage, baseImage, userImage, beam) {
 
 	return updateProbeLayout;
 }
+
+function drawProbeLayoutSampling(drawStage, originalImage, userImage, sBeam) {
+	var baseImage = originalImage.clone();
+	var beam = sBeam.clone();
+
+	/*
+	// prep a canvas and context
+	var _imgObj = originalImage.image();
+	var processingStage = createOffscreenStage(_imgObj.naturalWidth, _imgObj.naturalHeight, 2);
+	var rImageBase = new Konva.Image({
+		x: 0, y: 0, image: _imgObj,
+		width: _imgObj.naturalWidth, 
+		height: _imgObj.naturalHeight,
+	});
+	processingStage.getLayers()[0].add(rImageBase);
+	rImageBase.cache();
+	*/
+
+	var updateProbeLayoutSampling = function(){
+		var rows = getRowsInput();
+		var cols = getColsInput();
+
+		var probe = new Konva.Ellipse({
+			radius : {
+				x : (beam.width() / userImage.scaleX()) / 2,
+				y : (beam.height() / userImage.scaleY()) / 2
+			},
+			fill: 'white',
+			listening: false,
+		});
+
+		computeResampledPreview(drawStage, baseImage, probe, rows, cols);
+
+		drawStage.draw();
+	};
+
+	// run once immediately
+	updateProbeLayoutSampling();
+
+	return updateProbeLayoutSampling;
+}
+
+function drawResampled(sourceStage, destStage, originalImage, userImage, sBeam) {
+	var baseImage = originalImage.clone();
+	var beam = sBeam.clone();
+
+	var updateResampledDraw = function(){
+		var rows = getRowsInput();
+		var cols = getColsInput();
+
+		var probe = new Konva.Ellipse({
+			radius : {
+				x : (beam.width() / userImage.scaleX()) / 2,
+				y : (beam.height() / userImage.scaleY()) / 2
+			},
+			fill: 'white',
+			listening: false,
+		});
+
+		computeResampled(sourceStage, destStage, baseImage, probe, rows, cols);
+
+		destStage.draw();
+	};
+
+	// run once immediately
+	updateResampledDraw();
+
+	return updateResampledDraw;
+}

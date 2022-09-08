@@ -233,7 +233,7 @@ function repeatDrawOnGrid(layer, rect, shape, rows, cols) {
 }
 
 
-function computeResampledPreview(previewStage, processingStage, image, probe, rows, cols){
+function computeResampledPreview(previewStage, image, probe, rows, cols){
 	var previewLayer = previewStage.getLayers()[0];
 	previewLayer.destroyChildren();
 
@@ -249,7 +249,7 @@ function computeResampled(sourceStage, destStage, image, probe, rows, cols){
 	destLayer.destroyChildren(); 
 
 	var layer = sourceStage.getLayers()[0];
-	layer.cache();
+	// layer.cache();
 	var ctx = layer.getContext();
 
 

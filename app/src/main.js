@@ -42,7 +42,7 @@ function OnImageLoaded(image, beam, stages){
 	var doUpdate = function(){
 		updateAvgCircle();
 		updateProbeLayout();
-		G_UpdateResampled(true);
+		updateResamplingSteps(true);
 	};
 
 	var s3 = stages[2];
@@ -57,32 +57,14 @@ function OnImageLoaded(image, beam, stages){
 
 	// compute resampled image
 	var s6 = stages[5];
-	// $(s6.getContainer()).css('border-color', 'lime');
-	// prep a canvas and context
-	var _imgObj = G_MAIN_GRAIN_ORIGINAL.image();
-	var processingStage = createOffscreenStage(_imgObj.naturalWidth, _imgObj.naturalHeight, 2);
-	var rImageBase = new Konva.Image({
-		x: 0, y: 0, image: _imgObj,
-		width: _imgObj.naturalWidth, 
-		height: _imgObj.naturalHeight,
-	});
-	processingStage.getLayers()[0].add(rImageBase);
-	rImageBase.cache();
-
-
-	var s6l = s6.getLayers()[0];
-	var s6l2 = new Konva.Layer({listening:false}); s6.add(s6l2);
-
-	var tempFastImg = G_MAIN_GRAIN_ORIGINAL.clone();
-
-	s6.draw();
+	var updateProbeLayoutSamplingPreview = drawProbeLayoutSampling(s6, G_MAIN_GRAIN_ORIGINAL, G_MAIN_GRAIN, beam);
 
 
 	var s7 = stages[6];
 	$(s7.getContainer()).css('border-color', 'lime');
+	var updateResampled = drawResampled(s6, s7, G_MAIN_GRAIN_ORIGINAL, G_MAIN_GRAIN, beam);
 
-
-	G_UpdateResampled = function(internallyCalled){
+	var updateResamplingSteps = function(internallyCalled){
 		var rows = getRowsInput();
 		var cols = getColsInput();
 
@@ -91,22 +73,11 @@ function OnImageLoaded(image, beam, stages){
 			return;
 		}
 
-		var grs = G_MAIN_GRAIN; // user-scaled
-		var probe = new Konva.Ellipse({
-			radius : {
-				x : (cc.width() / grs.scaleX()) / 2,
-				y : (cc.height() / grs.scaleY()) / 2
-			},
-			fill: 'white',
-			listening: false,
-		});
+		updateProbeLayoutSamplingPreview();
+		updateResampled();
+	};
 
-		computeResampledPreview(s6, null, tempFastImg, probe, rows, cols);
-
-		computeResampled(s6, s7, tempFastImg, probe, rows, cols);
-
-		s7.draw();
-	}
+	G_UpdateResampled = updateResamplingSteps;
 
 	doUpdate();
 }
