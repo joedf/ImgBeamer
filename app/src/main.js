@@ -10,8 +10,7 @@ Konva.autoDrawEnabled = false;
 
 
 const nStages = 7;
-// var sz = 300;
-var sz = (document.body.clientWidth / 4) - (4 * 5);
+var sz = Math.max((document.body.clientWidth / 4) - (4 * 5), 300);
 var mc = $('#main-container');
 
 
