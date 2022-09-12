@@ -20,13 +20,18 @@ body {
 	right: .5em;
 }
 
+.final {
+	background-color: #172542;
+	border: 1px solid red;
+}
+
 .layout {
 	display: flex;
 	flex-wrap: wrap;
 	gap: 10px;
 }
 
-#loadspinner {
+.load_spinner_svg {
 	width: 16px;
 	position: relative;
 	top: .2em;

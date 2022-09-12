@@ -1,17 +1,18 @@
-const G_DEBUG = false;
+var G_DEBUG = false;
 
 const INPUT_IMAGE = 'src/testimages/grains1b.png';
 const COMPOSITE_OP = 'source-in';
 // const COMPOSITE_OP = 'destination-in';
 var G_UpdateResampled = null;
 
+const G_MAIN_CONTAINER = '#main-container';
 
 Konva.autoDrawEnabled = false;
 
 
 const nStages = 7;
 var sz = Math.max((document.body.clientWidth / 4) - (4 * 5), 300);
-var mc = $('#main-container');
+var mc = $(G_MAIN_CONTAINER);
 
 
 // first create the stages
@@ -95,8 +96,8 @@ function ResampleFullImage() {
 	var iw = image.naturalWidth, ih = image.naturalHeight;
 
 	// calculate grid layout
-	var pixelSizeX = 10; // px
-	var pixelSizeY = 10; // px
+	var pixelSizeX = getCellWInput(); // px
+	var pixelSizeY = getCellHInput(); // px
 	var cols = Math.floor(iw / pixelSizeX);
 	var rows = Math.floor(ih / pixelSizeY);
 
@@ -105,24 +106,38 @@ function ResampleFullImage() {
 	var cell_half_H = pixelSizeY / 2;
 
 	// spot size ratio
-	var spot_rX = 130; // %
-	var spot_rY = 130; // % 
+	var spot_rX = getSpotXInput(); // %
+	var spot_rY = getSpotYInput(); // % 
 
 	// probe radii
 	var probe_rX = pixelSizeX * (spot_rX / 100);
 	var probe_rY = pixelSizeY * (spot_rY / 100);
 	var probe_rotationRad = 0;
 
-	// prep result canvas
-	var cv = document.createElement('canvas');
-	cv.width = cols; cv.height = rows;
+	// prep result canvas, if not already there
+	var cv = document.querySelector('#finalCanvas');
+	if (cv == null) {
+		cv = document.createElement('canvas');
+		cv.id = 'finalCanvas';
+		cv.width = cols; cv.height = rows;
+		var cc = $('<div/>').addClass('box final').appendTo(mc); cc.append(cv);
+	}
+
+	cv.width = cols;
+	cv.height = rows;
+
+	// get context
 	var ctx = cv.getContext('2d');
+
+	// clear the canvas
+	ctx.clearRect(0, 0, cv.width, cv.height);
+
+	// row pixels container array
+	var pixels = new Uint8ClampedArray(rows * cols * 4);
+	count = 0;
 
 	// process and compute each pixel grid cell
 	for (let i = 0; i < rows; i++) {
-
-		// row pixels container array
-		var pixels = new Uint8ClampedArray(cols * 4);
 
 		// compute pixel value and push to matrix
 		for (let j = 0; j < cols; j++) {
@@ -137,26 +152,32 @@ function ResampleFullImage() {
 			// compute pixel value - greyscale
 			const pixel = ComputeProbeValue_gs(image, probe);
 
+			// console.info(pixel);
+
 			// push pixel to array - RGBA values
-			pixels[j+0] = pixel;
-			pixels[j+1] = pixel;
-			pixels[j+2] = pixel;
-			pixels[j+3] = 255;
+			pixels[count+0] = pixel;
+			pixels[count+1] = pixel;
+			pixels[count+2] = pixel;
+			pixels[count+3] = 255;
+
+			count += 4;
 		}
 
+		console.log('computed row: '+(i+1)+' / '+rows);
+
+		/*
 		// draw the image row by row
-		let imageData = new ImageData(pixels, cols); // rows/height is auto-calculated
-		ctx.putImageData(imageData, 0, i);
+		
 		console.log('ResampleFullImage drew row: '+(i+1)+' / '+rows);
 
 		// free memory
 		pixels = null;
 		imageData = null;
+		*/
 	}
 
-	// open in new window
-	var url = cv.toDataURL();
-	window.open(url, '_blank');
+	let imageData = new ImageData(pixels, cols); // rows/height is auto-calculated
+	ctx.putImageData(imageData, 0, 0);
 
 	var Elapsed = Date.now() - StartTime;
 	console.log('ResampleFullImage End: took '+ Math.floor(Elapsed / 1000).toString()+" seconds.");

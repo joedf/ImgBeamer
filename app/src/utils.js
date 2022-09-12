@@ -28,36 +28,6 @@ function loadImage(url, callback) {
 	imageObj.src = INPUT_IMAGE;
 }
 
-function createOffscreenStage(width, height, layers) {
-	// create canvas
-	var canvas = document.createElement('canvas');
-	canvas.width = width;
-	canvas.height = height;
-
-	// create Konva stage
-	var stage = new Konva.Stage({
-		container: canvas,
-		width: width,
-		height: height
-	});
-
-	// then create layers and to stage
-	for (let i = 0; i < layers; i++) {
-		var layer = new Konva.Layer({
-			listening: false // faster render
-		});
-
-		// antialiasing
-		var ctx = layer.getContext();
-		ctx.imageSmoothingEnabled = false;
-
-		// add and push
-		stage.add(layer);
-	}
-
-	return stage;
-}
-
 function getInputValueInt($e){
 	var v = parseInt($e.val());
 	if (isNaN(v))
@@ -67,6 +37,10 @@ function getInputValueInt($e){
 
 function getRowsInput(){ return getInputValueInt($('#iRows')); }
 function getColsInput(){ return getInputValueInt($('#iCols')); }
+function getCellWInput(){ return getInputValueInt($('#iCellW')); }
+function getCellHInput(){ return getInputValueInt($('#iCellH')); }
+function getSpotXInput(){ return getInputValueInt($('#iSpotX')); }
+function getSpotYInput(){ return getInputValueInt($('#iSpotY')); }
 
 // scales the give shape, and moves it to preserve original center
 function scaleOnCenter(stage, shape, oldScale, newScale){
@@ -344,6 +318,9 @@ function ComputeProbeValue_gs(image, probe) {
 	var maxDiameter = 2 * maxRadius;
 
 	var cv = document.createElement('canvas');
+	if (G_DEBUG) {
+		document.body.appendChild(cv);
+	}
 	cv.width = maxDiameter;
 	cv.height = maxDiameter;
 
@@ -369,8 +346,8 @@ function ComputeProbeValue_gs(image, probe) {
 	// then draw the pixel selection shape
 	ctx.beginPath();
 	ctx.ellipse(
-		cv.width / 2,
-		cv.height / 2,
+		maxDiameter / 2,
+		maxDiameter / 2,
 		ellipseInfo.radiusX,
 		ellipseInfo.radiusY,
 		ellipseInfo.rotationRad,
@@ -385,6 +362,7 @@ function ComputeProbeValue_gs(image, probe) {
 	var pxColor = get_avg_pixel_gs(pxData);
 
 	// delete the canvas
+	//document.body.removeChild(cv);
 	ctx = null;
 	cv = null;
 
