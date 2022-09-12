@@ -90,8 +90,12 @@ function ResampleFullImage() {
 		return;
 	}
 
+	var eStatus = document.querySelector('#status');
+
 	var StartTime = Date.now();
-	console.log('ResampleFullImage Start: '+ (new Date(StartTime)).toString())
+	let msg = 'ResampleFullImage Start: '+ (new Date(StartTime)).toString();
+	console.log(msg);
+	eStatus.innerHTML = msg;
 
 	var iw = image.naturalWidth, ih = image.naturalHeight;
 
@@ -163,7 +167,9 @@ function ResampleFullImage() {
 			count += 4;
 		}
 
-		console.log('computed row: '+(i+1)+' / '+rows);
+		let msg = 'computed row: '+(i+1)+' / '+rows;
+		console.log(msg);
+		// eStatus.innerHTML = msg;
 
 		/*
 		// draw the image row by row
@@ -180,5 +186,7 @@ function ResampleFullImage() {
 	ctx.putImageData(imageData, 0, 0);
 
 	var Elapsed = Date.now() - StartTime;
-	console.log('ResampleFullImage End: took '+ Math.floor(Elapsed / 1000).toString()+" seconds.");
+	msg = 'ResampleFullImage End: took '+ Math.floor(Elapsed / 1000).toString()+" seconds.";
+	console.log(msg);
+	eStatus.innerHTML = msg;
 }

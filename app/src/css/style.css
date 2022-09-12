@@ -4,6 +4,10 @@ body {
 	font-family: Arial, Helvetica, sans-serif;
 }
 
+summary {
+	cursor: pointer;
+}
+
 .box {
 	border: 1px solid #fff;
 	background-color: #000;
@@ -49,4 +53,8 @@ body {
 	position: absolute;
 	right: .25em;
 	bottom: .25em;
+}
+
+#status {
+	font-size: 10px;
 }
