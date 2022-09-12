@@ -320,3 +320,74 @@ function computeResampled(sourceStage, destStage, image, probe, rows, cols){
 		drawGrid(destLayer, image, rows, cols);
 	}
 }
+
+function toDegrees (angle) { return angle * (180 / Math.PI); }
+function toRadians (angle) { return angle * (Math.PI / 180); }
+
+function ComputeProbeValue_gs(image, probe) {
+	var iw = image.naturalWidth, ih = image.naturalHeight;
+
+	var cv = document.createElement('canvas');
+	cv.width = iw;
+	cv.height = ih;
+
+	var ctx = cv.getContext('2d');
+	ctx.imageSmoothingEnabled = false;
+
+	// draw the image
+	ctx.drawImage(image, 0, 0);
+	// TODO: optimization, to draw only the necessary area of the image
+
+	// then, set the composite operation
+	ctx.globalCompositeOperation = 'destination-in';
+
+	// then draw the pixel selection shape
+	ctx.beginPath();
+
+	var ellipseInfo = probe;
+	if (typeof probe.getStage == 'function') { // if Konva Ellipse
+		ellipseInfo = {
+			centerX: probe.x(),
+			centerY: probe.y(),
+			rotationRad: toRadians(probe.rotation()),
+			radiusX: probe.radiusX(),
+			radiusY: probe.radiusY()
+		};
+	}
+	ctx.ellipse(ellipseInfo.centerX,
+		ellipseInfo.centerY,
+		ellipseInfo.radiusX,
+		ellipseInfo.radiusY,
+		ellipseInfo.rotationRad,
+		0, 2 * Math.PI);
+	ctx.fillStyle = 'white';
+	ctx.fill();
+
+	// optimization is to reduce search area to max bounds possible of the ellipse
+	var maxRadius = Math.max(ellipseInfo.radiusX, ellipseInfo.radiusY);
+	/*
+	// for debug
+	ctx.globalCompositeOperation = 'source-over';
+	ctx.beginPath();
+	ctx.rect(ellipseInfo.centerX - maxRadius,
+			ellipseInfo.centerY - maxRadius,
+			2 * maxRadius,
+			2 * maxRadius);
+	ctx.stroke();
+	*/
+
+	// grab the pixel data from the pixel selection area
+	var pxData = ctx.getImageData(ellipseInfo.centerX - maxRadius,
+		ellipseInfo.centerY - maxRadius,
+		2 * maxRadius,
+		2 * maxRadius);
+
+	// compute the average pixel (excluding 0-0-0-0 rgba pixels)
+	var pxColor = get_avg_pixel_gs(pxData);
+
+	// delete the canvas
+	ctx = null;
+	cv = null;
+
+	return pxColor;
+}

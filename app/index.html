@@ -40,6 +40,10 @@
 								</svg>
 							</td>
 						</tr>
+						<tr>
+							<td>Resample Fully</td>
+							<td><button id="generateFull">Generate and open in new tab</button></td>
+						</tr>
 					</table>
 				</details>
 				
@@ -76,6 +80,10 @@
 			$('#openInNewTab').click(function(e){
 				var url = stageFinal.toDataURL({pixelRatio:2});
 				window.open(url, '_blank').focus();
+			});
+
+			$('#generateFull').click(function(e){
+				ResampleFullImage();
 			});
 		</script>
 	</body>
