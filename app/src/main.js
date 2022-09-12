@@ -112,7 +112,7 @@ function ResampleFullImage() {
 	// probe radii
 	var probe_rX = pixelSizeX * (spot_rX / 100);
 	var probe_rY = pixelSizeY * (spot_rY / 100);
-	var probe_rotationRad = 0;
+	var probe_rotationRad = toRadians(getSpotAngleInput());
 
 	// prep result canvas, if not already there
 	var cv = document.querySelector('#finalCanvas');

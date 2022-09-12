@@ -41,6 +41,7 @@ function getCellWInput(){ return getInputValueInt($('#iCellW')); }
 function getCellHInput(){ return getInputValueInt($('#iCellH')); }
 function getSpotXInput(){ return getInputValueInt($('#iSpotX')); }
 function getSpotYInput(){ return getInputValueInt($('#iSpotY')); }
+function getSpotAngleInput(){ return getInputValueInt($('#iSpotAngle')); }
 
 // scales the give shape, and moves it to preserve original center
 function scaleOnCenter(stage, shape, oldScale, newScale){
