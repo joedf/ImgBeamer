@@ -327,23 +327,7 @@ function toRadians (angle) { return angle * (Math.PI / 180); }
 function ComputeProbeValue_gs(image, probe) {
 	var iw = image.naturalWidth, ih = image.naturalHeight;
 
-	var cv = document.createElement('canvas');
-	cv.width = iw;
-	cv.height = ih;
-
-	var ctx = cv.getContext('2d');
-	ctx.imageSmoothingEnabled = false;
-
-	// draw the image
-	ctx.drawImage(image, 0, 0);
-	// TODO: optimization, to draw only the necessary area of the image
-
-	// then, set the composite operation
-	ctx.globalCompositeOperation = 'destination-in';
-
-	// then draw the pixel selection shape
-	ctx.beginPath();
-
+	// get ellipse info
 	var ellipseInfo = probe;
 	if (typeof probe.getStage == 'function') { // if Konva Ellipse
 		ellipseInfo = {
@@ -354,8 +338,39 @@ function ComputeProbeValue_gs(image, probe) {
 			radiusY: probe.radiusY()
 		};
 	}
-	ctx.ellipse(ellipseInfo.centerX,
-		ellipseInfo.centerY,
+
+	// optimization is to reduce search area to max bounds possible of the ellipse
+	var maxRadius = Math.max(ellipseInfo.radiusX, ellipseInfo.radiusY);
+	var maxDiameter = 2 * maxRadius;
+
+	var cv = document.createElement('canvas');
+	cv.width = maxDiameter;
+	cv.height = maxDiameter;
+
+	var ctx = cv.getContext('2d');
+	ctx.imageSmoothingEnabled = false;
+
+	// draw the image
+	// ctx.drawImage(image, 0, 0);
+	// optimization, to draw only the necessary area of the image
+	ctx.drawImage(image,
+		ellipseInfo.centerX - maxRadius,
+		ellipseInfo.centerY - maxRadius,
+		maxDiameter,
+		maxDiameter,
+		0,
+		0,
+		maxDiameter,
+		maxDiameter);
+
+	// then, set the composite operation
+	ctx.globalCompositeOperation = 'destination-in';
+
+	// then draw the pixel selection shape
+	ctx.beginPath();
+	ctx.ellipse(
+		cv.width / 2,
+		cv.height / 2,
 		ellipseInfo.radiusX,
 		ellipseInfo.radiusY,
 		ellipseInfo.rotationRad,
@@ -363,24 +378,8 @@ function ComputeProbeValue_gs(image, probe) {
 	ctx.fillStyle = 'white';
 	ctx.fill();
 
-	// optimization is to reduce search area to max bounds possible of the ellipse
-	var maxRadius = Math.max(ellipseInfo.radiusX, ellipseInfo.radiusY);
-	/*
-	// for debug
-	ctx.globalCompositeOperation = 'source-over';
-	ctx.beginPath();
-	ctx.rect(ellipseInfo.centerX - maxRadius,
-			ellipseInfo.centerY - maxRadius,
-			2 * maxRadius,
-			2 * maxRadius);
-	ctx.stroke();
-	*/
-
 	// grab the pixel data from the pixel selection area
-	var pxData = ctx.getImageData(ellipseInfo.centerX - maxRadius,
-		ellipseInfo.centerY - maxRadius,
-		2 * maxRadius,
-		2 * maxRadius);
+	var pxData = ctx.getImageData(0,0,maxDiameter,maxDiameter);
 
 	// compute the average pixel (excluding 0-0-0-0 rgba pixels)
 	var pxColor = get_avg_pixel_gs(pxData);
