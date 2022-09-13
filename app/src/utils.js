@@ -223,7 +223,7 @@ function computeResampledPreview(previewStage, image, probe, rows, cols){
 	previewLayer.add(gr);
 }
 
-function computeResampled(sourceStage, destStage, image, probe, rows, cols){
+function computeResampledFast(sourceStage, destStage, image, probe, rows, cols){
 	var destLayer = destStage.getLayers()[0];
 	destLayer.destroyChildren(); 
 
@@ -293,6 +293,57 @@ function computeResampled(sourceStage, destStage, image, probe, rows, cols){
 
 	if (G_DEBUG) {
 		drawGrid(destLayer, image, rows, cols);
+	}
+}
+
+// Essentially, this is computeResampleFast(), but corrected for spot size larger than the cell size
+// ComputeResampleFast() is limits the sampling to the cell size, and takes in smaller version of the
+// image that is already drawn and "compositied" in a Konva Stage, instead of the original larger image...
+function computeResampledSlow(destStage, oImage, probe, rows, cols){
+	var destLayer = destStage.getLayers()[0];
+	destLayer.destroyChildren(); 
+	
+	var image = oImage.image();
+
+	// process each grid cell
+	var startX = 0, startY = 0;
+	var stepSizeX = image.naturalWidth / cols, stepSizeY = image.naturalHeight / rows;
+
+	var startX_stage = oImage.x(), startY_stage = oImage.y();
+	var stepSizeX_stage = oImage.width() / cols, stepSizeY_stage = oImage.height() / rows;
+
+	// interate over X
+	for (let i = 0; i < cols; i++) {
+		// interate over Y
+		for (let j = 0; j < rows; j++) {
+			var cellX = startX + (i * stepSizeX);
+			var cellY = startY + (j * stepSizeY);
+			var cellW = stepSizeX;
+			var cellH = stepSizeY;
+
+			probe.x(cellX + cellW/2);
+			probe.y(cellY + cellH/2);
+
+			var avg = ComputeProbeValue_gs(image, probe);
+			var avgColor = "rgba("+[avg,avg,avg,1].join(',')+")";
+
+			// Konva drawing
+			var cellX_stage = startX_stage + (i * stepSizeX_stage);
+			var cellY_stage = startY_stage + (j * stepSizeY_stage);
+			var cellW_stage = stepSizeX_stage;
+			var cellH_stage = stepSizeY_stage;
+
+			var cPixel = new Konva.Rect({
+				listening: false,
+				x: cellX_stage,
+				y: cellY_stage,
+				width: cellW_stage,
+				height: cellH_stage,
+				fill: avgColor,
+			});
+
+			destLayer.add(cPixel);
+		}
 	}
 }
 
