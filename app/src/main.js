@@ -1,6 +1,6 @@
 var G_DEBUG = false;
 
-const INPUT_IMAGE = 'src/testimages/grains1b.png';
+const INPUT_IMAGE = 'src/testimages/grains2.png';
 const COMPOSITE_OP = 'source-in';
 // const COMPOSITE_OP = 'destination-in';
 var G_UpdateResampled = null;
