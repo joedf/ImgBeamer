@@ -376,6 +376,9 @@ function ComputeProbeValue_gs(image, probe) {
 	cv.width = maxDiameter;
 	cv.height = maxDiameter;
 
+	if (cv.width == 0 || cv.height == 0)
+		return 0;
+
 	var ctx = cv.getContext('2d');
 	ctx.imageSmoothingEnabled = false;
 
