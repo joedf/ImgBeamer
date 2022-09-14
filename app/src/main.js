@@ -29,9 +29,13 @@ var G_BASE_BEAM = drawBaseBeam(stages[0]);
 var G_MAIN_GRAIN_ORIGINAL = null;
 var G_MAIN_IMAGE_OBJ = null
 
+var G_PIXI_APP = null;
+
 loadImage(INPUT_IMAGE, function(event){
 	var imageObj = event.target;
 	G_MAIN_IMAGE_OBJ = imageObj;
+
+	G_PIXI_APP = init_pixi_app(imageObj.naturalWidth, imageObj.naturalHeight);
 
 	G_MAIN_GRAIN_ORIGINAL = drawBaseImage(stages[1], imageObj, sz);
 	
@@ -140,6 +144,10 @@ function ResampleFullImage() {
 	var pixels = new Uint8ClampedArray(rows * cols * 4);
 	count = 0;
 
+	// Prep image as sprite
+	var texture1 = PIXI.Texture.from(image);
+	var sprite1 = new PIXI.Sprite(texture1);
+
 	// process and compute each pixel grid cell
 	for (let i = 0; i < rows; i++) {
 
@@ -154,7 +162,8 @@ function ResampleFullImage() {
 			};
 			
 			// compute pixel value - greyscale
-			const pixel = ComputeProbeValue_gs(image, probe);
+			// const pixel = ComputeProbeValue_gs(image, probe);
+			const pixel = Pixi_ComputeProbeValue_gs(G_PIXI_APP, sprite1, probe);
 
 			// console.info(pixel);
 

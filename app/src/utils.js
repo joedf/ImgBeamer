@@ -133,6 +133,24 @@ function get_avg_pixel_gs(raw) {
 	return avg;
 }
 
+// similar to get_avg_pixel_gs, but expects the UInt8 array directly instead of ImageData
+function get_avg_pixel_gs_u8a(raw) {
+	var blanks = 0, sum = 0, d = raw;
+
+	// Optimization note, with greyscale we only need to process one component...
+	for (var i = 0; i < d.length; i += 4) {
+		const px = d[i], a = d[i+3];
+		if (px === 0 && a === 0) { blanks += 1; }
+		else { sum += px; }
+	}
+
+	var total = d.length / 4;
+	var fills = Math.max(1, total - blanks);
+	var avg = Math.round(sum / fills);
+
+	return avg;
+}
+
 // based on solution1 from:
 // https://longviewcoder.com/2021/12/08/konva-a-better-grid/
 function drawGrid(gridLayer, rect, rows, cols, lineColor) {
@@ -422,4 +440,93 @@ function ComputeProbeValue_gs(image, probe) {
 	cv = null;
 
 	return pxColor;
+}
+
+function init_pixi_app(w=640, h=480) {
+	const pixi = new PIXI.Application({
+		transparent: true,
+		antialias: false,
+		// resolution: 1
+		
+		// HiDPI setting
+		resolution: devicePixelRatio,
+		autoDensity: true
+	});
+	pixi.view.style.display = 'none';
+	document.body.appendChild(pixi.view);
+	pixi.renderer.resize(w, h);
+	return pixi;
+}
+
+// based on ComputeProbeValue_gs(), but uses Pixijs instead of canvas2d
+function Pixi_ComputeProbeValue_gs(pixi, imageSprite, probe) {
+	//var iw = image.naturalWidth, ih = image.naturalHeight;
+	//pixi.renderer.resize(iw, ih);
+
+	// get ellipse info
+	var ellipseInfo = probe;
+	if (typeof probe.getStage == 'function') { // if Konva Ellipse
+		ellipseInfo = {
+			centerX: probe.x(),
+			centerY: probe.y(),
+			rotationRad: toRadians(probe.rotation()),
+			radiusX: probe.radiusX(),
+			radiusY: probe.radiusY()
+		};
+	}
+
+	// optimization is to reduce search area to max bounds possible of the ellipse
+	var maxRadius = Math.max(ellipseInfo.radiusX, ellipseInfo.radiusY);
+	var maxDiameter = 2 * maxRadius;
+
+	// do nothing if invalid, simply return 0
+	if (maxDiameter <= 1)
+		return 0;
+
+	// draw an ellipse
+	var eGraphics = new PIXI.Graphics();
+	eGraphics.beginFill(0xFFFFFF);
+	eGraphics.drawEllipse(
+		ellipseInfo.centerX,
+		ellipseInfo.centerY,
+		ellipseInfo.radiusX * 2, ellipseInfo.radiusY * 2);
+
+	// rotate an object
+	// https://stackoverflow.com/a/47606162/883015
+	var eContainer = new PIXI.Container();
+	
+	// container's center location
+	eContainer.position.set(
+		ellipseInfo.centerX,
+		ellipseInfo.centerY);
+	
+	// container's rotation point
+	eContainer.pivot.x = ellipseInfo.centerX;
+	eContainer.pivot.y = ellipseInfo.centerY;
+
+	// then, set the composite operation
+	imageSprite.blendMode = PIXI.BLEND_MODES.SRC_IN;
+	
+	eContainer.addChild(eGraphics);
+
+	// set the rotation
+	eContainer.rotation = ellipseInfo.rotationRad;
+	
+	pixi.stage.addChild(eContainer);
+
+	// TODO: optimization, to draw only the necessary area of the image
+	pixi.stage.addChild(imageSprite);
+
+	// grab the pixel data from the pixel selection area
+	var pixels = pixi.renderer.plugins.extract.pixels(pixi.stage, eGraphics.getBounds());
+
+	// compute the average pixel (excluding 0-0-0-0 rgba pixels)
+	var avg = get_avg_pixel_gs_u8a(pixels);
+	// var pxString = "rgba(" + [avg,avg,avg].toString() + ",1)";
+
+	// free resources
+	eGraphics.destroy();
+	eContainer.destroy();
+
+	return avg;
 }
