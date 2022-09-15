@@ -446,11 +446,11 @@ function init_pixi_app(w=640, h=480) {
 	const pixi = new PIXI.Application({
 		transparent: true,
 		antialias: false,
-		// resolution: 1
+		resolution: 1
 		
 		// HiDPI setting
-		resolution: devicePixelRatio,
-		autoDensity: true
+		// resolution: devicePixelRatio,
+		// autoDensity: true
 	});
 	pixi.view.style.display = 'none';
 	document.body.appendChild(pixi.view);
