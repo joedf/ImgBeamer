@@ -36,9 +36,34 @@ function drawBaseImage(stage, oImg, size, doFill = false) {
 		image: oImg,
 		width: iw, 
 		height: ih,
+		draggable: true,
 	});
 
-	stage.getLayers()[0].add(kImage);
+	var layer = stage.getLayers()[0];
+	
+	// Enable drag and interaction events
+	layer.listening(true);
+	kImage.on('dragmove', function() {
+		// set bounds on object, by overriding position here
+		var scaleX = kImage.scaleX(), scaleY = kImage.scaleY();
+		var x = kImage.x(), y = kImage.y();
+		var w = kImage.width() * scaleX, h = kImage.height() * scaleY;
+
+		var sx = stage.x(), sw = stage.width();
+		var sy = stage.y(), sh = stage.height();
+		
+		if (x > sx) { kImage.x(sx); }
+		if (x < (sx - w + sw) ) { kImage.x(sx - w + sw); }
+		if (y > sy) { kImage.y(sy); }
+		if (y < (sy - h + sh) ) { kImage.y(sy - h + sh); }
+		
+		stage.draw();
+	});
+	kImage.on('wheel', MakeZoomHandler(stage, kImage, function(e){
+		// callback here, e.g. doUpdate();
+	}, 1.2, 1));
+
+	layer.add(kImage);
 
 	stage.draw();
 
@@ -74,29 +99,9 @@ function drawBaseComposite(stage, sImage, sBeam, updateCallback) {
 	// Events
 	image.on('mouseup', function() { doUpdate(); });
 	image.on('dragmove', function() { stage.draw(); });
-	image.on('wheel', function(e){
-		// modified from https://konvajs.org/docs/sandbox/Zooming_Relative_To_Pointer.html 
-		e.evt.preventDefault(); // stop default scrolling
-		
-		var scaleBy = 1.2;
-		
-		// Do half rate scaling, if shift is pressed
-		if (e.evt.shiftKey) {
-			scaleBy = 1 +((scaleBy-1) / 2);
-		}
-
-		// how to scale? Zoom in? Or zoom out?
-		let direction = e.evt.deltaY > 0 ? -1 : 1;
-		var oldScale = image.scaleX();
-		var pointer = stage.getPointerPosition();
-		var newScale = direction > 0 ? oldScale * scaleBy : oldScale / scaleBy;
-		
-		scaleCenteredOnPoint(pointer, image, oldScale, newScale);
-
-		stage.draw();
-
+	image.on('wheel', MakeZoomHandler(stage, image, function(e){
 		doUpdate();
-	});
+	}));
 
 	return image;
 }

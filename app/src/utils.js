@@ -43,6 +43,44 @@ function getSpotXInput(){ return getInputValueInt($('#iSpotX')); }
 function getSpotYInput(){ return getInputValueInt($('#iSpotY')); }
 function getSpotAngleInput(){ return getInputValueInt($('#iSpotAngle')); }
 
+function MakeZoomHandler(stage, konvaObj, callback=null, scaleFactor=1.2, scaleMin=0, scaleMax=Infinity) {
+	var handler = function(e){
+		// modified from https://konvajs.org/docs/sandbox/Zooming_Relative_To_Pointer.html 
+		e.evt.preventDefault(); // stop default scrolling
+		
+		var scaleBy = scaleFactor;
+		
+		// Do half rate scaling, if shift is pressed
+		if (e.evt.shiftKey) {
+			scaleBy = 1 +((scaleBy-1) / 2);
+		}
+
+		// how to scale? Zoom in? Or zoom out?
+		let direction = e.evt.deltaY > 0 ? -1 : 1;
+		var oldScale = konvaObj.scaleX();
+		var pointer = stage.getPointerPosition();
+		var newScale = direction > 0 ? oldScale * scaleBy : oldScale / scaleBy;
+
+		// Limit scale based on given bounds
+		var finalScale = Math.min(scaleMax, Math.max(scaleMin, newScale));
+		
+		if (pointer != null)
+			scaleCenteredOnPoint(pointer, konvaObj, oldScale, finalScale);
+		else {
+			if (G_DEBUG) {
+				console.warn("MakeZoomHandler got a null pointer...");
+			}
+		}
+
+		stage.draw();
+
+		if (typeof callback == 'function')
+			callback(e);
+	};
+
+	return handler;
+}
+
 // scales the give shape, and moves it to preserve original center
 function scaleOnCenter(stage, shape, oldScale, newScale){
 	var stageCenter = {
