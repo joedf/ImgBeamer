@@ -40,11 +40,8 @@ function drawBaseImage(stage, oImg, size, doFill = false) {
 	});
 
 	var layer = stage.getLayers()[0];
-	
-	// Enable drag and interaction events
-	layer.listening(true);
-	kImage.on('dragmove', function() {
-		// set bounds on object, by overriding position here
+
+	var contrainsBounds = function(){
 		var scaleX = kImage.scaleX(), scaleY = kImage.scaleY();
 		var x = kImage.x(), y = kImage.y();
 		var w = kImage.width() * scaleX, h = kImage.height() * scaleY;
@@ -56,10 +53,20 @@ function drawBaseImage(stage, oImg, size, doFill = false) {
 		if (x < (sx - w + sw) ) { kImage.x(sx - w + sw); }
 		if (y > sy) { kImage.y(sy); }
 		if (y < (sy - h + sh) ) { kImage.y(sy - h + sh); }
-		
+
 		stage.draw();
+	};
+	
+	// Enable drag and interaction events
+	layer.listening(true);
+	kImage.on('dragmove', function() {
+		// set bounds on object, by overriding position here
+		contrainsBounds();
 	});
 	kImage.on('wheel', MakeZoomHandler(stage, kImage, function(e){
+		// bounds check for zooming out
+		contrainsBounds();
+
 		// callback here, e.g. doUpdate();
 	}, 1.2, 1));
 
