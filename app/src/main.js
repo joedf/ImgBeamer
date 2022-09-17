@@ -33,7 +33,17 @@ loadImage(INPUT_IMAGE, function(event){
 	var imageObj = event.target;
 	G_MAIN_IMAGE_OBJ = imageObj;
 
-	G_MAIN_GRAIN_ORIGINAL = drawBaseImage(stages[1], imageObj, sz);
+	var _t = drawBaseImage(stages[1], imageObj, sz);
+
+	// Soft clone, using konva's .clone() seems to copy events as well...
+	G_MAIN_GRAIN_ORIGINAL = new Konva.Image({
+		x: _t.x(),
+		y: _t.y(),
+		image: imageObj,
+		width: _t.width(), 
+		height:_t.height(),
+		draggable: true,
+	});
 	
 	OnImageLoaded(G_MAIN_GRAIN_ORIGINAL, G_BASE_BEAM, stages);
 });
