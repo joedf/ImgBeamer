@@ -152,10 +152,12 @@ function drawProbeLayout(drawStage, baseImage, userImage, beam) {
 	// draws probe layout
 	var layers = drawStage.getLayers();
 	var baseLayer = layers[0];
-	
-	var image = baseImage.clone();
 
-	baseLayer.add(image);
+	var baseGridRect = new Konva.Rect(baseImage.getSelfRect());
+	
+	var imageCopy = baseImage.clone();
+
+	baseLayer.add(imageCopy);
 	baseLayer.draw();
 
 	var updateProbeLayout = function(){
@@ -182,15 +184,22 @@ function drawProbeLayout(drawStage, baseImage, userImage, beam) {
 		///////////////////////////////
 		// Do drawing work ...
 
+		// update image based on user subregion
+		imageCopy.x(baseImage.x());
+		imageCopy.y(baseImage.y());
+		imageCopy.scaleX(baseImage.scaleX());
+		imageCopy.scaleY(baseImage.scaleY());
+		imageCopy.draw();
+
 		var tRows = getRowsInput();
 		var tCols = getColsInput();
 		
 		// uncomment to draw grid only once
 		gridDrawn = false; gridLayer.destroyChildren();
 
-		// draw grid on base/source image
+		// draw grid, based on rect
 		if (!gridDrawn)
-			drawGrid(gridLayer, image, tRows, tCols);
+			drawGrid(gridLayer, baseGridRect, tRows, tCols);
 		
 		// clear the probe layer
 		probesLayer.destroyChildren();
@@ -205,18 +214,20 @@ function drawProbeLayout(drawStage, baseImage, userImage, beam) {
 			stroke: 'red'
 		});
 		
-		repeatDrawOnGrid(probesLayer, image, probe, tRows, tCols);
+		repeatDrawOnGrid(probesLayer, baseGridRect, probe, tRows, tCols);
 	};
 
 	// run once immediately
 	updateProbeLayout();
 
-	return updateProbeLayout;
+	return [updateProbeLayout, imageCopy];
 }
 
 function drawProbeLayoutSampling(drawStage, originalImage, userImage, sBeam) {
-	var baseImage = originalImage.clone();
+	var baseImage = originalImage; //.clone();
 	var beam = sBeam.clone();
+
+	var baseGridRect = new Konva.Rect(baseImage.getSelfRect());
 
 	var updateProbeLayoutSampling = function(){
 		var rows = getRowsInput();
@@ -231,7 +242,7 @@ function drawProbeLayoutSampling(drawStage, originalImage, userImage, sBeam) {
 			listening: false,
 		});
 
-		computeResampledPreview(drawStage, baseImage, probe, rows, cols);
+		computeResampledPreview(drawStage, baseImage, probe, rows, cols, baseGridRect);
 
 		drawStage.draw();
 	};
@@ -243,8 +254,10 @@ function drawProbeLayoutSampling(drawStage, originalImage, userImage, sBeam) {
 }
 
 function drawResampled(sourceStage, destStage, originalImage, userImage, sBeam) {
-	var baseImage = originalImage.clone();
+	var baseImage = originalImage; //.clone();
 	var beam = sBeam.clone();
+
+	var baseGridRect = new Konva.Rect(baseImage.getSelfRect());
 
 	var updateResampledDraw = function(){
 		var rows = getRowsInput();
@@ -260,7 +273,7 @@ function drawResampled(sourceStage, destStage, originalImage, userImage, sBeam) 
 		});
 
 		// computeResampledFast(sourceStage, destStage, baseImage, probe, rows, cols);
-		computeResampledSlow(destStage, baseImage, probe, rows, cols);
+		computeResampledSlow(destStage, baseImage, probe, rows, cols, baseGridRect);
 
 		destStage.draw();
 	};

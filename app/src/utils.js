@@ -67,7 +67,7 @@ function MakeZoomHandler(stage, konvaObj, callback=null, scaleFactor=1.2, scaleM
 		if (pointer != null)
 			scaleCenteredOnPoint(pointer, konvaObj, oldScale, finalScale);
 		else {
-			if (G_DEBUG) {
+			if (G_DEBUG) {r
 				console.warn("MakeZoomHandler got a null pointer...");
 			}
 		}
@@ -250,14 +250,14 @@ function repeatDrawOnGrid(layer, rect, shape, rows, cols) {
 }
 
 
-function computeResampledPreview(previewStage, image, probe, rows, cols){
+function computeResampledPreview(previewStage, image, probe, rows, cols, rect){
 	var previewLayer = previewStage.getLayers()[0];
 	previewLayer.destroyChildren();
 
 	var gr = image.clone();
 	gr.globalCompositeOperation(COMPOSITE_OP);
 
-	repeatDrawOnGrid(previewLayer, image, probe, rows, cols);
+	repeatDrawOnGrid(previewLayer, rect, probe, rows, cols);
 	previewLayer.add(gr);
 }
 
@@ -337,18 +337,32 @@ function computeResampledFast(sourceStage, destStage, image, probe, rows, cols){
 // Essentially, this is computeResampleFast(), but corrected for spot size larger than the cell size
 // ComputeResampleFast() is limits the sampling to the cell size, and takes in smaller version of the
 // image that is already drawn and "compositied" in a Konva Stage, instead of the original larger image...
-function computeResampledSlow(destStage, oImage, probe, rows, cols){
+function computeResampledSlow(destStage, oImage, probe, rows, cols, rect){
 	var destLayer = destStage.getLayers()[0];
 	destLayer.destroyChildren(); 
 	
+
+	var pImage = oImage.image(),
+	canvas = document.getElementById('canvas'),
+	ctx = canvas.getContext('2d');
+
+	ctx.drawImage(pImage,
+		// TODO: get and transform cropped region based on user-sized konva-image for resampling
+
+		
+		70, 20,   // Start at 70/20 pixels from the left and the top of the image (crop),
+		50, 50,   // "Get" a `50 * 50` (w * h) area from the source image (crop),
+		0, 0,     // Place the result at 0, 0 in the canvas,
+		100, 100); // With as width / height: 100 * 100 (scale)
+
 	var image = oImage.image();
 
 	// process each grid cell
 	var startX = 0, startY = 0;
 	var stepSizeX = image.naturalWidth / cols, stepSizeY = image.naturalHeight / rows;
 
-	var startX_stage = oImage.x(), startY_stage = oImage.y();
-	var stepSizeX_stage = oImage.width() / cols, stepSizeY_stage = oImage.height() / rows;
+	var startX_stage = rect.x(), startY_stage = rect.y();
+	var stepSizeX_stage = rect.width() / cols, stepSizeY_stage = rect.height() / rows;
 
 	// interate over X
 	for (let i = 0; i < cols; i++) {
