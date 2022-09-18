@@ -150,8 +150,10 @@ function drawProbeLayout(drawStage, baseImage, userImage, beam) {
 	// draws probe layout
 	var layers = drawStage.getLayers();
 	var baseLayer = layers[0];
+	
+	var image = baseImage.clone();
 
-	baseLayer.add(baseImage);
+	baseLayer.add(image);
 	baseLayer.draw();
 
 	var updateProbeLayout = function(){
@@ -186,7 +188,7 @@ function drawProbeLayout(drawStage, baseImage, userImage, beam) {
 
 		// draw grid on base/source image
 		if (!gridDrawn)
-			drawGrid(gridLayer, baseImage, tRows, tCols);
+			drawGrid(gridLayer, image, tRows, tCols);
 		
 		// clear the probe layer
 		probesLayer.destroyChildren();
@@ -201,7 +203,7 @@ function drawProbeLayout(drawStage, baseImage, userImage, beam) {
 			stroke: 'red'
 		});
 		
-		repeatDrawOnGrid(probesLayer, baseImage, probe, tRows, tCols);
+		repeatDrawOnGrid(probesLayer, image, probe, tRows, tCols);
 	};
 
 	// run once immediately

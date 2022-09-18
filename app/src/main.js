@@ -35,15 +35,8 @@ loadImage(INPUT_IMAGE, function(event){
 
 	var _t = drawBaseImage(stages[1], imageObj, sz);
 
-	// Soft clone, using konva's .clone() seems to copy events as well...
-	G_MAIN_GRAIN_ORIGINAL = new Konva.Image({
-		x: _t.x(),
-		y: _t.y(),
-		image: imageObj,
-		width: _t.width(), 
-		height:_t.height(),
-		draggable: true,
-	});
+	// make a clone without copying over the event bindings
+	G_MAIN_GRAIN_ORIGINAL = _t.clone().off();
 	
 	OnImageLoaded(G_MAIN_GRAIN_ORIGINAL, G_BASE_BEAM, stages);
 });
@@ -63,16 +56,16 @@ function OnImageLoaded(image, beam, stages){
 	var updateAvgCircle = drawAvgCircle(s3, s4, beam, userScaledImage);
 
 	var s5 = stages[4];
-	var updateProbeLayout = drawProbeLayout(s5, G_MAIN_GRAIN_ORIGINAL.clone(), userScaledImage, beam.clone());
+	var updateProbeLayout = drawProbeLayout(s5, image, userScaledImage, beam);
 
 	// compute resampled image
 	var s6 = stages[5];
-	var updateProbeLayoutSamplingPreview = drawProbeLayoutSampling(s6, G_MAIN_GRAIN_ORIGINAL, userScaledImage, beam);
+	var updateProbeLayoutSamplingPreview = drawProbeLayoutSampling(s6, image, userScaledImage, beam);
 
 
 	var s7 = stages[6];
 	$(s7.getContainer()).css('border-color', 'lime');
-	var updateResampled = drawResampled(s6, s7, G_MAIN_GRAIN_ORIGINAL, userScaledImage, beam);
+	var updateResampled = drawResampled(s6, s7, image, userScaledImage, beam);
 
 	var updateResamplingSteps = function(internallyCalled){
 		var rows = getRowsInput();
