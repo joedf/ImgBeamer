@@ -53,7 +53,7 @@ function OnImageLoaded(image, beam, stages){
 	var userScaledImage = drawBaseComposite(s3, image, beam, doUpdate);
 
 	var s4 = stages[3];
-	var updateAvgCircle = drawAvgCircle(s3, s4, beam, userScaledImage);
+	var updateAvgCircle = drawAvgCircle(s3, s4, beam);
 
 	var s5 = stages[4];
 	var updateProbeLayout = drawProbeLayout(s5, image, userScaledImage, beam);

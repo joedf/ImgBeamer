@@ -41,7 +41,7 @@ function drawBaseImage(stage, oImg, size, doFill = false) {
 
 	var layer = stage.getLayers()[0];
 
-	var contrainsBounds = function(){
+	var constrainBounds = function(){
 		var scaleX = kImage.scaleX(), scaleY = kImage.scaleY();
 		var x = kImage.x(), y = kImage.y();
 		var w = kImage.width() * scaleX, h = kImage.height() * scaleY;
@@ -61,11 +61,11 @@ function drawBaseImage(stage, oImg, size, doFill = false) {
 	layer.listening(true);
 	kImage.on('dragmove', function() {
 		// set bounds on object, by overriding position here
-		contrainsBounds();
+		constrainBounds();
 	});
 	kImage.on('wheel', MakeZoomHandler(stage, kImage, function(e){
 		// bounds check for zooming out
-		contrainsBounds();
+		constrainBounds();
 
 		// callback here, e.g. doUpdate();
 	}, 1.2, 1));
@@ -117,6 +117,8 @@ function drawAvgCircle(sourceStage, destStage, sBeam) {
 	var sourceLayer = sourceStage.getLayers()[0];
 	var destLayer = destStage.getLayers()[0];
 
+	var beam = sBeam.clone();
+
 	var updateAvgCircle = function(){
 		var pCtx = sourceLayer.getContext();
 		var allPx = pCtx.getImageData(0, 0, pCtx.canvas.width, pCtx.canvas.height);
@@ -125,7 +127,7 @@ function drawAvgCircle(sourceStage, destStage, sBeam) {
 
 		var avgCircle = null;
 		if (destLayer.getChildren().length <= 0){
-			avgCircle = sBeam.clone();
+			avgCircle = beam;
 			destLayer.add(avgCircle);
 		} else {
 			avgCircle = destLayer.getChildren()[0];
