@@ -273,7 +273,7 @@ function drawResampled(sourceStage, destStage, originalImage, userImage, sBeam) 
 		});
 
 		// computeResampledFast(sourceStage, destStage, baseImage, probe, rows, cols);
-		computeResampledSlow(destStage, baseImage, probe, rows, cols, baseGridRect);
+		computeResampledSlow(sourceStage, destStage, baseImage, probe, rows, cols, baseGridRect);
 
 		destStage.draw();
 	};

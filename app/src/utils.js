@@ -67,7 +67,7 @@ function MakeZoomHandler(stage, konvaObj, callback=null, scaleFactor=1.2, scaleM
 		if (pointer != null)
 			scaleCenteredOnPoint(pointer, konvaObj, oldScale, finalScale);
 		else {
-			if (G_DEBUG) {r
+			if (G_DEBUG) {
 				console.warn("MakeZoomHandler got a null pointer...");
 			}
 		}
@@ -337,29 +337,59 @@ function computeResampledFast(sourceStage, destStage, image, probe, rows, cols){
 // Essentially, this is computeResampleFast(), but corrected for spot size larger than the cell size
 // ComputeResampleFast() is limits the sampling to the cell size, and takes in smaller version of the
 // image that is already drawn and "compositied" in a Konva Stage, instead of the original larger image...
-function computeResampledSlow(destStage, oImage, probe, rows, cols, rect){
+function computeResampledSlow(sourceStage, destStage, oImage, probe, rows, cols, rect){
 	var destLayer = destStage.getLayers()[0];
 	destLayer.destroyChildren(); 
-	
 
 	var pImage = oImage.image(),
-	canvas = document.getElementById('canvas'),
+	canvas = document.createElement('canvas'),
+	// canvas = document.getElementById('testdemo'),
 	ctx = canvas.getContext('2d');
 
+
+	// get and transform cropped region based on user-sized konva-image for resampling
+	var sx = (sourceStage.x() - oImage.x()) / oImage.scaleX();
+	var sy = (sourceStage.y() - oImage.y()) / oImage.scaleY();
+	var sw = sourceStage.width() / oImage.scaleX();
+	var sh = sourceStage.height() / oImage.scaleY();
+
+	canvas.width = destStage.width();
+	canvas.height = destStage.height();
+	
+
+	var rw = (oImage.width() / pImage.naturalWidth);
+	var rh = (oImage.height() / pImage.naturalHeight);
+
 	ctx.drawImage(pImage,
-		// TODO: get and transform cropped region based on user-sized konva-image for resampling
+		sx / rw, sy /rh, // crop x, y
+		sw / rw, sh /rh, // crop width, height
+		0, 0,
+		destStage.width(),
+		destStage.height()
+		);
 
-		
-		70, 20,   // Start at 70/20 pixels from the left and the top of the image (crop),
-		50, 50,   // "Get" a `50 * 50` (w * h) area from the source image (crop),
-		0, 0,     // Place the result at 0, 0 in the canvas,
-		100, 100); // With as width / height: 100 * 100 (scale)
+	var image = canvas; //oImage.image();
 
-	var image = oImage.image();
+/*
+	var sx = (oImage.x() - sourceStage.x());// * oImage.scaleX();
+	var sy = (oImage.y() - sourceStage.y());// * oImage.scaleY();
+	var sw = sourceStage.width() * oImage.scaleX();
+	var sh = sourceStage.height() * oImage.scaleY();
+	destLayer.add(new Konva.Image({
+		x: sx,
+		y: sy,
+		width: sw,
+		height: sh,
+		image: pImage,
+	}));
+
+	return;
+	*/
 
 	// process each grid cell
 	var startX = 0, startY = 0;
-	var stepSizeX = image.naturalWidth / cols, stepSizeY = image.naturalHeight / rows;
+	// var stepSizeX = image.naturalWidth / cols, stepSizeY = image.naturalHeight / rows;
+	var stepSizeX = destStage.width() / cols, stepSizeY = destStage.height() / rows;
 
 	var startX_stage = rect.x(), startY_stage = rect.y();
 	var stepSizeX_stage = rect.width() / cols, stepSizeY_stage = rect.height() / rows;
