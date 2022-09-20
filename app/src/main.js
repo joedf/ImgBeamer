@@ -33,7 +33,9 @@ loadImage(INPUT_IMAGE, function(event){
 	var imageObj = event.target;
 	G_MAIN_IMAGE_OBJ = imageObj;
 
-	var _t = drawBaseImage(stages[1], imageObj, sz);
+	var s2 = stages[1];
+	$(s2.getContainer()).css('border-color', 'blue');
+	var _t = drawBaseImage(s2, imageObj, sz);
 
 	G_MAIN_GRAIN_ORIGINAL = _t;
 
