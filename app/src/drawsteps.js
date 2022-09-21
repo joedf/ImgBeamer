@@ -15,7 +15,7 @@ function drawBaseBeam(stage) {
 	return beam;
 }
 
-function drawBaseImage(stage, oImg, size, doFill = false) {
+function drawBaseImage(stage, oImg, size, doFill = false, updateCallback = null) {
 	var max = size;
 
 	if (G_DEBUG)
@@ -56,18 +56,28 @@ function drawBaseImage(stage, oImg, size, doFill = false) {
 
 		stage.draw();
 	};
+
+	// optional event callback
+	var doUpdate = function(){
+		if (typeof updateCallback == 'function')
+			return updateCallback();
+	};
 	
 	// Enable drag and interaction events
 	layer.listening(true);
+	kImage.on('mouseup', function() { doUpdate(); });
 	kImage.on('dragmove', function() {
 		// set bounds on object, by overriding position here
 		constrainBounds();
+
+		doUpdate();
 	});
 	kImage.on('wheel', MakeZoomHandler(stage, kImage, function(e){
 		// bounds check for zooming out
 		constrainBounds();
 
 		// callback here, e.g. doUpdate();
+		doUpdate();
 	}, 1.2, 1));
 
 	layer.add(kImage);

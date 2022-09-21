@@ -32,26 +32,29 @@ var G_MAIN_IMAGE_OBJ = null
 loadImage(INPUT_IMAGE, function(event){
 	var imageObj = event.target;
 	G_MAIN_IMAGE_OBJ = imageObj;
-
-	var s2 = stages[1];
-	$(s2.getContainer()).css('border-color', 'blue');
-	var _t = drawBaseImage(s2, imageObj, sz);
-
-	G_MAIN_GRAIN_ORIGINAL = _t;
-
-	// make a clone without copying over the event bindings
-	var copy = _t.clone().off();
 	
-	OnImageLoaded(copy, G_BASE_BEAM, stages);
+	OnImageLoaded(imageObj, G_BASE_BEAM, stages);
 });
 
-function OnImageLoaded(image, beam, stages){
+function OnImageLoaded(eImg, beam, stages){
 
 	var doUpdate = function(){
 		updateAvgCircle();
 		updateProbeLayout();
 		updateResamplingSteps(true);
 	};
+
+
+	// draw base image (can pan & zoom)
+	var s2 = stages[1];
+	$(s2.getContainer()).css('border-color', 'blue');
+	var _t = drawBaseImage(s2, eImg, sz, false, doUpdate);
+
+	G_MAIN_GRAIN_ORIGINAL = _t;
+
+	// make a clone without copying over the event bindings
+	var image = _t.clone().off();
+
 
 	var s3 = stages[2];
 	var userScaledImage = drawBaseComposite(s3, image, beam, doUpdate);
