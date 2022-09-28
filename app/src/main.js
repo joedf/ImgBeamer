@@ -1,4 +1,5 @@
 var G_DEBUG = false;
+var G_AUTO_PREVIEW_LIMIT = 16 * 16;
 
 const INPUT_IMAGE = 'src/testimages/grains2tl.png';
 const COMPOSITE_OP = 'source-in';
@@ -36,8 +37,8 @@ loadImage(INPUT_IMAGE, function(event){
 	OnImageLoaded(imageObj, G_BASE_BEAM, stages);
 });
 
-function OnImageLoaded(eImg, beam, stages){
 
+function OnImageLoaded(eImg, beam, stages){
 	var doUpdate = function(){
 		updateAvgCircle();
 		updateProbeLayout();
@@ -79,7 +80,7 @@ function OnImageLoaded(eImg, beam, stages){
 		var rows = getRowsInput();
 		var cols = getColsInput();
 
-		if (internallyCalled && (rows*cols > 64)) {
+		if (internallyCalled && (rows*cols > G_AUTO_PREVIEW_LIMIT)) {
 			console.warn('automatic preview disable for 64+ grid cells.');
 			return;
 		}
