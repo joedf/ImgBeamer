@@ -24,18 +24,14 @@ function drawBaseImage(stage, oImg, size, doFill = false, updateCallback = null)
 	var img_width = oImg.naturalWidth, img_height = oImg.naturalHeight;
 
 	// image ratio to "fit" in canvas
-	var ratio = (img_width > img_height ? (img_width / max) : (img_height / max)) // fit
-	if (doFill){
-		ratio = (img_width > img_height ? (img_height / max) : (img_width / max)) // fill
-	}
+	var fitSize = fitImageProportions(img_width, img_height, max, doFill);
 
-	var iw = img_width/ratio, ih = img_height/ratio;
 	var kImage = new Konva.Image({
-		x: (max - iw)/2,
-		y: (max - ih)/2,
+		x: (max - fitSize.w)/2,
+		y: (max - fitSize.h)/2,
 		image: oImg,
-		width: iw, 
-		height: ih,
+		width: fitSize.w, 
+		height: fitSize.h,
 		draggable: true,
 	});
 
@@ -295,4 +291,54 @@ function drawResampled(sourceStage, destStage, originalImage, userImage, sBeam) 
 	updateResampledDraw();
 
 	return updateResampledDraw;
+}
+
+function drawGroundtruthImage(stage, imageObj, subregionImage, maxSize=300){
+
+	var fit = fitImageProportions(imageObj.naturalWidth, imageObj.naturalHeight, maxSize);
+
+	var image = new Konva.Image({
+		x: (maxSize - fit.w)/2,
+		y: (maxSize - fit.h)/2,
+		image: imageObj,
+		width: fit.w,
+		height: fit.h,
+		listening: false,
+	});
+
+	var rect = new Konva.Rect({
+		x: image.x(),
+		y: image.y(),
+		width: image.width(),
+		height: image.height(),
+		fill: "rgba(0,255,255,0.4)",
+		stroke: "#00FFFF",
+		strokeWidth: 1,
+		listening: false,
+	});
+
+	var layer = stage.getLayers()[0];
+	layer.add(image);
+	layer.add(rect)
+
+	var update = function(){
+		// calc location rect from subregionImage
+		// and update bounds drawn rectangle
+		var s = subregionImage;
+		rect.position({
+			x: (0 - s.x()) / s.scaleX(),
+			y: (0 - s.y()) / s.scaleY(),
+		});
+		rect.size({
+			width: s.width() / s.scaleX(),
+			height: s.height() / s.scaleY(),
+		});
+
+		stage.draw();
+	};
+
+	update();
+	stage.draw();
+
+	return update;
 }

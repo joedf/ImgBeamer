@@ -11,7 +11,7 @@ const G_MAIN_CONTAINER = '#main-container';
 Konva.autoDrawEnabled = false;
 
 
-const nStages = 7;
+const nStages = 8;
 var sz = Math.max((document.body.clientWidth / 4) - (4 * 5), 300);
 var mc = $(G_MAIN_CONTAINER);
 
@@ -42,15 +42,16 @@ function OnImageLoaded(eImg, beam, stages){
 		updateAvgCircle();
 		updateProbeLayout();
 		updateResamplingSteps(true);
+		updateGroundtruthMap();
 	};
 
 	// draw base image (can pan & zoom)
 	var s2 = stages[1];
 	$(s2.getContainer()).css('border-color', 'blue');
-	var baseImage = drawBaseImage(s2, eImg, sz, false, doUpdate);
+	var subregionImage = drawBaseImage(s2, eImg, sz, false, doUpdate);
 
 	// make a clone without copying over the event bindings
-	var image = baseImage.clone().off();
+	var image = subregionImage.clone().off();
 
 	var s3 = stages[2];
 	var userScaledImage = drawBaseComposite(s3, image, beam, doUpdate);
@@ -59,7 +60,7 @@ function OnImageLoaded(eImg, beam, stages){
 	var updateAvgCircle = drawAvgCircle(s3, s4, beam);
 
 	var s5 = stages[4];
-	var probeLayout = drawProbeLayout(s5, baseImage, userScaledImage, beam);
+	var probeLayout = drawProbeLayout(s5, subregionImage, userScaledImage, beam);
 	var updateProbeLayout = probeLayout.updateCallback;
 
 	// compute resampled image
@@ -85,6 +86,11 @@ function OnImageLoaded(eImg, beam, stages){
 	};
 
 	G_UpdateResampled = updateResamplingSteps;
+
+
+	var s8 = stages[7];
+	var updateGroundtruthMap = drawGroundtruthImage(s8, eImg, subregionImage, sz);
+
 
 	doUpdate();
 }

@@ -81,6 +81,17 @@ function MakeZoomHandler(stage, konvaObj, callback=null, scaleFactor=1.2, scaleM
 	return handler;
 }
 
+function fitImageProportions(w, h, maxDimension, doFill=false){
+	// image ratio to "fit" in canvas
+	var ratio = (w > h ? (w / maxDimension) : (h / maxDimension)) // fit
+	if (doFill){
+		ratio = (w > h ? (h / maxDimension) : (w / maxDimension)) // fill
+	}
+
+	var iw = w/ratio, ih = h/ratio;
+	return {w: iw, h: iw};
+}
+
 // scales the give shape, and moves it to preserve original center
 function scaleOnCenter(stage, shape, oldScale, newScale){
 	var stageCenter = {
