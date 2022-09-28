@@ -23,7 +23,8 @@ for (let i = 0; i < nStages; i++) {
 	stages.push(stage);
 }
 
-var G_BASE_BEAM = drawBaseBeam(stages[0]);
+var baseBeamStage = stages[2];
+var G_BASE_BEAM = drawBaseBeam(baseBeamStage);
 
 /////////////////////
 
@@ -38,6 +39,14 @@ loadImage(INPUT_IMAGE, function(event){
 
 
 function OnImageLoaded(eImg, beam, stages){
+	var baseImageStage = stages[1];
+	var baseCompositeStage = stages[3];
+	var avgCircleStage = stages[4];
+	var probeLayoutStage = stages[5];
+	var layoutSampledStage = stages[6];
+	var resampledStage = stages[7];
+	var GroundtruthMapStage = stages[0];
+
 	var doUpdate = function(){
 		updateAvgCircle();
 		updateProbeLayout();
@@ -46,31 +55,25 @@ function OnImageLoaded(eImg, beam, stages){
 	};
 
 	// draw base image (can pan & zoom)
-	var s2 = stages[1];
-	$(s2.getContainer()).css('border-color', 'blue');
-	var subregionImage = drawBaseImage(s2, eImg, sz, false, doUpdate);
+	$(baseImageStage.getContainer()).css('border-color', 'blue');
+	var subregionImage = drawBaseImage(baseImageStage, eImg, sz, false, doUpdate);
 
 	// make a clone without copying over the event bindings
 	var image = subregionImage.clone().off();
 
-	var s3 = stages[2];
-	var userScaledImage = drawBaseComposite(s3, image, beam, doUpdate);
+	var userScaledImage = drawBaseComposite(baseCompositeStage, image, beam, doUpdate);
 
-	var s4 = stages[3];
-	var updateAvgCircle = drawAvgCircle(s3, s4, beam);
+	var updateAvgCircle = drawAvgCircle(baseCompositeStage, avgCircleStage, beam);
 
-	var s5 = stages[4];
-	var probeLayout = drawProbeLayout(s5, subregionImage, userScaledImage, beam);
+	var probeLayout = drawProbeLayout(probeLayoutStage, subregionImage, userScaledImage, beam);
 	var updateProbeLayout = probeLayout.updateCallback;
 
 	// compute resampled image
-	var s6 = stages[5];
-	var updateProbeLayoutSamplingPreview = drawProbeLayoutSampling(s6, probeLayout.image, userScaledImage, beam);
+	var updateProbeLayoutSamplingPreview = drawProbeLayoutSampling(layoutSampledStage, probeLayout.image, userScaledImage, beam);
 
 
-	var s7 = stages[6];
-	$(s7.getContainer()).css('border-color', 'lime');
-	var updateResampled = drawResampled(s6, s7, probeLayout.image, userScaledImage, beam);
+	$(resampledStage.getContainer()).css('border-color', 'lime');
+	var updateResampled = drawResampled(layoutSampledStage, resampledStage, probeLayout.image, userScaledImage, beam);
 
 	var updateResamplingSteps = function(internallyCalled){
 		var rows = getRowsInput();
@@ -88,9 +91,7 @@ function OnImageLoaded(eImg, beam, stages){
 	G_UpdateResampled = updateResamplingSteps;
 
 
-	var s8 = stages[7];
-	var updateGroundtruthMap = drawGroundtruthImage(s8, eImg, subregionImage, sz);
-
+	var updateGroundtruthMap = drawGroundtruthImage(GroundtruthMapStage, eImg, subregionImage, sz);
 
 	doUpdate();
 }

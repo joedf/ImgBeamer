@@ -8,7 +8,7 @@ function drawBaseBeam(stage) {
 		strokeWidth: 0,
 	});
 
-	var layer = stages[0].getLayers()[0];
+	var layer = stage.getLayers()[0];
 	layer.add(beam);
 	layer.draw();
 
