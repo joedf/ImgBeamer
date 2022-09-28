@@ -326,8 +326,8 @@ function drawGroundtruthImage(stage, imageObj, subregionImage, maxSize=300){
 		// and update bounds drawn rectangle
 		var s = subregionImage;
 		rect.position({
-			x: (0 - s.x()) / s.scaleX(),
-			y: (0 - s.y()) / s.scaleY(),
+			x: (image.x() - s.x()) / s.scaleX(),
+			y: (image.y() - s.y()) / s.scaleY(),
 		});
 		rect.size({
 			width: s.width() / s.scaleX(),
