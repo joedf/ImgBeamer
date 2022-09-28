@@ -1,4 +1,5 @@
 var G_DEBUG = false;
+var G_AUTO_PREVIEW_LIMIT = 16 * 16;
 
 const INPUT_IMAGE = 'src/testimages/grains2tl.png';
 const COMPOSITE_OP = 'source-in';
@@ -26,28 +27,30 @@ var G_BASE_BEAM = drawBaseBeam(stages[0]);
 
 /////////////////////
 
-var G_MAIN_GRAIN_ORIGINAL = null;
 var G_MAIN_IMAGE_OBJ = null
 
 loadImage(INPUT_IMAGE, function(event){
 	var imageObj = event.target;
 	G_MAIN_IMAGE_OBJ = imageObj;
-
-	var _t = drawBaseImage(stages[1], imageObj, sz);
-
-	// make a clone without copying over the event bindings
-	G_MAIN_GRAIN_ORIGINAL = _t.clone().off();
 	
-	OnImageLoaded(G_MAIN_GRAIN_ORIGINAL, G_BASE_BEAM, stages);
+	OnImageLoaded(imageObj, G_BASE_BEAM, stages);
 });
 
-function OnImageLoaded(image, beam, stages){
 
+function OnImageLoaded(eImg, beam, stages){
 	var doUpdate = function(){
 		updateAvgCircle();
 		updateProbeLayout();
 		updateResamplingSteps(true);
 	};
+
+	// draw base image (can pan & zoom)
+	var s2 = stages[1];
+	$(s2.getContainer()).css('border-color', 'blue');
+	var baseImage = drawBaseImage(s2, eImg, sz, false, doUpdate);
+
+	// make a clone without copying over the event bindings
+	var image = baseImage.clone().off();
 
 	var s3 = stages[2];
 	var userScaledImage = drawBaseComposite(s3, image, beam, doUpdate);
@@ -56,22 +59,23 @@ function OnImageLoaded(image, beam, stages){
 	var updateAvgCircle = drawAvgCircle(s3, s4, beam);
 
 	var s5 = stages[4];
-	var updateProbeLayout = drawProbeLayout(s5, image, userScaledImage, beam);
+	var probeLayout = drawProbeLayout(s5, baseImage, userScaledImage, beam);
+	var updateProbeLayout = probeLayout.updateCallback;
 
 	// compute resampled image
 	var s6 = stages[5];
-	var updateProbeLayoutSamplingPreview = drawProbeLayoutSampling(s6, image, userScaledImage, beam);
+	var updateProbeLayoutSamplingPreview = drawProbeLayoutSampling(s6, probeLayout.image, userScaledImage, beam);
 
 
 	var s7 = stages[6];
 	$(s7.getContainer()).css('border-color', 'lime');
-	var updateResampled = drawResampled(s6, s7, image, userScaledImage, beam);
+	var updateResampled = drawResampled(s6, s7, probeLayout.image, userScaledImage, beam);
 
 	var updateResamplingSteps = function(internallyCalled){
 		var rows = getRowsInput();
 		var cols = getColsInput();
 
-		if (internallyCalled && (rows*cols > 64)) {
+		if (internallyCalled && (rows*cols > G_AUTO_PREVIEW_LIMIT)) {
 			console.warn('automatic preview disable for 64+ grid cells.');
 			return;
 		}
@@ -174,11 +178,12 @@ function ResampleFullImage() {
 		console.log(msg);
 		// eStatus.innerHTML = msg;
 
-		/*
-		// draw the image row by row
 		
-		console.log('ResampleFullImage drew row: '+(i+1)+' / '+rows);
+		// drawing the image row by row
+		if (G_DEBUG)
+			console.log('ResampleFullImage drew row: '+(i+1)+' / '+rows);
 
+		/*
 		// free memory
 		pixels = null;
 		imageData = null;

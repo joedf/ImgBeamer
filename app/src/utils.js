@@ -250,14 +250,14 @@ function repeatDrawOnGrid(layer, rect, shape, rows, cols) {
 }
 
 
-function computeResampledPreview(previewStage, image, probe, rows, cols){
+function computeResampledPreview(previewStage, image, probe, rows, cols, rect){
 	var previewLayer = previewStage.getLayers()[0];
 	previewLayer.destroyChildren();
 
 	var gr = image.clone();
 	gr.globalCompositeOperation(COMPOSITE_OP);
 
-	repeatDrawOnGrid(previewLayer, image, probe, rows, cols);
+	repeatDrawOnGrid(previewLayer, rect, probe, rows, cols);
 	previewLayer.add(gr);
 }
 
@@ -337,18 +337,62 @@ function computeResampledFast(sourceStage, destStage, image, probe, rows, cols){
 // Essentially, this is computeResampleFast(), but corrected for spot size larger than the cell size
 // ComputeResampleFast() is limits the sampling to the cell size, and takes in smaller version of the
 // image that is already drawn and "compositied" in a Konva Stage, instead of the original larger image...
-function computeResampledSlow(destStage, oImage, probe, rows, cols){
+function computeResampledSlow(sourceStage, destStage, oImage, probe, rows, cols, rect){
 	var destLayer = destStage.getLayers()[0];
 	destLayer.destroyChildren(); 
+
+	var pImage = oImage.image(),
+	canvas = document.createElement('canvas'),
+	// canvas = document.getElementById('testdemo'),
+	ctx = canvas.getContext('2d');
+
+
+	// get and transform cropped region based on user-sized konva-image for resampling
+	var sx = (sourceStage.x() - oImage.x()) / oImage.scaleX();
+	var sy = (sourceStage.y() - oImage.y()) / oImage.scaleY();
+	var sw = sourceStage.width() / oImage.scaleX();
+	var sh = sourceStage.height() / oImage.scaleY();
+
+	canvas.width = destStage.width();
+	canvas.height = destStage.height();
 	
-	var image = oImage.image();
+
+	var rw = (oImage.width() / pImage.naturalWidth);
+	var rh = (oImage.height() / pImage.naturalHeight);
+
+	ctx.drawImage(pImage,
+		sx / rw, sy /rh, // crop x, y
+		sw / rw, sh /rh, // crop width, height
+		0, 0,
+		destStage.width(),
+		destStage.height()
+		);
+
+	var image = canvas; //oImage.image();
+
+/*
+	var sx = (oImage.x() - sourceStage.x());// * oImage.scaleX();
+	var sy = (oImage.y() - sourceStage.y());// * oImage.scaleY();
+	var sw = sourceStage.width() * oImage.scaleX();
+	var sh = sourceStage.height() * oImage.scaleY();
+	destLayer.add(new Konva.Image({
+		x: sx,
+		y: sy,
+		width: sw,
+		height: sh,
+		image: pImage,
+	}));
+
+	return;
+	*/
 
 	// process each grid cell
 	var startX = 0, startY = 0;
-	var stepSizeX = image.naturalWidth / cols, stepSizeY = image.naturalHeight / rows;
+	// var stepSizeX = image.naturalWidth / cols, stepSizeY = image.naturalHeight / rows;
+	var stepSizeX = destStage.width() / cols, stepSizeY = destStage.height() / rows;
 
-	var startX_stage = oImage.x(), startY_stage = oImage.y();
-	var stepSizeX_stage = oImage.width() / cols, stepSizeY_stage = oImage.height() / rows;
+	var startX_stage = rect.x(), startY_stage = rect.y();
+	var stepSizeX_stage = rect.width() / cols, stepSizeY_stage = rect.height() / rows;
 
 	// interate over X
 	for (let i = 0; i < cols; i++) {
