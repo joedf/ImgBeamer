@@ -230,7 +230,10 @@ function drawProbeLayout(drawStage, baseImage, userImage, beam) {
 	// run once immediately
 	updateProbeLayout();
 
-	return [updateProbeLayout, imageCopy];
+	return {
+		updateCallback: updateProbeLayout,
+		image: imageCopy
+	};
 }
 
 function drawProbeLayoutSampling(drawStage, originalImage, userImage, sBeam) {

@@ -27,7 +27,6 @@ var G_BASE_BEAM = drawBaseBeam(stages[0]);
 
 /////////////////////
 
-var G_MAIN_GRAIN_ORIGINAL = null;
 var G_MAIN_IMAGE_OBJ = null
 
 loadImage(INPUT_IMAGE, function(event){
@@ -45,17 +44,13 @@ function OnImageLoaded(eImg, beam, stages){
 		updateResamplingSteps(true);
 	};
 
-
 	// draw base image (can pan & zoom)
 	var s2 = stages[1];
 	$(s2.getContainer()).css('border-color', 'blue');
-	var _t = drawBaseImage(s2, eImg, sz, false, doUpdate);
-
-	G_MAIN_GRAIN_ORIGINAL = _t;
+	var baseImage = drawBaseImage(s2, eImg, sz, false, doUpdate);
 
 	// make a clone without copying over the event bindings
-	var image = _t.clone().off();
-
+	var image = baseImage.clone().off();
 
 	var s3 = stages[2];
 	var userScaledImage = drawBaseComposite(s3, image, beam, doUpdate);
@@ -64,17 +59,17 @@ function OnImageLoaded(eImg, beam, stages){
 	var updateAvgCircle = drawAvgCircle(s3, s4, beam);
 
 	var s5 = stages[4];
-	var _t = drawProbeLayout(s5, G_MAIN_GRAIN_ORIGINAL, userScaledImage, beam);
-	var updateProbeLayout = _t[0];
+	var probeLayout = drawProbeLayout(s5, baseImage, userScaledImage, beam);
+	var updateProbeLayout = probeLayout.updateCallback;
 
 	// compute resampled image
 	var s6 = stages[5];
-	var updateProbeLayoutSamplingPreview = drawProbeLayoutSampling(s6, _t[1], userScaledImage, beam);
+	var updateProbeLayoutSamplingPreview = drawProbeLayoutSampling(s6, probeLayout.image, userScaledImage, beam);
 
 
 	var s7 = stages[6];
 	$(s7.getContainer()).css('border-color', 'lime');
-	var updateResampled = drawResampled(s6, s7, _t[1], userScaledImage, beam);
+	var updateResampled = drawResampled(s6, s7, probeLayout.image, userScaledImage, beam);
 
 	var updateResamplingSteps = function(internallyCalled){
 		var rows = getRowsInput();
