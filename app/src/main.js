@@ -178,11 +178,12 @@ function ResampleFullImage() {
 		console.log(msg);
 		// eStatus.innerHTML = msg;
 
-		/*
-		// draw the image row by row
 		
-		console.log('ResampleFullImage drew row: '+(i+1)+' / '+rows);
+		// drawing the image row by row
+		if (G_DEBUG)
+			console.log('ResampleFullImage drew row: '+(i+1)+' / '+rows);
 
+		/*
 		// free memory
 		pixels = null;
 		imageData = null;
