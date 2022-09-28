@@ -24,6 +24,7 @@ for (let i = 0; i < nStages; i++) {
 }
 
 var baseBeamStage = stages[2];
+$(baseBeamStage.getContainer()).attr('box_label', 'Spot Profile');
 var G_BASE_BEAM = drawBaseBeam(baseBeamStage);
 
 /////////////////////
@@ -45,7 +46,7 @@ function OnImageLoaded(eImg, beam, stages){
 	var probeLayoutStage = stages[5];
 	var layoutSampledStage = stages[6];
 	var resampledStage = stages[7];
-	var GroundtruthMapStage = stages[0];
+	var groundtruthMapStage = stages[0];
 
 	var doUpdate = function(){
 		updateAvgCircle();
@@ -56,23 +57,29 @@ function OnImageLoaded(eImg, beam, stages){
 
 	// draw base image (can pan & zoom)
 	$(baseImageStage.getContainer()).css('border-color', 'blue');
+	$(baseImageStage.getContainer()).attr('box_label', 'Subregion View');
 	var subregionImage = drawBaseImage(baseImageStage, eImg, sz, false, doUpdate);
 
 	// make a clone without copying over the event bindings
 	var image = subregionImage.clone().off();
 
+	$(baseCompositeStage.getContainer()).attr('box_label', 'Spot Content');
 	var userScaledImage = drawBaseComposite(baseCompositeStage, image, beam, doUpdate);
 
+	$(avgCircleStage.getContainer()).attr('box_label', 'Spot Signal');
 	var updateAvgCircle = drawAvgCircle(baseCompositeStage, avgCircleStage, beam);
 
+	$(probeLayoutStage.getContainer()).attr('box_label', 'Spot Layout');
 	var probeLayout = drawProbeLayout(probeLayoutStage, subregionImage, userScaledImage, beam);
 	var updateProbeLayout = probeLayout.updateCallback;
 
 	// compute resampled image
+	$(layoutSampledStage.getContainer()).attr('box_label', 'Sample Subregion');
 	var updateProbeLayoutSamplingPreview = drawProbeLayoutSampling(layoutSampledStage, probeLayout.image, userScaledImage, beam);
 
 
 	$(resampledStage.getContainer()).css('border-color', 'lime');
+	$(resampledStage.getContainer()).attr('box_label', 'Resulting Subregion');
 	var updateResampled = drawResampled(layoutSampledStage, resampledStage, probeLayout.image, userScaledImage, beam);
 
 	var updateResamplingSteps = function(internallyCalled){
@@ -90,8 +97,8 @@ function OnImageLoaded(eImg, beam, stages){
 
 	G_UpdateResampled = updateResamplingSteps;
 
-
-	var updateGroundtruthMap = drawGroundtruthImage(GroundtruthMapStage, eImg, subregionImage, sz);
+	$(groundtruthMapStage.getContainer()).attr('box_label', 'Sample Groundtruth');
+	var updateGroundtruthMap = drawGroundtruthImage(groundtruthMapStage, eImg, subregionImage, sz);
 
 	doUpdate();
 }

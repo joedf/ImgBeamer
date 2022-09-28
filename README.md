@@ -1,21 +1,19 @@
 # ImageProbeSampler
 
+### Stages / Boxes
+1. Sample Groundtruth (map navigation)
+2. Subregion View ("zoomed" view)
+3. Spot Profile
+4. Spot Content
+5. Spot Signal (rgba)
+6. Spot Layout
+7. Sampled Subregion
+8. Resulting Subregion
+9. [+] Resulting Image (full) - could be auto-scale or
+
 ### To Do
-1. sample groundtruth / map nav
-2. subregion / zoomed view
-3. spot profile
-4. Spot content
-5. Spot signal (rgba)
-6. Spot layout
-7. sampled subregion
-8. Resulting subregion
-9. [+] Resulting image (full) - could be auto-scale or
-
 - Update row by row
-- add labels
 - updated terms
-
  
 ### Screenshot
-
 ![screenshot1](misc/screenshot1.png)

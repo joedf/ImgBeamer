@@ -14,6 +14,16 @@ summary {
 	position: relative;
 }
 
+.box:before {
+	content: attr(box_label);
+	position: absolute;
+	z-index: 20;
+	background: rgba(0,0,0,0.5);
+	padding: 2px 4px;
+	font-size: 12px;
+	font-family: monospace;
+}
+
 .box::after {
 	content: attr(pixel_value);
 	color: yellow;
