@@ -1,12 +1,15 @@
 function drawBaseBeam(stage) {
+	// default beam shape values
+	var defaultRadius = {
+		x: 70,
+		y: 70
+	};
+
 	// create our shape
 	var beam = new Konva.Ellipse({
 		x: stage.width() / 2,
 		y: stage.height() / 2,
-		radius: {
-			x: 70,
-			y: 70
-		},
+		radius: defaultRadius,
 		fill: 'white',
 		strokeWidth: 0,
 	});
@@ -38,6 +41,25 @@ function drawBaseBeam(stage) {
 			// select just the one
 			tr.nodes([e.target]);
 		}
+	});
+
+	// keyboard events
+	// based on https://konvajs.org/docs/events/Keyboard_Events.html
+	var container = stage.container();
+	// make it focusable
+	container.tabIndex = 1;
+	container.addEventListener('keydown', function(e) {
+		switch (e.keyCode) {
+			case 82: // 'r' key, reset beam shape
+				beam.rotation(0);
+				beam.scale({x:1, y:1});
+				// update other beams based on this one
+				beam.fire('transform');
+				break;
+		
+			default: break;
+		}
+		e.preventDefault();
 	});
 
 	return beam;
