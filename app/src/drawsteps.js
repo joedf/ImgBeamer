@@ -23,6 +23,23 @@ function drawBaseBeam(stage) {
 	layer.listening(true);
 	layer.add(tr);
 
+	// make it (de)selectable
+	// based on https://konvajs.org/docs/select_and_transform/Basic_demo.html
+	stage.on('click tap', function (e) {
+		// if click on empty area - remove all selections
+		if (e.target === stage) {
+			tr.nodes([]);
+			return;
+		}
+
+		const isSelected = tr.nodes().indexOf(e.target) >= 0;
+		if (!isSelected) {
+			// was not already selected, so now we add it to the transformer
+			// select just the one
+			tr.nodes([e.target]);
+		}
+	});
+
 	return beam;
 }
 
