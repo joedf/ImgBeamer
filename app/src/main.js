@@ -13,7 +13,8 @@ Konva.autoDrawEnabled = true;
 
 
 const nStages = 9;
-var sz = Math.max((document.body.clientWidth / 4) - (4 * 5), 300);
+var boxesPerPageWidth = 5;
+var sz = Math.max((document.body.clientWidth / boxesPerPageWidth) - (boxesPerPageWidth * 5), 300);
 var mc = $(G_MAIN_CONTAINER);
 
 
