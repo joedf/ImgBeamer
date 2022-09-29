@@ -9,10 +9,10 @@
 6. Spot Layout
 7. Sampled Subregion
 8. Resulting Subregion
-9. [+] Resulting Image (full) - could be auto-scale or
+9. Resulting Image (full, "virtual SEM")
 
 ### To Do
-- Update row by row
+- verify/fix issue in virtualSEM; spot size seems to be too large
 - updated terms
  
 ### Screenshot
