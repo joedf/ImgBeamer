@@ -49,6 +49,11 @@ function drawBaseBeam(stage) {
 	// make it focusable
 	container.tabIndex = 1;
 	container.addEventListener('keydown', function(e) {
+		// don't handle meta-key'd events for now...
+		const metaPressed = e.shiftKey || e.ctrlKey || e.metaKey;
+		if (metaPressed)
+			return;
+
 		switch (e.keyCode) {
 			case 82: // 'r' key, reset beam shape
 				beam.rotation(0);
