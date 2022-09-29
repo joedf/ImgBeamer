@@ -1,9 +1,12 @@
 function drawBaseBeam(stage) {
 	// create our shape
-	var beam = new Konva.Circle({
+	var beam = new Konva.Ellipse({
 		x: stage.width() / 2,
 		y: stage.height() / 2,
-		radius: 70,
+		radius: {
+			x: 70,
+			y: 70
+		},
 		fill: 'white',
 		strokeWidth: 0,
 	});
@@ -11,6 +14,14 @@ function drawBaseBeam(stage) {
 	var layer = stage.getLayers()[0];
 	layer.add(beam);
 	layer.draw();
+
+	// make it editable	
+	var tr = new Konva.Transformer({
+		nodes: [beam],
+		centeredScaling: true,
+	});
+	layer.listening(true);
+	layer.add(tr);
 
 	return beam;
 }
@@ -90,7 +101,7 @@ function drawBaseComposite(stage, sImage, sBeam, updateCallback) {
 	// Give yellow box border to indicate interactive
 	$(stage.getContainer()).css('border-color','yellow')
 
-	var beam = sBeam.clone();
+	var beam = sBeam;//.clone();
 	var image = sImage.clone();
 	image.draggable(true);
 	
@@ -123,7 +134,7 @@ function drawAvgCircle(sourceStage, destStage, sBeam) {
 	var sourceLayer = sourceStage.getLayers()[0];
 	var destLayer = destStage.getLayers()[0];
 
-	var beam = sBeam.clone();
+	var beam = sBeam; //.clone();
 
 	var updateAvgCircle = function(){
 		var pCtx = sourceLayer.getContext();
@@ -215,6 +226,7 @@ function drawProbeLayout(drawStage, baseImage, userImage, beam) {
 				x : (beam.width() / userImage.scaleX()) / 2, //(cell.width/2) * .8,
 				y : (beam.height() / userImage.scaleY()) / 2 //(cell.height/2) * .8
 			},
+			rotation: beam.rotation(),
 			fill: 'rgba(255,0,0,.4)',
 			strokeWidth: 1,
 			stroke: 'red'

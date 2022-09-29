@@ -8,7 +8,7 @@ var G_UpdateResampled = null;
 
 const G_MAIN_CONTAINER = '#main-container';
 
-Konva.autoDrawEnabled = false;
+Konva.autoDrawEnabled = true;
 
 
 const nStages = 8;
@@ -64,13 +64,16 @@ function OnImageLoaded(eImg, beam, stages){
 	var image = subregionImage.clone().off();
 
 	$(baseCompositeStage.getContainer()).attr('box_label', 'Spot Content');
-	var userScaledImage = drawBaseComposite(baseCompositeStage, image, beam, doUpdate);
+	var compositeBeam = beam.clone();
+	var userScaledImage = drawBaseComposite(baseCompositeStage, image, compositeBeam, doUpdate);
 
 	$(avgCircleStage.getContainer()).attr('box_label', 'Spot Signal');
-	var updateAvgCircle = drawAvgCircle(baseCompositeStage, avgCircleStage, beam);
+	var avgCircleBeam = beam.clone();
+	var updateAvgCircle = drawAvgCircle(baseCompositeStage, avgCircleStage, avgCircleBeam);
 
 	$(probeLayoutStage.getContainer()).attr('box_label', 'Spot Layout');
-	var probeLayout = drawProbeLayout(probeLayoutStage, subregionImage, userScaledImage, beam);
+	var layoutBeam = beam.clone();
+	var probeLayout = drawProbeLayout(probeLayoutStage, subregionImage, userScaledImage, layoutBeam);
 	var updateProbeLayout = probeLayout.updateCallback;
 
 	// compute resampled image
@@ -99,6 +102,23 @@ function OnImageLoaded(eImg, beam, stages){
 
 	$(groundtruthMapStage.getContainer()).attr('box_label', 'Sample Groundtruth');
 	var updateGroundtruthMap = drawGroundtruthImage(groundtruthMapStage, eImg, subregionImage, sz);
+
+	// update beams
+	beam.on('transform', function(){
+		compositeBeam.scale(beam.scale());
+		compositeBeam.rotation(beam.rotation());
+		avgCircleBeam.scale(beam.scale());
+		avgCircleBeam.rotation(beam.rotation());
+
+		var maxScale = Math.max(beam.scaleX(), beam.scaleY());
+		layoutBeam.size({
+			width: beam.width() * (beam.scaleX() / maxScale),
+			height: beam.height() * (beam.scaleY() / maxScale),
+		});
+		layoutBeam.rotation(beam.rotation());
+
+		doUpdate();
+	});
 
 	doUpdate();
 }
