@@ -54,6 +54,7 @@ function drawBaseBeam(stage) {
 				beam.rotation(0);
 				beam.scale({x:1, y:1});
 				// update other beams based on this one
+				// https://konvajs.org/docs/events/Fire_Events.html
 				beam.fire('transform');
 				break;
 		
