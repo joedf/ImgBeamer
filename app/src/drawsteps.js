@@ -437,6 +437,15 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 	});
 	layer.add(image);
 
+	// draw an indicator to show which row was last drawn
+	var indicator = new Konva.Rect({
+		x: 0, y: 0,
+		width: 20,
+		height: 3,
+		fill: 'red',
+	});
+	layer.add(indicator);
+
 	var context = canvas.getContext('2d');
 	context.imageSmoothingEnabled = false;
 
@@ -512,6 +521,9 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 			ctx.fillStyle = color;
 			ctx.fillRect(cellX, cellY, cellW, cellH);
 		}
+
+		// move/update the indicator
+		indicator.y((row+1) * cellH - indicator.height());
 
 		layer.batchDraw();
 
