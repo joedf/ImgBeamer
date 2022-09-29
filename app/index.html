@@ -111,14 +111,22 @@
 
 			var stageFinal = stages[stages.length - 1];
 
-			$('#generateFinal').click(function(e){
+			var doGenerateSubRegion = function(e){
 				$('#loadspinner').show();
 				
 				setTimeout(function(){
 					G_UpdateResampled(false);
 					$('#loadspinner').hide();
 				}, 250);
+			};
+
+			$('#iRows, #iCols').keypress(function(e){
+				if ( e.which == 13 ) {
+					e.preventDefault();
+					doGenerateSubRegion();
+				}
 			});
+			$('#generateFinal').click(doGenerateSubRegion);
 			$('#openInNewTab').click(function(e){
 				var url = stageFinal.toDataURL({pixelRatio:2});
 				window.open(url, '_blank').focus();
