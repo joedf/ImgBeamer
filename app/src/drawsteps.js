@@ -62,6 +62,10 @@ function drawBaseBeam(stage) {
 				// https://konvajs.org/docs/events/Fire_Events.html
 				beam.fire('transform');
 				break;
+			
+			case 27: // 'esc' key, deselect all
+				tr.nodes([]);
+				break;
 		
 			default: break;
 		}
