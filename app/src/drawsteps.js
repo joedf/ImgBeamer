@@ -19,9 +19,15 @@ function drawBaseBeam(stage) {
 	layer.draw();
 
 	// make it editable	
+	// make it editable
 	var tr = new Konva.Transformer({
 		nodes: [beam],
 		centeredScaling: true,
+		// style the transformer:
+		// https://konvajs.org/docs/select_and_transform/Transformer_Styling.html
+		anchorSize: 9,
+		anchorCornerRadius: 5,
+		borderDash: [3, 3],
 	});
 	layer.listening(true);
 	layer.add(tr);
