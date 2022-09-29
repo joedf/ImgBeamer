@@ -439,7 +439,7 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 
 	// draw an indicator to show which row was last drawn
 	var indicator = new Konva.Rect({
-		x: 0, y: 0,
+		x: stage.width() - 20, y: 0,
 		width: 20,
 		height: 3,
 		fill: 'red',
