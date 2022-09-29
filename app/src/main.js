@@ -75,15 +75,17 @@ function OnImageLoaded(eImg, beam, stages){
 	var layoutBeam = beam.clone();
 	var probeLayout = drawProbeLayout(probeLayoutStage, subregionImage, userScaledImage, layoutBeam);
 	var updateProbeLayout = probeLayout.updateCallback;
-
+	
 	// compute resampled image
 	$(layoutSampledStage.getContainer()).attr('box_label', 'Sample Subregion');
-	var updateProbeLayoutSamplingPreview = drawProbeLayoutSampling(layoutSampledStage, probeLayout.image, userScaledImage, beam);
+	var layoutSampledBeam = beam.clone();
+	var updateProbeLayoutSamplingPreview = drawProbeLayoutSampling(layoutSampledStage, probeLayout.image, userScaledImage, layoutSampledBeam);
 
 
 	$(resampledStage.getContainer()).css('border-color', 'lime');
 	$(resampledStage.getContainer()).attr('box_label', 'Resulting Subregion');
-	var updateResampled = drawResampled(layoutSampledStage, resampledStage, probeLayout.image, userScaledImage, beam);
+	var resampledBeam = beam.clone();
+	var updateResampled = drawResampled(layoutSampledStage, resampledStage, probeLayout.image, userScaledImage, resampledBeam);
 
 	var updateResamplingSteps = function(internallyCalled){
 		var rows = getRowsInput();
@@ -110,12 +112,19 @@ function OnImageLoaded(eImg, beam, stages){
 		avgCircleBeam.scale(beam.scale());
 		avgCircleBeam.rotation(beam.rotation());
 
+		// keep the shape of the ellipse, not the actual size of it...
 		var maxScale = Math.max(beam.scaleX(), beam.scaleY());
 		layoutBeam.size({
 			width: beam.width() * (beam.scaleX() / maxScale),
 			height: beam.height() * (beam.scaleY() / maxScale),
 		});
 		layoutBeam.rotation(beam.rotation());
+
+		layoutSampledBeam.size(layoutBeam.size());
+		layoutSampledBeam.rotation(layoutBeam.rotation());
+		
+		resampledBeam.size(layoutBeam.size());
+		resampledBeam.rotation(layoutBeam.rotation());
 
 		doUpdate();
 	});

@@ -246,7 +246,7 @@ function drawProbeLayout(drawStage, baseImage, userImage, beam) {
 
 function drawProbeLayoutSampling(drawStage, originalImage, userImage, sBeam) {
 	var baseImage = originalImage; //.clone();
-	var beam = sBeam.clone();
+	var beam = sBeam; //.clone();
 
 	var baseGridRect = new Konva.Rect(baseImage.getSelfRect());
 
@@ -259,6 +259,7 @@ function drawProbeLayoutSampling(drawStage, originalImage, userImage, sBeam) {
 				x : (beam.width() / userImage.scaleX()) / 2,
 				y : (beam.height() / userImage.scaleY()) / 2
 			},
+			rotation: beam.rotation(),
 			fill: 'white',
 			listening: false,
 		});
@@ -276,7 +277,7 @@ function drawProbeLayoutSampling(drawStage, originalImage, userImage, sBeam) {
 
 function drawResampled(sourceStage, destStage, originalImage, userImage, sBeam) {
 	var baseImage = originalImage; //.clone();
-	var beam = sBeam.clone();
+	var beam = sBeam; //.clone();
 
 	var baseGridRect = new Konva.Rect(baseImage.getSelfRect());
 
@@ -289,6 +290,7 @@ function drawResampled(sourceStage, destStage, originalImage, userImage, sBeam) 
 				x : (beam.width() / userImage.scaleX()) / 2,
 				y : (beam.height() / userImage.scaleY()) / 2
 			},
+			rotation: beam.rotation(),
 			fill: 'white',
 			listening: false,
 		});
