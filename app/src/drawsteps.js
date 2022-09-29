@@ -408,5 +408,125 @@ function drawGroundtruthImage(stage, imageObj, subregionImage, maxSize=300){
 	update();
 	stage.draw();
 
-	return update;
+	return {
+		updateFunc: update,
+		subregionRect: rect
+	};
+}
+
+function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, originalImageObj, userScaledImage){
+	var rows = 0, cols = 0;
+	var cellW = 0, cellH = 0;
+	var currentRow = 0;
+
+	var refreshDelay = 500;
+
+	// use the canvas API directly in a konva stage
+	// https://konvajs.org/docs/sandbox/Free_Drawing.html
+
+	var layer = stage.getLayers()[0];
+	var canvas = document.createElement('canvas');
+	canvas.width = stage.width();
+	canvas.height = stage.height();
+
+	// the canvas is added to the layer as a "Konva.Image" element
+	var image = new Konva.Image({
+		image: canvas,
+		x: 0,
+		y: 0,
+	});
+	layer.add(image);
+
+	var context = canvas.getContext('2d');
+	context.imageSmoothingEnabled = false;
+
+	var beamRadius = {x : 0, y: 0};
+
+	var updateConfigValues = function(){
+		var ratioX = subregionRectStage.width() / subregionRect.width();
+		var ratioY = subregionRectStage.height() / subregionRect.height();
+
+		rows = Math.floor(getRowsInput() * ratioY);
+		cols = Math.floor(getColsInput() * ratioX);
+
+		// save last value, to detect significant change
+		var lastCellW = cellW, lastCellH = cellH;
+
+		cellW = stage.width() / cols;
+		cellH = stage.height() / rows;
+
+		var significantChange = (cellW != lastCellW) && (cellH != lastCellH);
+
+		// get beam size based on user-scaled image
+		beamRadius = {
+			x : (beam.width() / userScaledImage.scaleX()) / 2,
+			y : (beam.height() / userScaledImage.scaleY()) / 2
+		};
+
+		refreshDelay = getSEMRefreshDelay();
+
+		// we can clear the screen here, if we want to avoid lines from previous configs...
+		if (significantChange) { // if it affects the drawing
+			context.clearRect(0, 0, canvas.width, canvas.height);
+		}
+	};
+	updateConfigValues();
+
+	// var colors = ['blue', 'yellow', 'red', 'green', 'cyan', 'pink'];
+	var colors = ['#DDDDDD','#EEEEEE','#CCCCCC','#999999','#666666','#333333','#B6B6B6','#1A1A1A'];
+	var color = colors[getRandomInt(colors.length)];
+
+	// original image size
+	var iw = originalImageObj.naturalWidth, ih = originalImageObj.naturalHeight;
+	// get scale factor for full image size
+	var irw = (iw / stage.width()), irh = (ih / stage.height());
+
+	var doUpdate = function(){
+		var row = currentRow++;
+		var ctx = context;
+
+		if (currentRow >= rows)
+			currentRow = 0;
+
+		// interate over X
+		for (let i = 0; i < cols; i++) {
+			const cellX = i * cellW;
+			const cellY = row * cellH;
+
+			// TODO: check these values and the ComputeProbeValue_gs again
+			// since the final image seems to differ...
+
+			// map/transform values to full resolution image coordinates
+			const scaledProbe = {
+				centerX: (cellX + cellW/2) * irw,
+				centerY: (cellY + cellH/2) * irh,
+				rotationRad: toRadians(beam.rotation()),
+				radiusX: beamRadius.x * irw,
+				radiusY: beamRadius.y * irh,
+			};
+
+			// compute the pixel value, for the given spot/probe profile
+			var gsValue = ComputeProbeValue_gs(originalImageObj, scaledProbe);
+			color = 'rgba('+[gsValue,gsValue,gsValue].join(',')+',1)';
+
+			ctx.fillStyle = color;
+			ctx.fillRect(cellX, cellY, cellW, cellH);
+		}
+
+		layer.batchDraw();
+
+		// use this for debugging, less heavy, draw random color rows
+		// color = colors[getRandomInt(colors.length)];
+		// updateConfigValues();
+
+		// see comment on using this instead of setInterval below
+		setTimeout(doUpdate, refreshDelay);
+	};
+
+	//var updateLoop = setInterval(doUpdate, 500);
+	// use setTimer instead, to adapt delay while running
+	// https://stackoverflow.com/questions/1280263/changing-the-interval-of-setinterval-while-its-running
+	setTimeout(doUpdate, refreshDelay);
+
+	return updateConfigValues;
 }

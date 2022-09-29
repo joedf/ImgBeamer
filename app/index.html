@@ -28,6 +28,10 @@
 							<td><input type="number" id="iCols" placeholder="8"></td>
 						</tr>
 						<tr>
+							<td>Refresh delay (ms)</td>
+							<td><input type="number" id="iDelaySEM" placeholder="300"></td>
+						</tr>
+						<tr>
 							<td><button id="generateFinal">Generate preview</button></td>
 							<td>
 								<button id="openInNewTab">Open in new tab</button>
@@ -114,13 +118,15 @@
 			var doGenerateSubRegion = function(e){
 				$('#loadspinner').show();
 				
+				G_UpdateVirtualSEMConfig();
+				
 				setTimeout(function(){
 					G_UpdateResampled(false);
 					$('#loadspinner').hide();
 				}, 250);
 			};
 
-			$('#iRows, #iCols').keypress(function(e){
+			$('#iRows, #iCols, #iDelaySEM').keypress(function(e){
 				if ( e.which == 13 ) {
 					e.preventDefault();
 					doGenerateSubRegion();

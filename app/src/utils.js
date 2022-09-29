@@ -42,6 +42,7 @@ function getCellHInput(){ return getInputValueInt($('#iCellH')); }
 function getSpotXInput(){ return getInputValueInt($('#iSpotX')); }
 function getSpotYInput(){ return getInputValueInt($('#iSpotY')); }
 function getSpotAngleInput(){ return getInputValueInt($('#iSpotAngle')); }
+function getSEMRefreshDelay(){ return getInputValueInt($('#iDelaySEM')); }
 
 function MakeZoomHandler(stage, konvaObj, callback=null, scaleFactor=1.2, scaleMin=0, scaleMax=Infinity) {
 	var handler = function(e){
@@ -79,6 +80,11 @@ function MakeZoomHandler(stage, konvaObj, callback=null, scaleFactor=1.2, scaleM
 	};
 
 	return handler;
+}
+
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random
+function getRandomInt(max) {
+	return Math.floor(Math.random() * max);
 }
 
 function fitImageProportions(w, h, maxDimension, doFill=false){

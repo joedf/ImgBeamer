@@ -5,13 +5,14 @@ const INPUT_IMAGE = 'src/testimages/grains2tl.png';
 const COMPOSITE_OP = 'source-in';
 // const COMPOSITE_OP = 'destination-in';
 var G_UpdateResampled = null;
+var G_UpdateVirtualSEMConfig = null;
 
 const G_MAIN_CONTAINER = '#main-container';
 
 Konva.autoDrawEnabled = true;
 
 
-const nStages = 8;
+const nStages = 9;
 var sz = Math.max((document.body.clientWidth / 4) - (4 * 5), 300);
 var mc = $(G_MAIN_CONTAINER);
 
@@ -51,12 +52,14 @@ function OnImageLoaded(eImg, beam, stages){
 	var layoutSampledStage = stages[6];
 	var resampledStage = stages[7];
 	var groundtruthMapStage = stages[0];
+	var virtualSEMStage = stages[8];
 
 	var doUpdate = function(){
 		updateAvgCircle();
 		updateProbeLayout();
 		updateResamplingSteps(true);
 		updateGroundtruthMap();
+		updateVirtualSEM_Config();
 	};
 
 	// draw base image (can pan & zoom)
@@ -113,7 +116,13 @@ function OnImageLoaded(eImg, beam, stages){
 
 	// draw Sample Groundtruth
 	$(groundtruthMapStage.getContainer()).attr('box_label', 'Sample Groundtruth');
-	var updateGroundtruthMap = drawGroundtruthImage(groundtruthMapStage, eImg, subregionImage, sz);
+	var groundtruthMap = drawGroundtruthImage(groundtruthMapStage, eImg, subregionImage, sz);
+	var updateGroundtruthMap = groundtruthMap.updateFunc;
+	
+	$(virtualSEMStage.getContainer()).attr('box_label', 'Resulting Image');
+	var vitualSEMBeam = beam.clone();
+	var updateVirtualSEM_Config = drawVirtualSEM(virtualSEMStage, vitualSEMBeam, groundtruthMap.subregionRect, groundtruthMapStage, eImg, userScaledImage);
+	G_UpdateVirtualSEMConfig = updateVirtualSEM_Config;
 
 	// update beams
 	beam.on('transform', function(){
@@ -135,6 +144,8 @@ function OnImageLoaded(eImg, beam, stages){
 		
 		resampledBeam.size(layoutBeam.size());
 		resampledBeam.rotation(layoutBeam.rotation());
+
+		vitualSEMBeam.rotation(layoutBeam.rotation());
 
 		doUpdate();
 	});
