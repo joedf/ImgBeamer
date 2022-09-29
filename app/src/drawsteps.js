@@ -18,7 +18,6 @@ function drawBaseBeam(stage) {
 	layer.add(beam);
 	layer.draw();
 
-	// make it editable	
 	// make it editable
 	var tr = new Konva.Transformer({
 		nodes: [beam],
