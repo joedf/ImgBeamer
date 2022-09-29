@@ -1,9 +1,15 @@
 function drawBaseBeam(stage) {
+	// default beam shape values
+	var defaultRadius = {
+		x: 70,
+		y: 70
+	};
+
 	// create our shape
-	var beam = new Konva.Circle({
+	var beam = new Konva.Ellipse({
 		x: stage.width() / 2,
 		y: stage.height() / 2,
-		radius: 70,
+		radius: defaultRadius,
 		fill: 'white',
 		strokeWidth: 0,
 	});
@@ -11,6 +17,51 @@ function drawBaseBeam(stage) {
 	var layer = stage.getLayers()[0];
 	layer.add(beam);
 	layer.draw();
+
+	// make it editable	
+	var tr = new Konva.Transformer({
+		nodes: [beam],
+		centeredScaling: true,
+	});
+	layer.listening(true);
+	layer.add(tr);
+
+	// make it (de)selectable
+	// based on https://konvajs.org/docs/select_and_transform/Basic_demo.html
+	stage.on('click tap', function (e) {
+		// if click on empty area - remove all selections
+		if (e.target === stage) {
+			tr.nodes([]);
+			return;
+		}
+
+		const isSelected = tr.nodes().indexOf(e.target) >= 0;
+		if (!isSelected) {
+			// was not already selected, so now we add it to the transformer
+			// select just the one
+			tr.nodes([e.target]);
+		}
+	});
+
+	// keyboard events
+	// based on https://konvajs.org/docs/events/Keyboard_Events.html
+	var container = stage.container();
+	// make it focusable
+	container.tabIndex = 1;
+	container.addEventListener('keydown', function(e) {
+		switch (e.keyCode) {
+			case 82: // 'r' key, reset beam shape
+				beam.rotation(0);
+				beam.scale({x:1, y:1});
+				// update other beams based on this one
+				// https://konvajs.org/docs/events/Fire_Events.html
+				beam.fire('transform');
+				break;
+		
+			default: break;
+		}
+		e.preventDefault();
+	});
 
 	return beam;
 }
@@ -90,7 +141,7 @@ function drawBaseComposite(stage, sImage, sBeam, updateCallback) {
 	// Give yellow box border to indicate interactive
 	$(stage.getContainer()).css('border-color','yellow')
 
-	var beam = sBeam.clone();
+	var beam = sBeam;//.clone();
 	var image = sImage.clone();
 	image.draggable(true);
 	
@@ -123,7 +174,7 @@ function drawAvgCircle(sourceStage, destStage, sBeam) {
 	var sourceLayer = sourceStage.getLayers()[0];
 	var destLayer = destStage.getLayers()[0];
 
-	var beam = sBeam.clone();
+	var beam = sBeam; //.clone();
 
 	var updateAvgCircle = function(){
 		var pCtx = sourceLayer.getContext();
@@ -215,6 +266,7 @@ function drawProbeLayout(drawStage, baseImage, userImage, beam) {
 				x : (beam.width() / userImage.scaleX()) / 2, //(cell.width/2) * .8,
 				y : (beam.height() / userImage.scaleY()) / 2 //(cell.height/2) * .8
 			},
+			rotation: beam.rotation(),
 			fill: 'rgba(255,0,0,.4)',
 			strokeWidth: 1,
 			stroke: 'red'
@@ -234,7 +286,7 @@ function drawProbeLayout(drawStage, baseImage, userImage, beam) {
 
 function drawProbeLayoutSampling(drawStage, originalImage, userImage, sBeam) {
 	var baseImage = originalImage; //.clone();
-	var beam = sBeam.clone();
+	var beam = sBeam; //.clone();
 
 	var baseGridRect = new Konva.Rect(baseImage.getSelfRect());
 
@@ -247,6 +299,7 @@ function drawProbeLayoutSampling(drawStage, originalImage, userImage, sBeam) {
 				x : (beam.width() / userImage.scaleX()) / 2,
 				y : (beam.height() / userImage.scaleY()) / 2
 			},
+			rotation: beam.rotation(),
 			fill: 'white',
 			listening: false,
 		});
@@ -264,7 +317,7 @@ function drawProbeLayoutSampling(drawStage, originalImage, userImage, sBeam) {
 
 function drawResampled(sourceStage, destStage, originalImage, userImage, sBeam) {
 	var baseImage = originalImage; //.clone();
-	var beam = sBeam.clone();
+	var beam = sBeam; //.clone();
 
 	var baseGridRect = new Konva.Rect(baseImage.getSelfRect());
 
@@ -277,6 +330,7 @@ function drawResampled(sourceStage, destStage, originalImage, userImage, sBeam) 
 				x : (beam.width() / userImage.scaleX()) / 2,
 				y : (beam.height() / userImage.scaleY()) / 2
 			},
+			rotation: beam.rotation(),
 			fill: 'white',
 			listening: false,
 		});
