@@ -23,15 +23,18 @@ for (let i = 0; i < nStages; i++) {
 	stages.push(stage);
 }
 
+// draw Spot Profile
 var baseBeamStage = stages[2];
-$(baseBeamStage.getContainer()).attr('box_label', 'Spot Profile');
-$(baseBeamStage.getContainer()).css('border-color', 'red');
+$(baseBeamStage.getContainer())
+	.attr('box_label', 'Spot Profile')
+	.css('border-color', 'red');
 var G_BASE_BEAM = drawBaseBeam(baseBeamStage);
 
 /////////////////////
 
 var G_MAIN_IMAGE_OBJ = null
 
+// load image and wait for when ready
 loadImage(INPUT_IMAGE, function(event){
 	var imageObj = event.target;
 	G_MAIN_IMAGE_OBJ = imageObj;
@@ -57,37 +60,43 @@ function OnImageLoaded(eImg, beam, stages){
 	};
 
 	// draw base image (can pan & zoom)
-	$(baseImageStage.getContainer()).css('border-color', 'blue');
-	$(baseImageStage.getContainer()).attr('box_label', 'Subregion View');
+	$(baseImageStage.getContainer())
+		.attr('box_label', 'Subregion View')
+		.css('border-color', 'blue');
 	var subregionImage = drawBaseImage(baseImageStage, eImg, sz, false, doUpdate);
 
 	// make a clone without copying over the event bindings
 	var image = subregionImage.clone().off();
 
+	// draw Spot Content
 	$(baseCompositeStage.getContainer()).attr('box_label', 'Spot Content');
 	var compositeBeam = beam.clone();
 	var userScaledImage = drawBaseComposite(baseCompositeStage, image, compositeBeam, doUpdate);
 
+	// draw Spot Signal
 	$(avgCircleStage.getContainer()).attr('box_label', 'Spot Signal');
 	var avgCircleBeam = beam.clone();
 	var updateAvgCircle = drawAvgCircle(baseCompositeStage, avgCircleStage, avgCircleBeam);
 
+	// draw Spot Layout
 	$(probeLayoutStage.getContainer()).attr('box_label', 'Spot Layout');
 	var layoutBeam = beam.clone();
 	var probeLayout = drawProbeLayout(probeLayoutStage, subregionImage, userScaledImage, layoutBeam);
 	var updateProbeLayout = probeLayout.updateCallback;
 	
+	// draw Sample Subregion
 	// compute resampled image
 	$(layoutSampledStage.getContainer()).attr('box_label', 'Sample Subregion');
 	var layoutSampledBeam = beam.clone();
 	var updateProbeLayoutSamplingPreview = drawProbeLayoutSampling(layoutSampledStage, probeLayout.image, userScaledImage, layoutSampledBeam);
 
-
-	$(resampledStage.getContainer()).css('border-color', 'lime');
-	$(resampledStage.getContainer()).attr('box_label', 'Resulting Subregion');
+	// draw Resulting Subregion
+	$(resampledStage.getContainer())
+		.attr('box_label', 'Resulting Subregion')
+		.css('border-color', 'lime');
 	var resampledBeam = beam.clone();
 	var updateResampled = drawResampled(layoutSampledStage, resampledStage, probeLayout.image, userScaledImage, resampledBeam);
-
+	
 	var updateResamplingSteps = function(internallyCalled){
 		var rows = getRowsInput();
 		var cols = getColsInput();
@@ -100,9 +109,9 @@ function OnImageLoaded(eImg, beam, stages){
 		updateProbeLayoutSamplingPreview();
 		updateResampled();
 	};
-
 	G_UpdateResampled = updateResamplingSteps;
 
+	// draw Sample Groundtruth
 	$(groundtruthMapStage.getContainer()).attr('box_label', 'Sample Groundtruth');
 	var updateGroundtruthMap = drawGroundtruthImage(groundtruthMapStage, eImg, subregionImage, sz);
 
