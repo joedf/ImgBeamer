@@ -26,14 +26,17 @@ summary {
 
 .box::after {
 	content: attr(note);
-	color: yellow;
-	text-shadow: #000 1px 1px;
+	/* color: yellow; */
+	background: rgba(0,0,0,0.5);
 	font-family: monospace;
 	float: right;
 	position: absolute;
-	bottom: .5em;
-	right: .5em;
+	/* bottom: .5em; right: .5em; */
+	bottom: 0; right: 0;
+	padding: 2px 4px;
 }
+
+.box.note_colored::after { color: yellow; }
 
 .final {
 	background-color: #172542;

@@ -69,6 +69,7 @@ function OnImageLoaded(eImg, beam, stages){
 	// draw base image (can pan & zoom)
 	$(baseImageStage.getContainer())
 		.attr('box_label', 'Subregion View')
+		.attr('note', 'Pan & Zoom: Drag and Scroll')
 		.css('border-color', 'blue');
 	var subregionImage = drawBaseImage(baseImageStage, eImg, G_BoxSize, false, doUpdate);
 
@@ -76,12 +77,16 @@ function OnImageLoaded(eImg, beam, stages){
 	var image = subregionImage.clone().off();
 
 	// draw Spot Content
-	$(baseCompositeStage.getContainer()).attr('box_label', 'Spot Content');
+	$(baseCompositeStage.getContainer())
+		.attr('box_label', 'Spot Content')
+		.attr('note', 'Scroll to adjust spot size');
 	var compositeBeam = beam.clone();
 	var userScaledImage = drawBaseComposite(baseCompositeStage, image, compositeBeam, doUpdate);
 
 	// draw Spot Signal
-	$(avgCircleStage.getContainer()).attr('box_label', 'Spot Signal');
+	$(avgCircleStage.getContainer())
+		.addClass('note_colored')
+		.attr('box_label', 'Spot Signal');
 	var avgCircleBeam = beam.clone();
 	var updateAvgCircle = drawAvgCircle(baseCompositeStage, avgCircleStage, avgCircleBeam);
 
