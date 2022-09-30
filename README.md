@@ -11,9 +11,9 @@
 8. Resulting Subregion
 9. Resulting Image (full, "virtual SEM")
 
-### To Do
-- verify/fix issue in virtualSEM; spot size seems to be too large
-- updated terms
+### To Do / Notes
+- Minor pixel value differences in virtualSEM; improved, but could be due to sampling from  downsized sampling of the larger full image
+- Update terms
  
 ### Screenshot
 ![screenshot1](misc/screenshot1.png)
