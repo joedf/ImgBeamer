@@ -455,8 +455,8 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 		var ratioX = subregionRectStage.width() / subregionRect.width();
 		var ratioY = subregionRectStage.height() / subregionRect.height();
 
-		rows = Math.floor(getRowsInput() * ratioY);
-		cols = Math.floor(getColsInput() * ratioX);
+		rows = Math.round(getRowsInput() * ratioY);
+		cols = Math.round(getColsInput() * ratioX);
 
 		// save last value, to detect significant change
 		var lastCellW = cellW, lastCellH = cellH;
