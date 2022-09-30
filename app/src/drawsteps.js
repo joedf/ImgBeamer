@@ -468,8 +468,8 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 
 		// get beam size based on user-scaled image
 		beamRadius = {
-			x : (beam.width() / userScaledImage.scaleX()) / 2,
-			y : (beam.height() / userScaledImage.scaleY()) / 2
+			x : (beam.width() / userScaledImage.scaleX()) / 2 / ratioX,
+			y : (beam.height() / userScaledImage.scaleY()) / 2 / ratioY
 		};
 
 		refreshDelay = getSEMRefreshDelay();
