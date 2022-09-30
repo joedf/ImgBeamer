@@ -24,8 +24,8 @@ function drawBaseBeam(stage) {
 		centeredScaling: true,
 		// style the transformer:
 		// https://konvajs.org/docs/select_and_transform/Transformer_Styling.html
-		anchorSize: 9,
-		anchorCornerRadius: 5,
+		anchorSize: 11,
+		anchorCornerRadius: 3,
 		borderDash: [3, 3],
 	});
 	layer.listening(true);
