@@ -68,6 +68,7 @@ function OnImageLoaded(eImg, beam, stages){
 
 	// draw base image (can pan & zoom)
 	$(baseImageStage.getContainer())
+		.addClass('grabCursor')
 		.attr('box_label', 'Subregion View')
 		.attr('note', 'Pan & Zoom: Drag and Scroll')
 		.css('border-color', 'blue');
@@ -78,6 +79,7 @@ function OnImageLoaded(eImg, beam, stages){
 
 	// draw Spot Content
 	$(baseCompositeStage.getContainer())
+		.addClass('grabCursor')
 		.attr('box_label', 'Spot Content')
 		.attr('note', 'Scroll to adjust spot size');
 	var compositeBeam = beam.clone();

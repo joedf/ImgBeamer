@@ -4,6 +4,20 @@ body {
 	font-family: Arial, Helvetica, sans-serif;
 }
 
+/* https://stackoverflow.com/a/18294634 */
+.grabCursor {
+	cursor: move; /* fallback if grab cursor is unsupported */
+	cursor: grab;
+	cursor: -moz-grab;
+	cursor: -webkit-grab;
+}
+.grabCursor:active {
+	/* (Optional) Apply a "closed-hand" cursor during drag operation. */
+	cursor: grabbing;
+	cursor: -moz-grabbing;
+	cursor: -webkit-grabbing;
+}
+
 summary {
 	cursor: pointer;
 }
