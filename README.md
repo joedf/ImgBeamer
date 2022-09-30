@@ -16,4 +16,4 @@
 - Update terms
  
 ### Screenshot
-![screenshot1](misc/screenshot1.png)
+![screenshot1](misc/screenshot2.png)
