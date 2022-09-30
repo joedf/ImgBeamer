@@ -208,7 +208,7 @@ function drawAvgCircle(sourceStage, destStage, sBeam) {
 		avgCircle.stroke(avgColor);
 		avgCircle.fill(avgColor);
 
-		destStage.getContainer().setAttribute('pixel_value', avgColor);
+		destStage.getContainer().setAttribute('note', avgColor);
 
 		destLayer.draw();
 	};

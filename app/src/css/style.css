@@ -25,8 +25,9 @@ summary {
 }
 
 .box::after {
-	content: attr(pixel_value);
+	content: attr(note);
 	color: yellow;
+	text-shadow: #000 1px 1px;
 	font-family: monospace;
 	float: right;
 	position: absolute;
