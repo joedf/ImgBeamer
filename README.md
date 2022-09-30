@@ -1,7 +1,7 @@
 # ImageProbeSampler
 
 ### Stages / Boxes
-1. Sample Groundtruth (map navigation)
+1. Sample Ground Truth (map navigation)
 2. Subregion View ("zoomed" view)
 3. Spot Profile
 4. Spot Content

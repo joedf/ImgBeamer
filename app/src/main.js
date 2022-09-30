@@ -125,8 +125,8 @@ function OnImageLoaded(eImg, beam, stages){
 	};
 	G_UpdateResampled = updateResamplingSteps;
 
-	// draw Sample Groundtruth
-	$(groundtruthMapStage.getContainer()).attr('box_label', 'Sample Groundtruth');
+	// draw Sample Ground Truth
+	$(groundtruthMapStage.getContainer()).attr('box_label', 'Sample Ground Truth');
 	var groundtruthMap = drawGroundtruthImage(groundtruthMapStage, eImg, subregionImage, G_BoxSize);
 	var updateGroundtruthMap = groundtruthMap.updateFunc;
 	
