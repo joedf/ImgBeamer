@@ -541,7 +541,7 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 		setTimeout(doUpdate, refreshDelay);
 
 		var timeDrawTotal = Date.now() - timeRowStart;
-		stage.getContainer().setAttribute('note', timeDrawTotal + " ms / row");
+		stage.getContainer().setAttribute('note', timeDrawTotal + " ms/Row");
 	};
 
 	//var updateLoop = setInterval(doUpdate, 500);
