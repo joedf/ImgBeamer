@@ -14,14 +14,16 @@ Konva.autoDrawEnabled = true;
 
 const nStages = 9;
 var boxesPerPageWidth = 5;
-var sz = Math.max((document.body.clientWidth / boxesPerPageWidth) - (boxesPerPageWidth * 5), 300);
-var mc = $(G_MAIN_CONTAINER);
+var boxBorderW = 2 * (parseInt($('.box:first').css('border-width')) || 1);
+var scrollBarW = 15;
+var G_BoxSize = Math.max((document.body.clientWidth / boxesPerPageWidth) - boxBorderW - scrollBarW, 300);
+var G_MainContainer = $(G_MAIN_CONTAINER);
 
 
 // first create the stages
 var stages = [];
 for (let i = 0; i < nStages; i++) {
-	var stage = newStageTemplate(mc, sz, sz);
+	var stage = newStageTemplate(G_MainContainer, G_BoxSize, G_BoxSize);
 	stages.push(stage);
 }
 
@@ -68,7 +70,7 @@ function OnImageLoaded(eImg, beam, stages){
 	$(baseImageStage.getContainer())
 		.attr('box_label', 'Subregion View')
 		.css('border-color', 'blue');
-	var subregionImage = drawBaseImage(baseImageStage, eImg, sz, false, doUpdate);
+	var subregionImage = drawBaseImage(baseImageStage, eImg, G_BoxSize, false, doUpdate);
 
 	// make a clone without copying over the event bindings
 	var image = subregionImage.clone().off();
@@ -118,7 +120,7 @@ function OnImageLoaded(eImg, beam, stages){
 
 	// draw Sample Groundtruth
 	$(groundtruthMapStage.getContainer()).attr('box_label', 'Sample Groundtruth');
-	var groundtruthMap = drawGroundtruthImage(groundtruthMapStage, eImg, subregionImage, sz);
+	var groundtruthMap = drawGroundtruthImage(groundtruthMapStage, eImg, subregionImage, G_BoxSize);
 	var updateGroundtruthMap = groundtruthMap.updateFunc;
 	
 	$(virtualSEMStage.getContainer()).attr('box_label', 'Resulting Image');
@@ -198,7 +200,7 @@ function ResampleFullImage() {
 		cv = document.createElement('canvas');
 		cv.id = 'finalCanvas';
 		cv.width = cols; cv.height = rows;
-		var cc = $('<div/>').addClass('box final').appendTo(mc); cc.append(cv);
+		var cc = $('<div/>').addClass('box final').appendTo(G_MainContainer); cc.append(cv);
 	}
 
 	cv.width = cols;
