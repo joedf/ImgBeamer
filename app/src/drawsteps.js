@@ -455,6 +455,7 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 		var ratioX = subregionRectStage.width() / subregionRect.width();
 		var ratioY = subregionRectStage.height() / subregionRect.height();
 
+		// multiply by the ratio, since we should have more cells on the full image
 		rows = Math.round(getRowsInput() * ratioY);
 		cols = Math.round(getColsInput() * ratioX);
 
@@ -468,6 +469,8 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 
 		// get beam size based on user-scaled image
 		beamRadius = {
+			// divide by the ratio, since the spot should be smaller when mapped onto
+			// the full image which is scaled down to the same stage size...
 			x : (beam.width() / userScaledImage.scaleX()) / 2 / ratioX,
 			y : (beam.height() / userScaledImage.scaleY()) / 2 / ratioY
 		};
