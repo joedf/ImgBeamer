@@ -494,6 +494,9 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 	var irw = (iw / stage.width()), irh = (ih / stage.height());
 
 	var doUpdate = function(){
+		// track time to draw the row
+		var timeRowStart = Date.now();
+
 		var row = currentRow++;
 		var ctx = context;
 
@@ -536,6 +539,9 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 
 		// see comment on using this instead of setInterval below
 		setTimeout(doUpdate, refreshDelay);
+
+		var timeDrawTotal = Date.now() - timeRowStart;
+		stage.getContainer().setAttribute('note', timeDrawTotal + " ms");
 	};
 
 	//var updateLoop = setInterval(doUpdate, 500);
