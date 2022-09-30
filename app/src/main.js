@@ -146,6 +146,7 @@ function OnImageLoaded(eImg, beam, stages){
 		resampledBeam.size(layoutBeam.size());
 		resampledBeam.rotation(layoutBeam.rotation());
 
+		vitualSEMBeam.size(layoutBeam.size());
 		vitualSEMBeam.rotation(layoutBeam.rotation());
 
 		doUpdate();
