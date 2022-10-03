@@ -421,6 +421,7 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 
 	var pixelCount = 0
 
+	var currentDrawPass = 0;
 	var refreshDelay = 500;
 
 	// use the canvas API directly in a konva stage
@@ -485,6 +486,8 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 		// we can clear the screen here, if we want to avoid lines from previous configs...
 		if (significantChange) { // if it affects the drawing
 			context.clearRect(0, 0, canvas.width, canvas.height);
+			currentRow = 0; // restart drawing from the top
+			currentDrawPass = 0;
 		}
 	};
 	updateConfigValues();
@@ -505,8 +508,10 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 		var row = currentRow++;
 		var ctx = context;
 
-		if (currentRow >= rows)
+		if (currentRow >= rows) {
 			currentRow = 0;
+			currentDrawPass += 1;
+		}
 
 		// interate over X
 		for (let i = 0; i < cols; i++) {
@@ -532,7 +537,8 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 			ctx.fillStyle = color;
 
 			// optionally, draw with overlap to reduce visual artifacts
-			if (G_DRAW_WITH_OVERLAP && pixelCount >= G_DRAW_OVERLAP_THRESHOLD){
+			if ((currentDrawPass < G_DRAW_OVERLAP_PASSES)
+			&& (G_DRAW_WITH_OVERLAP && pixelCount >= G_DRAW_OVERLAP_THRESHOLD)) {
 				ctx.fillRect(
 					cellX -G_DRAW_OVERLAP_PIXELS,
 					cellY -G_DRAW_OVERLAP_PIXELS,
