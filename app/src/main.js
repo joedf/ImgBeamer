@@ -8,7 +8,7 @@ var G_DRAW_WITH_OVERLAP = true;
 var G_DRAW_OVERLAP_PIXELS = 1;
 // Optionally draw with overlap when above a certain pixel (cell) count
 // set to 0 to essentially ignore this threshold value...
-var G_DRAW_OVERLAP_THRESHOLD = 50 * 50;
+var G_DRAW_OVERLAP_THRESHOLD = 10 * 10; // rows * cols
 // Optionally, to draw normally (w/o overlap) after a number of passes
 var G_DRAW_OVERLAP_PASSES = 1;
 
