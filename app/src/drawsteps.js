@@ -557,15 +557,19 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 		stage.getContainer().setAttribute('note', timeDrawTotal + " ms/Row");
 		
 		// see comment on using this instead of setInterval below
-		// setTimeout(doUpdate, refreshDelay);
-		requestAnimationFrame(doUpdate);
+		setTimeout(doUpdate, refreshDelay);
+		// requestAnimationFrame(doUpdate);
 	};
 
 	//var updateLoop = setInterval(doUpdate, 500);
 	// use setTimer instead, to adapt delay while running
 	// https://stackoverflow.com/questions/1280263/changing-the-interval-of-setinterval-while-its-running
-	// setTimeout(doUpdate, refreshDelay);
-	requestAnimationFrame(doUpdate);
+	setTimeout(doUpdate, refreshDelay);
+
+	// Don't use requestAnimationFrame instead of timers for now, since a warning is logged
+	// for each frame taking longer than ~60+ ms... resulting in hundreds/thousands,
+	// possibly slowing down the browser over time...
+	// requestAnimationFrame(doUpdate);
 
 	return updateConfigValues;
 }
