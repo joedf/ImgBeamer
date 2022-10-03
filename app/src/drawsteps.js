@@ -537,17 +537,19 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 		// color = colors[getRandomInt(colors.length)];
 		// updateConfigValues();
 
-		// see comment on using this instead of setInterval below
-		setTimeout(doUpdate, refreshDelay);
-
 		var timeDrawTotal = Date.now() - timeRowStart;
 		stage.getContainer().setAttribute('note', timeDrawTotal + " ms/Row");
+		
+		// see comment on using this instead of setInterval below
+		// setTimeout(doUpdate, refreshDelay);
+		requestAnimationFrame(doUpdate);
 	};
 
 	//var updateLoop = setInterval(doUpdate, 500);
 	// use setTimer instead, to adapt delay while running
 	// https://stackoverflow.com/questions/1280263/changing-the-interval-of-setinterval-while-its-running
-	setTimeout(doUpdate, refreshDelay);
+	// setTimeout(doUpdate, refreshDelay);
+	requestAnimationFrame(doUpdate);
 
 	return updateConfigValues;
 }
