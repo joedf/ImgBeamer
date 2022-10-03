@@ -1,6 +1,15 @@
 var G_DEBUG = false;
 var G_AUTO_PREVIEW_LIMIT = 16 * 16;
 
+// used by "Resulting Image" box / drawVirtualSEM()
+// to reduce artifacts from drawing pixel-by-pixel in canvas
+var G_DRAW_WITH_OVERLAP = true;
+// overlap amount in pixels to all edges (top, left, right, bottom)
+var G_DRAW_OVERLAP_PIXELS = 1;
+// Optionally draw with overlap when above a certain pixel (cell) count
+// set to 0 to essentially ignore this threshold value...
+var G_DRAW_OVERLAP_THRESHOLD = 50 * 50;
+
 const INPUT_IMAGE = 'src/testimages/grains2tl.png';
 const COMPOSITE_OP = 'source-in';
 // const COMPOSITE_OP = 'destination-in';

@@ -419,6 +419,8 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 	var cellW = 0, cellH = 0;
 	var currentRow = 0;
 
+	var pixelCount = 0
+
 	var refreshDelay = 500;
 
 	// use the canvas API directly in a konva stage
@@ -458,6 +460,9 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 		// multiply by the ratio, since we should have more cells on the full image
 		rows = Math.round(getRowsInput() * ratioY);
 		cols = Math.round(getColsInput() * ratioX);
+
+		// the total number of "pixels" (cells) that will drawn
+		pixelCount = rows * cols;
 
 		// save last value, to detect significant change
 		var lastCellW = cellW, lastCellH = cellH;
@@ -525,7 +530,18 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 			color = 'rgba('+[gsValue,gsValue,gsValue].join(',')+',1)';
 
 			ctx.fillStyle = color;
-			ctx.fillRect(cellX, cellY, cellW, cellH);
+
+			// optionally, draw with overlap to reduce visual artifacts
+			if (G_DRAW_WITH_OVERLAP && pixelCount >= G_DRAW_OVERLAP_THRESHOLD){
+				ctx.fillRect(
+					cellX -G_DRAW_OVERLAP_PIXELS,
+					cellY -G_DRAW_OVERLAP_PIXELS,
+					cellW +G_DRAW_OVERLAP_PIXELS,
+					cellH +G_DRAW_OVERLAP_PIXELS
+				);
+			} else {
+				ctx.fillRect(cellX, cellY, cellW, cellH);
+			}
 		}
 
 		// move/update the indicator
