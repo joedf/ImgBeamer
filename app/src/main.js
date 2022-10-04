@@ -109,9 +109,9 @@ function OnImageLoaded(eImg, beam, stages){
 	var probeLayout = drawProbeLayout(probeLayoutStage, subregionImage, userScaledImage, layoutBeam);
 	var updateProbeLayout = probeLayout.updateCallback;
 	
-	// draw Sample Subregion
+	// draw Sampled Subregion
 	// compute resampled image
-	$(layoutSampledStage.getContainer()).attr('box_label', 'Sample Subregion');
+	$(layoutSampledStage.getContainer()).attr('box_label', 'Sampled Subregion');
 	var layoutSampledBeam = beam.clone();
 	var updateProbeLayoutSamplingPreview = drawProbeLayoutSampling(layoutSampledStage, probeLayout.image, userScaledImage, layoutSampledBeam);
 
