@@ -33,6 +33,7 @@ function drawBaseBeam(stage) {
 
 	// make it (de)selectable
 	// based on https://konvajs.org/docs/select_and_transform/Basic_demo.html
+	stage.off('click tap'); // prevent "eventHandler doubling" from subsequent calls
 	stage.on('click tap', function (e) {
 		// if click on empty area - remove all selections
 		if (e.target === stage) {

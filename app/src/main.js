@@ -158,6 +158,7 @@ function OnImageLoaded(eImg, beam, stages){
 	G_UpdateVirtualSEMConfig = updateVirtualSEM_Config;
 
 	// update beams
+	beam.off('transform'); // prevent "eventHandler doubling" from subsequent calls
 	beam.on('transform', function(){
 		compositeBeam.scale(beam.scale());
 		compositeBeam.rotation(beam.rotation());
