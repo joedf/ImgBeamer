@@ -87,6 +87,9 @@ function OnImageLoaded(eImg, beam, stages){
 		updateVirtualSEM_Config();
 	};
 
+	// do once on start, update beam/spot param/stats info
+	updateDisplayBeamParams(beam);
+
 	// Subregion View
 	// draw base image (can pan & zoom)
 	$(baseImageStage.getContainer())
@@ -160,6 +163,8 @@ function OnImageLoaded(eImg, beam, stages){
 	// update beams
 	beam.off('transform'); // prevent "eventHandler doubling" from subsequent calls
 	beam.on('transform', function(){
+		updateDisplayBeamParams(beam);
+
 		compositeBeam.scale(beam.scale());
 		compositeBeam.rotation(beam.rotation());
 		avgCircleBeam.scale(beam.scale());

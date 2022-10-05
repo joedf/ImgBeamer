@@ -88,6 +88,27 @@ function getRandomInt(max) {
 	return Math.floor(Math.random() * max);
 }
 
+function updateDisplayBeamParams(beam) {
+	var infoclass = "parameterDisplay";
+	var eStage = $(beam.getStage().getContainer());
+	var e = eStage.children('.'+infoclass+':first');
+	if (e.length < 1) {
+		eStage.prepend('<span class="'+infoclass+'"></span>');
+		e = eStage.children('.'+infoclass+':first');
+	}
+	if (e.length > 0) {
+		var element = e.get(0);
+
+		var a = beam.radiusX() * beam.scaleX(), b = beam.radiusY() * beam.scaleY();
+		if (a < b) { [a, b] = [b, a] } // swap
+		// https://www.cuemath.com/geometry/eccentricity-of-ellipse/
+		var eccentricity = Math.sqrt(1 - (Math.pow(b,2) / Math.pow(a,2)));
+
+		element.innerHTML = 'Eccentricity: '+eccentricity.toFixed(2) + '<br>' +
+		'Rotation: '+beam.rotation().toFixed(1)+"°";
+	}
+}
+
 function fitImageProportions(w, h, maxDimension, doFill=false){
 	// image ratio to "fit" in canvas
 	var ratio = (w > h ? (w / maxDimension) : (h / maxDimension)) // fit

@@ -28,29 +28,34 @@ summary {
 	position: relative;
 }
 
-.box:before {
-	content: attr(box_label);
+.box:before,
+.box::after,
+.box > span.parameterDisplay {
 	position: absolute;
 	z-index: 20;
-	background: rgba(0,0,0,0.5);
-	padding: 2px 4px;
 	font-size: 12px;
 	font-family: monospace;
+	background: rgba(0,0,0,0.5);
+	padding: 2px 4px;
 }
+
+.box:before { content: attr(box_label); }
 
 .box::after {
 	content: attr(note);
 	/* color: yellow; */
-	background: rgba(0,0,0,0.5);
-	font-family: monospace;
 	float: right;
-	position: absolute;
 	/* bottom: .5em; right: .5em; */
 	bottom: 0; right: 0;
-	padding: 2px 4px;
 }
 
 .box.note_colored::after { color: yellow; }
+
+.box > span.parameterDisplay {
+	top: 0;
+	right: 0;
+	text-align: right;
+}
 
 .final {
 	background-color: #172542;
