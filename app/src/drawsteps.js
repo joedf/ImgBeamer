@@ -462,6 +462,8 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 
 	var beamRadius = {x : 0, y: 0};
 
+	var superScale = 1;
+
 	var updateConfigValues = function(){
 		var ratioX = subregionRectStage.width() / subregionRect.width();
 		var ratioY = subregionRectStage.height() / subregionRect.height();
@@ -488,6 +490,11 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 			x : (beam.width() / userScaledImage.scaleX()) / 2 / ratioX,
 			y : (beam.height() / userScaledImage.scaleY()) / 2 / ratioY
 		};
+
+		// check if we need to scale up the image for sampling...
+		// if the avg spot radius is less than 1, scale up at 1 / x (inversely proportional)
+		var radiusAvg = (beamRadius.x+beamRadius.y)/2;
+		superScale = (radiusAvg < 1) ? 1 / radiusAvg : 1;
 
 		refreshDelay = getSEMRefreshDelay();
 
@@ -541,7 +548,7 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 			};
 
 			// compute the pixel value, for the given spot/probe profile
-			var gsValue = ComputeProbeValue_gs(originalImageObj, scaledProbe);
+			var gsValue = ComputeProbeValue_gs(originalImageObj, scaledProbe, superScale);
 			color = 'rgba('+[gsValue,gsValue,gsValue].join(',')+',1)';
 
 			ctx.fillStyle = color;

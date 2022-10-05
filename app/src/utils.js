@@ -475,7 +475,9 @@ function computeResampledSlow(sourceStage, destStage, oImage, probe, rows, cols,
 function toDegrees (angle) { return angle * (180 / Math.PI); }
 function toRadians (angle) { return angle * (Math.PI / 180); }
 
-function ComputeProbeValue_gs(image, probe) {
+// Gets the average pixel value with a given image and probe.
+// superScale factor to scale up ("blow-up") the image for the sampling
+function ComputeProbeValue_gs(image, probe, superScale=1) {
 	var iw = image.naturalWidth, ih = image.naturalHeight;
 
 	// get ellipse info
@@ -498,8 +500,8 @@ function ComputeProbeValue_gs(image, probe) {
 	if (G_DEBUG) {
 		document.body.appendChild(cv);
 	}
-	cv.width = maxDiameter;
-	cv.height = maxDiameter;
+	cv.width = maxDiameter * superScale;
+	cv.height = maxDiameter * superScale;
 
 	if (cv.width == 0 || cv.height == 0)
 		return 0;
@@ -517,8 +519,8 @@ function ComputeProbeValue_gs(image, probe) {
 		maxDiameter,
 		0,
 		0,
-		maxDiameter,
-		maxDiameter);
+		cv.width,
+		cv.height);
 
 	// then, set the composite operation
 	ctx.globalCompositeOperation = 'destination-in';
@@ -526,17 +528,17 @@ function ComputeProbeValue_gs(image, probe) {
 	// then draw the pixel selection shape
 	ctx.beginPath();
 	ctx.ellipse(
-		maxDiameter / 2,
-		maxDiameter / 2,
-		ellipseInfo.radiusX,
-		ellipseInfo.radiusY,
+		maxDiameter / 2 * superScale,
+		maxDiameter / 2 * superScale,
+		ellipseInfo.radiusX * superScale,
+		ellipseInfo.radiusY * superScale,
 		ellipseInfo.rotationRad,
 		0, 2 * Math.PI);
 	ctx.fillStyle = 'white';
 	ctx.fill();
 
 	// grab the pixel data from the pixel selection area
-	var pxData = ctx.getImageData(0,0,maxDiameter,maxDiameter);
+	var pxData = ctx.getImageData(0,0,cv.width,cv.height);
 
 	// compute the average pixel (excluding 0-0-0-0 rgba pixels)
 	var pxColor = get_avg_pixel_gs(pxData);
