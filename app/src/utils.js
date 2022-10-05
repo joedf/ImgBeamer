@@ -63,8 +63,12 @@ function MakeZoomHandler(stage, konvaObj, callback=null, scaleFactor=1.2, scaleM
 		var pointer = stage.getPointerPosition();
 		var newScale = direction > 0 ? oldScale * scaleBy : oldScale / scaleBy;
 
+		// Allow scale[Min/Max] to be functions or numbers...
+		var _scaleMin = (typeof scaleMin == 'function') ? scaleMin(oldScale, newScale) : scaleMin;
+		var _scaleMax = (typeof scaleMax == 'function') ? scaleMax(oldScale, newScale) : scaleMax;
+
 		// Limit scale based on given bounds
-		var finalScale = Math.min(scaleMax, Math.max(scaleMin, newScale));
+		var finalScale = Math.min(_scaleMax, Math.max(_scaleMin, newScale));
 		
 		if (pointer != null)
 			scaleCenteredOnPoint(pointer, konvaObj, oldScale, finalScale);
