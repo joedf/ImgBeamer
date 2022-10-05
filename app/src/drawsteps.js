@@ -521,6 +521,8 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 			currentDrawPass += 1;
 		}
 
+		var rowIntensitySum = 0;
+
 		// interate over X
 		for (let i = 0; i < cols; i++) {
 			const cellX = i * cellW;
@@ -544,6 +546,8 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 
 			ctx.fillStyle = color;
 
+			rowIntensitySum += gsValue;
+
 			// optionally, draw with overlap to reduce visual artifacts
 			if ((currentDrawPass < G_DRAW_OVERLAP_PASSES)
 			&& (G_DRAW_WITH_OVERLAP && pixelCount >= G_DRAW_OVERLAP_THRESHOLD)) {
@@ -556,6 +560,14 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 			} else {
 				ctx.fillRect(cellX, cellY, cellW, cellH);
 			}
+		}
+
+		// if the last drawn was essentially completely black
+		// assume the spot size was too small or no signal
+		// for 1-2 overlapped-draw passes...
+		var rowIntensityAvg = rowIntensitySum / cols;
+		if (rowIntensityAvg <= 2) { // out of 255
+			currentDrawPass = -1;
 		}
 
 		// move/update the indicator
