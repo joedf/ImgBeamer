@@ -12,11 +12,13 @@ var G_DRAW_OVERLAP_THRESHOLD = 10 * 10; // rows * cols
 // Optionally, to draw normally (w/o overlap) after a number of passes
 var G_DRAW_OVERLAP_PASSES = 1;
 
-const INPUT_IMAGE = 'src/testimages/grains2tl.png';
+// const INPUT_IMAGE = 'src/testimages/grains2tl.png';
+var INPUT_IMAGE = getGroundtruthImage();
 const COMPOSITE_OP = 'source-in';
 // const COMPOSITE_OP = 'destination-in';
 var G_UpdateResampled = null;
 var G_UpdateVirtualSEMConfig = null;
+var G_VirtualSEM_animationFrameRequestId = null;
 
 const G_MAIN_CONTAINER = '#main-container';
 
@@ -50,14 +52,22 @@ var G_BASE_BEAM = drawBaseBeam(baseBeamStage);
 
 var G_MAIN_IMAGE_OBJ = null
 
-// load image and wait for when ready
-loadImage(INPUT_IMAGE, function(event){
-	var imageObj = event.target;
-	G_MAIN_IMAGE_OBJ = imageObj;
-	
-	OnImageLoaded(imageObj, G_BASE_BEAM, stages);
-});
+// call once on App start
+UpdateBaseImage();
 
+// update event for ground truth image change
+$(document.body).on('OnGroundtruthImageChange', UpdateBaseImage);
+
+// once the image is loaded, updates/draws all the stages/boxes
+function UpdateBaseImage(){
+	// load image and wait for when ready
+	loadImage(INPUT_IMAGE, function(event){
+		var imageObj = event.target;
+		G_MAIN_IMAGE_OBJ = imageObj;
+		
+		OnImageLoaded(imageObj, G_BASE_BEAM, stages);
+	});
+}
 
 function OnImageLoaded(eImg, beam, stages){
 	var baseImageStage = stages[1];
@@ -77,6 +87,7 @@ function OnImageLoaded(eImg, beam, stages){
 		updateVirtualSEM_Config();
 	};
 
+	// Subregion View
 	// draw base image (can pan & zoom)
 	$(baseImageStage.getContainer())
 		.addClass('grabCursor')

@@ -101,6 +101,7 @@ function drawBaseImage(stage, oImg, size, doFill = false, updateCallback = null)
 	});
 
 	var layer = stage.getLayers()[0];
+	layer.destroyChildren(); // avoid memory leaks
 
 	var constrainBounds = function(){
 		var scaleX = kImage.scaleX(), scaleY = kImage.scaleY();
@@ -150,6 +151,7 @@ function drawBaseImage(stage, oImg, size, doFill = false, updateCallback = null)
 
 function drawBaseComposite(stage, sImage, sBeam, updateCallback) {
 	var layer = stage.getLayers()[0];
+	layer.destroyChildren();  // avoid memory leaks
 	layer.listening(true);
 
 	// Give yellow box border to indicate interactive
@@ -223,6 +225,7 @@ function drawProbeLayout(drawStage, baseImage, userImage, beam) {
 	// draws probe layout
 	var layers = drawStage.getLayers();
 	var baseLayer = layers[0];
+	baseLayer.destroyChildren(); // avoid memory leaks
 
 	var baseGridRect = new Konva.Rect(baseImage.getSelfRect());
 	
@@ -365,6 +368,9 @@ function drawGroundtruthImage(stage, imageObj, subregionImage, maxSize=300){
 
 	var fit = fitImageProportions(imageObj.naturalWidth, imageObj.naturalHeight, maxSize);
 
+	var layer = stage.getLayers()[0];
+	layer.destroyChildren(); // avoid memory leaks
+
 	var image = new Konva.Image({
 		x: (maxSize - fit.w)/2,
 		y: (maxSize - fit.h)/2,
@@ -385,7 +391,6 @@ function drawGroundtruthImage(stage, imageObj, subregionImage, maxSize=300){
 		listening: false,
 	});
 
-	var layer = stage.getLayers()[0];
 	layer.add(image);
 	layer.add(rect)
 
@@ -428,6 +433,8 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 	// https://konvajs.org/docs/sandbox/Free_Drawing.html
 
 	var layer = stage.getLayers()[0];
+	layer.destroyChildren(); // avoid memory leaks
+	
 	var canvas = document.createElement('canvas');
 	canvas.width = stage.width();
 	canvas.height = stage.height();
@@ -564,7 +571,7 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 		
 		// see comment on using this instead of setInterval below
 		// setTimeout(doUpdate, refreshDelay);
-		requestAnimationFrame(doUpdate);
+		G_VirtualSEM_animationFrameRequestId = requestAnimationFrame(doUpdate);
 	};
 
 	//var updateLoop = setInterval(doUpdate, 500);
@@ -576,9 +583,16 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 	// for each frame taking longer than ~60+ ms... resulting in hundreds/thousands,
 	// possibly slowing down the browser over time...
 
+	// ... read next comment block first, then come back to this one ...
+	// This cancel is needed, otherwise subsequent calls will multiple rogue update functions
+	// (going out of scope) running forever, but never allow itself to be garbage collected
+	// because the execution never ends... A similar case would likely happen with timers
+	// as well, e.g. self-calling setTimeout or setInterval...
+	cancelAnimationFrame(G_VirtualSEM_animationFrameRequestId);
+
 	// ... but we use requestAnimationFrame to let the browser determine what the
 	// fastest possible ideal speed is.
-	requestAnimationFrame(doUpdate);
+	G_VirtualSEM_animationFrameRequestId = requestAnimationFrame(doUpdate);
 
 	return updateConfigValues;
 }

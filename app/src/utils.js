@@ -43,6 +43,7 @@ function getSpotXInput(){ return getInputValueInt($('#iSpotX')); }
 function getSpotYInput(){ return getInputValueInt($('#iSpotY')); }
 function getSpotAngleInput(){ return getInputValueInt($('#iSpotAngle')); }
 function getSEMRefreshDelay(){ return getInputValueInt($('#iDelaySEM')); }
+function getGroundtruthImage(){ return $('#sb_groundtruthImage').val(); }
 
 function MakeZoomHandler(stage, konvaObj, callback=null, scaleFactor=1.2, scaleMin=0, scaleMax=Infinity) {
 	var handler = function(e){

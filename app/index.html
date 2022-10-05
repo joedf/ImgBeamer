@@ -33,6 +33,19 @@
 							<td><input type="number" id="iDelaySEM" placeholder="10"></td>
 						</tr>
 						<tr>
+							<td>Ground Truth Image</td>
+							<td>
+								<select id="sb_groundtruthImage" name="sb_groundtruthImage" title="Ground Truth Image">
+									<option value="src/testimages/grains1.png">grains1.png</option>
+									<option value="src/testimages/grains1b.png">grains1b.png</option>
+									<option value="src/testimages/grains1c.png">grains1c.png</option>
+									<option value="src/testimages/grains2.png">grains2.png</option>
+									<option value="src/testimages/grains2c.png">grains2c.png</option>
+									<option value="src/testimages/grains2tl.png" selected>grains2tl.png</option>
+								</select>
+							</td>
+						</tr>
+						<tr>
 							<td><button id="generateFinal">Generate preview</button></td>
 							<td>
 								<button id="openInNewTab">Open in new tab</button>
@@ -133,6 +146,13 @@
 					doGenerateSubRegion();
 				}
 			});
+
+			$('#sb_groundtruthImage').on('change', function(e){
+				INPUT_IMAGE = getGroundtruthImage();
+				console.log("Ground Truth Image changed to: "+INPUT_IMAGE);
+				$(document.body).trigger('OnGroundtruthImageChange');
+			});
+
 			$('#generateFinal').click(doGenerateSubRegion);
 			$('#openInNewTab').click(function(e){
 				var url = stageFinal.toDataURL({pixelRatio:2});
