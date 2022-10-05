@@ -80,6 +80,16 @@ function OnImageLoaded(eImg, beam, stages){
 	var virtualSEMStage = stages[8];
 
 	var doUpdate = function(){
+
+		// update userScaledImage
+		if (typeof userScaledImage != 'undefined' && typeof subregionImage != 'undefined'){
+			userScaledImage.x(subregionImage.x());
+			userScaledImage.y(subregionImage.y());
+			userScaledImage.scaleX(subregionImage.scaleX());
+			userScaledImage.scaleY(subregionImage.scaleY());
+			userScaledImage.draw();
+		}
+
 		updateAvgCircle();
 		updateProbeLayout();
 		updateResamplingSteps(true);
