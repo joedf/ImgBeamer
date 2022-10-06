@@ -182,6 +182,15 @@ function drawBaseComposite(stage, sImage, sBeam, updateCallback) {
 	image.on('dragmove', function() { stage.draw(); });
 	image.on('wheel', MakeZoomHandler(stage, image, function(e){
 		doUpdate();
+	}, 1.2, 0, function(oldScale,newScale){
+		// limit the max zoom from scrolling, to prevent blank pixel data
+		// because of too small of a spot size...
+		const tolerance = -0.1;
+		if (G_BEAMRADIUS_SUBREGION_PX.x + tolerance < 1
+		|| G_BEAMRADIUS_SUBREGION_PX.y + tolerance < 1) {
+			return Math.min(oldScale, newScale);
+		}
+		return newScale;
 	}));
 
 	return image;
@@ -352,6 +361,9 @@ function drawResampled(sourceStage, destStage, originalImage, userImage, sBeam) 
 			fill: 'white',
 			listening: false,
 		});
+
+		// update it globally, so we can limit zoom in Spot Content, based on this
+		G_BEAMRADIUS_SUBREGION_PX = {x:probe.radiusX()*2, y:probe.radiusY()*2};
 
 		// computeResampledFast(sourceStage, destStage, baseImage, probe, rows, cols);
 		computeResampledSlow(sourceStage, destStage, baseImage, probe, rows, cols, baseGridRect);

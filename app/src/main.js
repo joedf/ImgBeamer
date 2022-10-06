@@ -24,6 +24,8 @@ const G_MAIN_CONTAINER = '#main-container';
 
 Konva.autoDrawEnabled = true;
 
+// the pixel size of the spot used for the subregion render view, updated elsewhere
+var G_BEAMRADIUS_SUBREGION_PX = {x:1,y:1};
 
 const nStages = 9;
 var boxesPerPageWidth = 5;
