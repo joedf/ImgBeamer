@@ -46,7 +46,7 @@ for (let i = 0; i < nStages; i++) {
 var baseBeamStage = stages[2];
 $(baseBeamStage.getContainer())
 	.attr('box_label', 'Spot Profile')
-	.attr('note', 'Press [R] to reset')
+	.attr('note', 'Press [R] to reset shape')
 	.css('border-color', 'red');
 var G_BASE_BEAM = drawBaseBeam(baseBeamStage);
 
