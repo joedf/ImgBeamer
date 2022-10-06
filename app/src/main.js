@@ -87,10 +87,11 @@ function OnImageLoaded(eImg, beam, stages){
 		updateResamplingSteps(true);
 		updateGroundtruthMap();
 		updateVirtualSEM_Config();
-	};
 
-	// do once on start, update beam/spot param/stats info
-	updateDisplayBeamParams(beam);
+		// update spot/beam info: size, rotation, shape
+		var cellSize = computeCellSize(probeLayout.image, getColsInput(), getRowsInput());
+		updateDisplayBeamParams(baseBeamStage, layoutBeam, cellSize, userScaledImage);
+	};
 
 	// Subregion View
 	// draw base image (can pan & zoom)
@@ -165,8 +166,6 @@ function OnImageLoaded(eImg, beam, stages){
 	// update beams
 	beam.off('transform'); // prevent "eventHandler doubling" from subsequent calls
 	beam.on('transform', function(){
-		updateDisplayBeamParams(beam);
-
 		compositeBeam.scale(beam.scale());
 		compositeBeam.rotation(beam.rotation());
 		avgCircleBeam.scale(beam.scale());

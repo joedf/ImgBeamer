@@ -92,9 +92,9 @@ function getRandomInt(max) {
 	return Math.floor(Math.random() * max);
 }
 
-function updateDisplayBeamParams(beam) {
+function updateDisplayBeamParams(stage, beam, cellSize, userImage) {
 	var infoclass = "parameterDisplay";
-	var eStage = $(beam.getStage().getContainer());
+	var eStage = $(stage.getContainer());
 	var e = eStage.children('.'+infoclass+':first');
 	if (e.length < 1) {
 		eStage.prepend('<span class="'+infoclass+'"></span>');
@@ -108,9 +108,30 @@ function updateDisplayBeamParams(beam) {
 		// https://www.cuemath.com/geometry/eccentricity-of-ellipse/
 		var eccentricity = Math.sqrt(1 - (Math.pow(b,2) / Math.pow(a,2)));
 
-		element.innerHTML = 'Eccentricity: '+eccentricity.toFixed(2) + '<br>' +
-		'Rotation: '+beam.rotation().toFixed(1)+"°";
+		var spotSizeX = NaN, spotSizeY = NaN;
+		if (typeof userImage != 'undefined'){
+			var bw = (beam.width()*beam.scaleX()) / userImage.scaleX();
+			var bh = (beam.height()*beam.scaleY()) / userImage.scaleY();
+
+			spotSizeX = (bw / cellSize.w)*100;
+			spotSizeY = (bh / cellSize.h)*100;
+		}
+
+		element.innerHTML = 'Eccentricity: '+eccentricity.toFixed(2) +'<br>'
+		+ 'Rotation: '+beam.rotation().toFixed(1)+"°" +'<br>'
+		+ 'Width: '+spotSizeX.toFixed(1)+'%' +'<br>'
+		+ 'Height: '+spotSizeY.toFixed(1)+'%';
 	}
+}
+
+// calculates cell size based on imageRect, rows and cols
+function computeCellSize(image, rows, cols){
+	var subregionRect = image.getSelfRect();
+	var cellSize = {
+		w: subregionRect.width / cols,
+		h: subregionRect.height / rows
+	};
+	return cellSize;
 }
 
 function fitImageProportions(w, h, maxDimension, doFill=false){
