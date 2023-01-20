@@ -1,5 +1,7 @@
 # ImgBeamer
 
+Try it live! https://joedf.github.io/ImgBeamer/app/index.html
+
 ### Stages / Boxes
 1. Sample Ground Truth (map navigation)
 2. Subregion View ("zoomed" view)
