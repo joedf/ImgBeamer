@@ -1,4 +1,4 @@
-# ImageProbeSampler
+# ImgBeamer
 
 ### Stages / Boxes
 1. Sample Ground Truth (map navigation)
