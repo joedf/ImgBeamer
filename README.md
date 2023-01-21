@@ -4,6 +4,8 @@
 
 Try it live [here](https://joedf.github.io/ImgBeamer/app/index.html), no setup or installation required!
 
+Simple demo tool of the image formation[<sup>1</sup>](#references) process used in a Scanning Electron Microscope (SEM).
+
 ### Description of Stages / Boxes
 1. Sample Ground Truth (map navigation)
 2. Subregion View ("zoomed" view)
@@ -16,8 +18,11 @@ Try it live [here](https://joedf.github.io/ImgBeamer/app/index.html), no setup o
 9. Resulting Image (full, "virtual SEM")
  
 ### Screenshot
-![screenshot1](misc/screenshot2.png)
+![screenshot](misc/screenshot2.png)
 
 ### To Do / Notes
-- Minor pixel value differences in virtualSEM; improved, but could be due to sampling from  downsized sampling of the larger full image
+- Minor pixel value differences in virtualSEM; improved, but could be due to sampling from downsized sampling of the larger full image
 - Update terms
+
+### References
+1. Goldstein _et al_. “Image Formation.” In Scanning Electron Microscopy and X-Ray Microanalysis, edited by Joseph I. Goldstein, Dale E. Newbury, Joseph R. Michael, Nicholas W.M. Ritchie, John Henry J. Scott, and David C. Joy, 93–110. New York, NY: Springer, 2018. https://doi.org/10.1007/978-1-4939-6676-9_6.
