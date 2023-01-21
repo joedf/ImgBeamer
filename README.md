@@ -1,6 +1,6 @@
-<img src="app/src/img/icon.svg" width="96">
-
 # ImgBeamer
+
+<img src="app/src/img/icon.svg" width="128">
 
 Try it live [here](https://joedf.github.io/ImgBeamer/app/index.html), no setup or installation required!
 
