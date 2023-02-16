@@ -111,6 +111,7 @@
 
 		function run_tests(fn, d){
 			fn('og v og: ', d['og'], d['og']);
+			fn('og v fant: ', d['og'], d['fant']);
 			fn('og v c010: ', d['og'], d['c010']);
 			fn('og v c060: ', d['og'], d['c060']);
 			fn('og v c100: ', d['og'], d['c100']);
@@ -123,8 +124,12 @@
 		function run_all(fant){
 			console.log('reading all pixel data...');
 
+			var ogpx = readPixels($i('og'));
+			var fantpx = readPixels($i('fant'));
+
 			var data = {
-				'og': readPixels($i( (!!fant == true) ? 'fant' : 'og' )),
+				'og': ((!!fant == true) ? fantpx : ogpx),
+				'fant': fantpx,
 				'c010': readPixels($i('c010')),
 				'c060': readPixels($i('c060')),
 				'c100': readPixels($i('c100')),
