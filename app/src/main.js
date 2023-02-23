@@ -91,6 +91,7 @@ function OnImageLoaded(eImg, beam, stages){
 		// update spot/beam info: size, rotation, shape
 		var cellSize = computeCellSize(probeLayout.image, getColsInput(), getRowsInput());
 		updateDisplayBeamParams(baseBeamStage, layoutBeam, cellSize, userScaledImage);
+		updateMagInfo(baseImageStage, subregionImage);
 	};
 
 	// Subregion View
