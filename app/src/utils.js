@@ -134,6 +134,32 @@ function computeCellSize(image, rows, cols){
 	return cellSize;
 }
 
+// Calculates the magnification based on the given rectangles' width and scaleX
+function computeMagLevel(rectBase, rectScaled) {
+	var rW = (rectScaled.width() * rectScaled.scaleX()) / (rectBase.width() * rectBase.scaleX());
+	return rW;
+}
+
+// Display magnification
+function updateMagInfo(destStage, scaledRect) {
+	var magLevel = computeMagLevel(scaledRect.getStage(), scaledRect);
+	var fmtMag = magLevel.toFixed(2) + 'X';
+
+	// add/update the mag disp. text
+	// TODO: this is smiliar/duplicate code from updateDisplayBeamParams()
+	var infoclass = "magDisplay";
+	var eStage = $(destStage.getContainer());
+	var e = eStage.children('.'+infoclass+':first');
+	if (e.length < 1) {
+		eStage.prepend('<span class="'+infoclass+'"></span>');
+		e = eStage.children('.'+infoclass+':first');
+	}
+	if (e.length > 0) {
+		var element = e.get(0);
+		element.innerHTML = fmtMag;
+	}
+}
+
 function fitImageProportions(w, h, maxDimension, doFill=false){
 	// image ratio to "fit" in canvas
 	var ratio = (w > h ? (w / maxDimension) : (h / maxDimension)) // fit
