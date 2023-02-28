@@ -79,6 +79,7 @@ summary {
 
 #options {
 	padding: .5em;
+	z-index: 30;
 	background: rgba(0,0,0,0.6);
 	border: solid 1px rgba(255,255,255,0.6);
 }
