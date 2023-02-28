@@ -1,0 +1,21 @@
+{
+  "name": "imgbeamer",
+  "version": "1.0.0",
+  "description": "SEM image formation demo app",
+  "main": "app\\src\\main.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "joedf",
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^8.35.0",
+    "eslint-config-standard": "^17.0.0",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-n": "^15.6.1",
+    "eslint-plugin-promise": "^6.1.1"
+  }
+}
