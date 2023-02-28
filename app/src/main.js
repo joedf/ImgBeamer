@@ -89,7 +89,7 @@ function OnImageLoaded(eImg, beam, stages){
 		updateVirtualSEM_Config();
 
 		// update spot/beam info: size, rotation, shape
-		var cellSize = computeCellSize(probeLayout.image, getColsInput(), getRowsInput());
+		var cellSize = computeCellSize(probeLayout.image, getRowsInput(), getColsInput());
 		updateDisplayBeamParams(baseBeamStage, layoutBeam, cellSize, userScaledImage);
 		updateMagInfo(baseImageStage, subregionImage);
 	};
