@@ -19,6 +19,7 @@ const COMPOSITE_OP = 'source-in';
 var G_UpdateResampled = null;
 var G_UpdateVirtualSEMConfig = null;
 var G_VirtualSEM_animationFrameRequestId = null;
+var G_VirtualSEM_indicator = null;
 
 const G_MAIN_CONTAINER = '#main-container';
 

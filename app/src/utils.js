@@ -92,6 +92,18 @@ function getRandomInt(max) {
 	return Math.floor(Math.random() * max);
 }
 
+// https://konvajs.org/docs/data_and_serialization/High-Quality-Export.html
+// function from https://stackoverflow.com/a/15832662/512042
+function downloadURI(uri, name) {
+	var link = document.createElement('a');
+	link.download = name;
+	link.href = uri;
+	document.body.appendChild(link);
+	link.click();
+	document.body.removeChild(link);
+	delete link;
+}
+
 function updateDisplayBeamParams(stage, beam, cellSize, userImage) {
 	var infoclass = "parameterDisplay";
 	var eStage = $(stage.getContainer());

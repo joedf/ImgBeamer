@@ -59,6 +59,9 @@
 								</svg>
 							</td>
 						</tr>
+						<tr>
+							<td><button id="exportPNG">Export ...</button></td>
+						</tr>
 					</table>
 				</details>
 
@@ -158,6 +161,23 @@
 			$('#openInNewTab').click(function(e){
 				var url = stageFinal.toDataURL({pixelRatio:2});
 				window.open(url, '_blank').focus();
+			});
+
+			$('#exportPNG').click(function(e){
+				// Export image as file download
+				// https://konvajs.org/docs/data_and_serialization/High-Quality-Export.html
+				
+				// hide the indicator if possible
+				if (G_VirtualSEM_indicator != null)
+					G_VirtualSEM_indicator.hide();
+
+				// export the image
+				var url = stageFinal.toDataURL({pixelRatio:2});
+				downloadURI(url, "result_image.png");
+				
+				// restore the indicator
+				if (G_VirtualSEM_indicator != null)
+					G_VirtualSEM_indicator.show();
 			});
 
 			$('#generateFull').click(function(e){
