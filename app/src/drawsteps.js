@@ -491,6 +491,9 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 	});
 	layer.add(indicator);
 
+	// global reference, so we can show/hide the indicator
+	G_VirtualSEM_indicator = indicator;
+
 	var context = canvas.getContext('2d');
 	context.imageSmoothingEnabled = false;
 
