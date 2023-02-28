@@ -53,7 +53,7 @@ function drawBaseBeam(stage) {
 	// based on https://konvajs.org/docs/events/Keyboard_Events.html
 	var container = stage.container();
 	// make it focusable
-	container.tabIndex = 1;
+	container.tabIndex = 2;
 	container.addEventListener('keydown', function(e) {
 		// don't handle meta-key'd events for now...
 		const metaPressed = e.shiftKey || e.ctrlKey || e.metaKey;
@@ -146,6 +146,28 @@ function drawBaseImage(stage, oImg, size, doFill = false, updateCallback = null)
 	layer.add(kImage);
 
 	stage.draw();
+	
+	// keyboard events
+	// TODO: similar or duplicate from drawBaseBeam()/"Spot Profile" keyboard event code
+	var container = stage.container();
+	// make it focusable
+	container.tabIndex = 1;
+	container.addEventListener('keydown', function(e) {
+		// don't handle meta-key'd events for now...
+		const metaPressed = e.shiftKey || e.ctrlKey || e.metaKey;
+		if (metaPressed)
+			return;
+
+		switch (e.keyCode) {
+			case 82: // 'r' key, reset scale & position
+				kImage.setAttrs({scaleX:1,scaleY:1,x:0,y:0});
+				doUpdate();
+				break;
+		
+			default: break;
+		}
+		e.preventDefault();
+	});
 
 	return kImage;
 }

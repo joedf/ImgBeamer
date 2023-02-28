@@ -44,6 +44,8 @@ summary {
 
 .box::after {
 	content: attr(note);
+	white-space: pre;
+	text-align: right;
 	/* color: yellow; */
 	float: right;
 	/* bottom: .5em; right: .5em; */
