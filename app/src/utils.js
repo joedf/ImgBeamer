@@ -101,7 +101,7 @@ function downloadURI(uri, name) {
 	document.body.appendChild(link);
 	link.click();
 	document.body.removeChild(link);
-	delete link;
+	// delete link;
 }
 
 function updateDisplayBeamParams(stage, beam, cellSize, userImage) {
@@ -116,7 +116,7 @@ function updateDisplayBeamParams(stage, beam, cellSize, userImage) {
 		var element = e.get(0);
 
 		var a = beam.radiusX() * beam.scaleX(), b = beam.radiusY() * beam.scaleY();
-		if (a < b) { [a, b] = [b, a] } // swap
+		if (a < b) { [a, b] = [b, a]; } // swap
 		// https://www.cuemath.com/geometry/eccentricity-of-ellipse/
 		var eccentricity = Math.sqrt(1 - (Math.pow(b,2) / Math.pow(a,2)));
 
@@ -174,12 +174,12 @@ function updateMagInfo(destStage, scaledRect) {
 
 function fitImageProportions(w, h, maxDimension, doFill=false){
 	// image ratio to "fit" in canvas
-	var ratio = (w > h ? (w / maxDimension) : (h / maxDimension)) // fit
+	var ratio = (w > h ? (w / maxDimension) : (h / maxDimension)); // fit
 	if (doFill){
-		ratio = (w > h ? (h / maxDimension) : (w / maxDimension)) // fill
+		ratio = (w > h ? (h / maxDimension) : (w / maxDimension)); // fill
 	}
 
-	var iw = w/ratio, ih = h/ratio;
+	var iw = w/ratio; //, ih = h/ratio;
 	return {w: iw, h: iw};
 }
 
@@ -288,7 +288,7 @@ function drawGrid(gridLayer, rect, rows, cols, lineColor) {
  
 	const xSize= gridLayer.width(), // stage.width(), 
 			ySize= gridLayer.height(), // stage.height(),
-			xSteps = cols; //Math.round(xSize/ stepSizeX), 
+			xSteps = cols, //Math.round(xSize/ stepSizeX), 
 			ySteps = rows; //Math.round(ySize / stepSizeY);
 
 	// draw vertical lines
@@ -537,7 +537,7 @@ function toRadians (angle) { return angle * (Math.PI / 180); }
 // Gets the average pixel value with a given image and probe.
 // superScale factor to scale up ("blow-up") the image for the sampling
 function ComputeProbeValue_gs(image, probe, superScale=1) {
-	var iw = image.naturalWidth, ih = image.naturalHeight;
+	// var iw = image.naturalWidth, ih = image.naturalHeight;
 
 	// get ellipse info
 	var ellipseInfo = probe;

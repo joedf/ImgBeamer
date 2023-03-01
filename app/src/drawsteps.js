@@ -135,7 +135,7 @@ function drawBaseImage(stage, oImg, size, doFill = false, updateCallback = null)
 
 		doUpdate();
 	});
-	kImage.on('wheel', MakeZoomHandler(stage, kImage, function(e){
+	kImage.on('wheel', MakeZoomHandler(stage, kImage, function(){
 		// bounds check for zooming out
 		constrainBounds();
 
@@ -178,7 +178,7 @@ function drawBaseComposite(stage, sImage, sBeam, updateCallback) {
 	layer.listening(true);
 
 	// Give yellow box border to indicate interactive
-	$(stage.getContainer()).css('border-color','yellow')
+	$(stage.getContainer()).css('border-color','yellow');
 
 	var beam = sBeam;//.clone();
 	var image = sImage.clone();
@@ -202,7 +202,7 @@ function drawBaseComposite(stage, sImage, sBeam, updateCallback) {
 	// Events
 	image.on('mouseup', function() { doUpdate(); });
 	image.on('dragmove', function() { stage.draw(); });
-	image.on('wheel', MakeZoomHandler(stage, image, function(e){
+	image.on('wheel', MakeZoomHandler(stage, image, function(){
 		doUpdate();
 	}, 1.2, 0, function(oldScale,newScale){
 		// limit the max zoom from scrolling, to prevent blank pixel data
@@ -427,7 +427,7 @@ function drawGroundtruthImage(stage, imageObj, subregionImage, maxSize=300){
 	});
 
 	layer.add(image);
-	layer.add(rect)
+	layer.add(rect);
 
 	var update = function(){
 		// calc location rect from subregionImage
@@ -459,10 +459,10 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 	var cellW = 0, cellH = 0;
 	var currentRow = 0;
 
-	var pixelCount = 0
+	var pixelCount = 0;
 
 	var currentDrawPass = 0;
-	var refreshDelay = 500;
+	// var refreshDelay = 500;
 
 	// use the canvas API directly in a konva stage
 	// https://konvajs.org/docs/sandbox/Free_Drawing.html
@@ -533,7 +533,7 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 		var radiusAvg = (beamRadius.x+beamRadius.y)/2;
 		superScale = (radiusAvg < 1) ? 1 / radiusAvg : 1;
 
-		refreshDelay = getSEMRefreshDelay();
+		// refreshDelay = getSEMRefreshDelay();
 
 		// we can clear the screen here, if we want to avoid lines from previous configs...
 		if (significantChange) { // if it affects the drawing

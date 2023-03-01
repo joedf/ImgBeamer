@@ -53,7 +53,7 @@ var G_BASE_BEAM = drawBaseBeam(baseBeamStage);
 
 /////////////////////
 
-var G_MAIN_IMAGE_OBJ = null
+var G_MAIN_IMAGE_OBJ = null;
 
 // call once on App start
 UpdateBaseImage();
@@ -252,7 +252,7 @@ function ResampleFullImage() {
 
 	// row pixels container array
 	var pixels = new Uint8ClampedArray(rows * cols * 4);
-	count = 0;
+	var count = 0;
 
 	// process and compute each pixel grid cell
 	for (let i = 0; i < rows; i++) {
