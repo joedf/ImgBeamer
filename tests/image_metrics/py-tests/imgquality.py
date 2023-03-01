@@ -1,9 +1,10 @@
-from sewar.full_ref import uqi, mse, rmse, psnr, uqi, ssim, msssim, scc, vifp
+from sewar.full_ref import mse, rmse, psnr, uqi, ssim, msssim, scc, vifp
 import imageio as iio
 
 from pprint import pprint
 
 IMG_DIR = "../cropped/"
+
 
 def compare(msg, im1, im2):
 	q = {
@@ -17,17 +18,18 @@ def compare(msg, im1, im2):
 		'vifp': vifp(im1, im2),
 	}
 
-	pprint(msg+": "+str(q))
+	pprint(msg + ": " + str(q))
+
 
 # og = iio.imread(IMG_DIR+'original_500-crop.png')
 og = iio.imread('../downsize_algorithms/og-fant.png')
-c010 = iio.imread(IMG_DIR+'c10-010-010.png')
-c060 = iio.imread(IMG_DIR+'c10-060-060.png')
-c100 = iio.imread(IMG_DIR+'c10-100-100.png')
-c120 = iio.imread(IMG_DIR+'c10-120-120.png')
-c130 = iio.imread(IMG_DIR+'c10-130-130.png')
-c500 = iio.imread(IMG_DIR+'c10-500-500.png')
-c6a5 = iio.imread(IMG_DIR+'c10-060-500.png')
+c010 = iio.imread(IMG_DIR + 'c10-010-010.png')
+c060 = iio.imread(IMG_DIR + 'c10-060-060.png')
+c100 = iio.imread(IMG_DIR + 'c10-100-100.png')
+c120 = iio.imread(IMG_DIR + 'c10-120-120.png')
+c130 = iio.imread(IMG_DIR + 'c10-130-130.png')
+c500 = iio.imread(IMG_DIR + 'c10-500-500.png')
+c6a5 = iio.imread(IMG_DIR + 'c10-060-500.png')
 
 
 compare("og, og", og, og)
