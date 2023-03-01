@@ -462,7 +462,6 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 	var pixelCount = 0;
 
 	var currentDrawPass = 0;
-	// var refreshDelay = 500;
 
 	// use the canvas API directly in a konva stage
 	// https://konvajs.org/docs/sandbox/Free_Drawing.html
@@ -532,8 +531,6 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 		// if the avg spot radius is less than 1, scale up at 1 / x (inversely proportional)
 		var radiusAvg = (beamRadius.x+beamRadius.y)/2;
 		superScale = (radiusAvg < 1) ? 1 / radiusAvg : 1;
-
-		// refreshDelay = getSEMRefreshDelay();
 
 		// we can clear the screen here, if we want to avoid lines from previous configs...
 		if (significantChange) { // if it affects the drawing
@@ -627,14 +624,8 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 		stage.getContainer().setAttribute('note', timeDrawTotal + " ms/Row");
 		
 		// see comment on using this instead of setInterval below
-		// setTimeout(doUpdate, refreshDelay);
 		G_VirtualSEM_animationFrameRequestId = requestAnimationFrame(doUpdate);
 	};
-
-	//var updateLoop = setInterval(doUpdate, 500);
-	// use setTimer instead, to adapt delay while running
-	// https://stackoverflow.com/questions/1280263/changing-the-interval-of-setinterval-while-its-running
-	// setTimeout(doUpdate, refreshDelay);
 
 	// a warning is logged with slow setTimeout or requestAnimationFrame callbacks
 	// for each frame taking longer than ~60+ ms... resulting in hundreds/thousands,
