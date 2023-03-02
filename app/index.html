@@ -158,6 +158,8 @@
 				window.open(url, '_blank').focus();
 			});
 
+			// used to auto-name the export files with a counter
+			var G_Export_img_count = 0;
 			$('#exportPNG').click(function(e){
 				// Export image as file download
 				// https://konvajs.org/docs/data_and_serialization/High-Quality-Export.html
@@ -168,7 +170,10 @@
 
 				// export the image
 				var url = stageFinal.toDataURL({pixelRatio:2});
-				downloadURI(url, "result_image.png");
+				var datestamp = new Date().toISOString().slice(0, 10).replaceAll('-','.');
+				var counter = String(++G_Export_img_count).padStart(3,'0');
+				var filename = "result_image-"+datestamp+"-"+counter+".png";
+				downloadURI(url, filename);
 				
 				// restore the indicator
 				if (G_VirtualSEM_indicator != null)
