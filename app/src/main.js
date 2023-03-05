@@ -1,3 +1,5 @@
+/* globals Utils */
+
 var G_DEBUG = false;
 var G_AUTO_PREVIEW_LIMIT = 16 * 16;
 
@@ -12,8 +14,8 @@ var G_DRAW_OVERLAP_THRESHOLD = 10 * 10; // rows * cols
 // Optionally, to draw normally (w/o overlap) after a number of passes
 var G_DRAW_OVERLAP_PASSES = 1;
 
-// const INPUT_IMAGE = 'src/testimages/grains2tl.png';
-var INPUT_IMAGE = getGroundtruthImage();
+// const G_INPUT_IMAGE = 'src/testimages/grains2tl.png';
+var G_INPUT_IMAGE = Utils.getGroundtruthImage();
 const COMPOSITE_OP = 'source-in';
 // const COMPOSITE_OP = 'destination-in';
 var G_UpdateResampled = null;
@@ -38,7 +40,7 @@ var G_MainContainer = $(G_MAIN_CONTAINER);
 // first create the stages
 var stages = [];
 for (let i = 0; i < nStages; i++) {
-	var stage = newStageTemplate(G_MainContainer, G_BoxSize, G_BoxSize);
+	var stage = Utils.newStageTemplate(G_MainContainer, G_BoxSize, G_BoxSize);
 	stages.push(stage);
 }
 
@@ -63,7 +65,7 @@ $(document.body).on('OnGroundtruthImageChange', UpdateBaseImage);
 // once the image is loaded, updates/draws all the stages/boxes
 function UpdateBaseImage(){
 	// load image and wait for when ready
-	loadImage(INPUT_IMAGE, function(event){
+	Utils.loadImage(G_INPUT_IMAGE, function(event){
 		var imageObj = event.target;
 		G_MAIN_IMAGE_OBJ = imageObj;
 		
@@ -90,10 +92,10 @@ function OnImageLoaded(eImg, beam, stages){
 		updateVirtualSEM_Config();
 
 		// update spot/beam info: size, rotation, shape
-		var cellSize = computeCellSize(probeLayout.image, getRowsInput(), getColsInput());
-		updateDisplayBeamParams(baseBeamStage, layoutBeam, cellSize, userScaledImage);
-		updateMagInfo(baseImageStage, subregionImage);
-		updateImageMetricsInfo(groundtruthMapStage, virtualSEMStage);
+		var cellSize = Utils.computeCellSize(probeLayout.image, Utils.getRowsInput(), Utils.getColsInput());
+		Utils.updateDisplayBeamParams(baseBeamStage, layoutBeam, cellSize, userScaledImage);
+		Utils.updateMagInfo(baseImageStage, subregionImage);
+		Utils.updateImageMetricsInfo(groundtruthMapStage, virtualSEMStage);
 	};
 
 	// Subregion View
@@ -143,8 +145,8 @@ function OnImageLoaded(eImg, beam, stages){
 	var updateResampled = drawResampled(layoutSampledStage, resampledStage, probeLayout.image, userScaledImage, resampledBeam);
 	
 	var updateResamplingSteps = function(internallyCalled){
-		var rows = getRowsInput();
-		var cols = getColsInput();
+		var rows = Utils.getRowsInput();
+		var cols = Utils.getColsInput();
 
 		if (internallyCalled && (rows*cols > G_AUTO_PREVIEW_LIMIT)) {
 			console.warn('automatic preview disable for 64+ grid cells.');
@@ -215,8 +217,8 @@ function ResampleFullImage() {
 	var iw = image.naturalWidth, ih = image.naturalHeight;
 
 	// calculate grid layout
-	var pixelSizeX = getCellWInput(); // px
-	var pixelSizeY = getCellHInput(); // px
+	var pixelSizeX = Utils.getCellWInput(); // px
+	var pixelSizeY = Utils.getCellHInput(); // px
 	var cols = Math.floor(iw / pixelSizeX);
 	var rows = Math.floor(ih / pixelSizeY);
 
@@ -225,13 +227,13 @@ function ResampleFullImage() {
 	var cell_half_H = pixelSizeY / 2;
 
 	// spot size ratio
-	var spot_rX = getSpotXInput(); // %
-	var spot_rY = getSpotYInput(); // % 
+	var spot_rX = Utils.getSpotXInput(); // %
+	var spot_rY = Utils.getSpotYInput(); // % 
 
 	// probe radii
 	var probe_rX = (pixelSizeX/2) * (spot_rX / 100);
 	var probe_rY = (pixelSizeY/2) * (spot_rY / 100);
-	var probe_rotationRad = toRadians(getSpotAngleInput());
+	var probe_rotationRad = Utils.toRadians(getSpotAngleInput());
 
 	// prep result canvas, if not already there
 	var cv = document.querySelector('#finalCanvas');
@@ -269,7 +271,7 @@ function ResampleFullImage() {
 			};
 			
 			// compute pixel value - greyscale
-			const pixel = ComputeProbeValue_gs(image, probe);
+			const pixel = Utils.ComputeProbeValue_gs(image, probe);
 
 			// console.info(pixel);
 

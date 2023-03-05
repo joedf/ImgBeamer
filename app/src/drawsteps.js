@@ -90,7 +90,7 @@ function drawBaseImage(stage, oImg, size, doFill = false, updateCallback = null)
 	var img_width = oImg.naturalWidth, img_height = oImg.naturalHeight;
 
 	// image ratio to "fit" in canvas
-	var fitSize = fitImageProportions(img_width, img_height, max, doFill);
+	var fitSize = Utils.fitImageProportions(img_width, img_height, max, doFill);
 
 	var kImage = new Konva.Image({
 		x: (max - fitSize.w)/2,
@@ -135,7 +135,7 @@ function drawBaseImage(stage, oImg, size, doFill = false, updateCallback = null)
 
 		doUpdate();
 	});
-	kImage.on('wheel', MakeZoomHandler(stage, kImage, function(){
+	kImage.on('wheel', Utils.MakeZoomHandler(stage, kImage, function(){
 		// bounds check for zooming out
 		constrainBounds();
 
@@ -190,7 +190,7 @@ function drawBaseComposite(stage, sImage, sBeam, updateCallback) {
 	layer.add(image);
 
 	// "pre-zoom" a bit, and start with center position
-	scaleOnCenter(stage, image, 1, 4);
+	Utils.scaleOnCenter(stage, image, 1, 4);
 
 	layer.draw();
 
@@ -202,7 +202,7 @@ function drawBaseComposite(stage, sImage, sBeam, updateCallback) {
 	// Events
 	image.on('mouseup', function() { doUpdate(); });
 	image.on('dragmove', function() { stage.draw(); });
-	image.on('wheel', MakeZoomHandler(stage, image, function(){
+	image.on('wheel', Utils.MakeZoomHandler(stage, image, function(){
 		doUpdate();
 	}, 1.2, 0, function(oldScale,newScale){
 		// limit the max zoom from scrolling, to prevent blank pixel data
@@ -227,8 +227,8 @@ function drawAvgCircle(sourceStage, destStage, sBeam) {
 	var updateAvgCircle = function(){
 		var pCtx = sourceLayer.getContext();
 		var allPx = pCtx.getImageData(0, 0, pCtx.canvas.width, pCtx.canvas.height);
-		// var avgPx = get_avg_pixel_rgba(allPx);
-		var avgPx = get_avg_pixel_gs(allPx); avgPx = [avgPx,avgPx,avgPx,1];
+		// var avgPx = Utils.get_avg_pixel_rgba(allPx);
+		var avgPx = Utils.get_avg_pixel_gs(allPx); avgPx = [avgPx,avgPx,avgPx,1];
 
 		var avgCircle = null;
 		if (destLayer.getChildren().length <= 0){
@@ -297,15 +297,15 @@ function drawProbeLayout(drawStage, baseImage, userImage, beam) {
 		imageCopy.scaleY(baseImage.scaleY());
 		imageCopy.draw();
 
-		var tRows = getRowsInput();
-		var tCols = getColsInput();
+		var tRows = Utils.getRowsInput();
+		var tCols = Utils.getColsInput();
 		
 		// uncomment to draw grid only once
 		gridDrawn = false; gridLayer.destroyChildren();
 
 		// draw grid, based on rect
 		if (!gridDrawn)
-			drawGrid(gridLayer, baseGridRect, tRows, tCols);
+		Utils.drawGrid(gridLayer, baseGridRect, tRows, tCols);
 		
 		// clear the probe layer
 		probesLayer.destroyChildren();
@@ -321,7 +321,7 @@ function drawProbeLayout(drawStage, baseImage, userImage, beam) {
 			stroke: 'red'
 		});
 		
-		repeatDrawOnGrid(probesLayer, baseGridRect, probe, tRows, tCols);
+		Utils.repeatDrawOnGrid(probesLayer, baseGridRect, probe, tRows, tCols);
 	};
 
 	// run once immediately
@@ -340,8 +340,8 @@ function drawProbeLayoutSampling(drawStage, originalImage, userImage, sBeam) {
 	var baseGridRect = new Konva.Rect(baseImage.getSelfRect());
 
 	var updateProbeLayoutSampling = function(){
-		var rows = getRowsInput();
-		var cols = getColsInput();
+		var rows = Utils.getRowsInput();
+		var cols = Utils.getColsInput();
 
 		var probe = new Konva.Ellipse({
 			radius : {
@@ -353,7 +353,7 @@ function drawProbeLayoutSampling(drawStage, originalImage, userImage, sBeam) {
 			listening: false,
 		});
 
-		computeResampledPreview(drawStage, baseImage, probe, rows, cols, baseGridRect);
+		Utils.computeResampledPreview(drawStage, baseImage, probe, rows, cols, baseGridRect);
 
 		drawStage.draw();
 	};
@@ -371,8 +371,8 @@ function drawResampled(sourceStage, destStage, originalImage, userImage, sBeam) 
 	var baseGridRect = new Konva.Rect(baseImage.getSelfRect());
 
 	var updateResampledDraw = function(){
-		var rows = getRowsInput();
-		var cols = getColsInput();
+		var rows = Utils.getRowsInput();
+		var cols = Utils.getColsInput();
 
 		var probe = new Konva.Ellipse({
 			radius : {
@@ -387,8 +387,8 @@ function drawResampled(sourceStage, destStage, originalImage, userImage, sBeam) 
 		// update it globally, so we can limit zoom in Spot Content, based on this
 		G_BEAMRADIUS_SUBREGION_PX = {x:probe.radiusX()*2, y:probe.radiusY()*2};
 
-		// computeResampledFast(sourceStage, destStage, baseImage, probe, rows, cols);
-		computeResampledSlow(sourceStage, destStage, baseImage, probe, rows, cols, baseGridRect);
+		// Utils.computeResampledFast(sourceStage, destStage, baseImage, probe, rows, cols);
+		Utils.computeResampledSlow(sourceStage, destStage, baseImage, probe, rows, cols, baseGridRect);
 
 		destStage.draw();
 	};
@@ -401,7 +401,7 @@ function drawResampled(sourceStage, destStage, originalImage, userImage, sBeam) 
 
 function drawGroundtruthImage(stage, imageObj, subregionImage, maxSize=300){
 
-	var fit = fitImageProportions(imageObj.naturalWidth, imageObj.naturalHeight, maxSize);
+	var fit = Utils.fitImageProportions(imageObj.naturalWidth, imageObj.naturalHeight, maxSize);
 
 	var layer = stage.getLayers()[0];
 	layer.destroyChildren(); // avoid memory leaks
@@ -502,8 +502,8 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 		var ratioY = subregionRectStage.height() / subregionRect.height();
 
 		// multiply by the ratio, since we should have more cells on the full image
-		rows = Math.round(getRowsInput() * ratioY);
-		cols = Math.round(getColsInput() * ratioX);
+		rows = Math.round(Utils.getRowsInput() * ratioY);
+		cols = Math.round(Utils.getColsInput() * ratioX);
 
 		// the total number of "pixels" (cells) that will drawn
 		pixelCount = rows * cols;
@@ -540,7 +540,7 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 
 	// var colors = ['blue', 'yellow', 'red', 'green', 'cyan', 'pink'];
 	var colors = ['#DDDDDD','#EEEEEE','#CCCCCC','#999999','#666666','#333333','#B6B6B6','#1A1A1A'];
-	var color = colors[getRandomInt(colors.length)];
+	var color = colors[Utils.getRandomInt(colors.length)];
 
 	// original image size
 	var iw = originalImageObj.naturalWidth, ih = originalImageObj.naturalHeight;
@@ -566,20 +566,20 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 			const cellX = i * cellW;
 			const cellY = row * cellH;
 
-			// TODO: check these values and the ComputeProbeValue_gs again
+			// TODO: check these values and the Utils.ComputeProbeValue_gs again
 			// since the final image seems to differ...
 
 			// map/transform values to full resolution image coordinates
 			const scaledProbe = {
 				centerX: (cellX + cellW/2) * irw,
 				centerY: (cellY + cellH/2) * irh,
-				rotationRad: toRadians(beam.rotation()),
+				rotationRad: Utils.toRadians(beam.rotation()),
 				radiusX: beamRadius.x * irw,
 				radiusY: beamRadius.y * irh,
 			};
 
 			// compute the pixel value, for the given spot/probe profile
-			var gsValue = ComputeProbeValue_gs(originalImageObj, scaledProbe, superScale);
+			var gsValue = Utils.ComputeProbeValue_gs(originalImageObj, scaledProbe, superScale);
 			color = 'rgba('+[gsValue,gsValue,gsValue].join(',')+',1)';
 
 			ctx.fillStyle = color;
@@ -614,7 +614,7 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 		layer.batchDraw();
 
 		// use this for debugging, less heavy, draw random color rows
-		// color = colors[getRandomInt(colors.length)];
+		// color = colors[Utils.getRandomInt(colors.length)];
 		// updateConfigValues();
 
 		var timeDrawTotal = Date.now() - timeRowStart;

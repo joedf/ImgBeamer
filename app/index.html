@@ -148,8 +148,8 @@
 			});
 
 			$('#sb_groundtruthImage').on('change', function(e){
-				INPUT_IMAGE = getGroundtruthImage();
-				console.log("Ground Truth Image changed to: "+INPUT_IMAGE);
+				G_INPUT_IMAGE = Utils.getGroundtruthImage();
+				console.log("Ground Truth Image changed to: "+G_INPUT_IMAGE);
 				$(document.body).trigger('OnGroundtruthImageChange');
 			});
 
@@ -166,14 +166,14 @@
 				// https://konvajs.org/docs/data_and_serialization/High-Quality-Export.html
 
 				// get the image without the row/draw indicator
-				var finalImage = getVirtualSEM_KonvaImage(stageFinal);
+				var finalImage = Utils.getVirtualSEM_KonvaImage(stageFinal);
 				
 				// export the image
 				var url = finalImage.toDataURL({pixelRatio:2});
 				var datestamp = new Date().toISOString().slice(0, 10).replaceAll('-','.');
 				var counter = String(++G_Export_img_count).padStart(3,'0');
 				var filename = "result_image-"+datestamp+"-"+counter+".png";
-				downloadURI(url, filename);
+				Utils.downloadURI(url, filename);
 			});
 
 			$('#generateFull').click(function(e){
