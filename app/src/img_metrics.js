@@ -9,8 +9,8 @@ const NRMSE = {
 	compare: function(image1, image2) {
 		'use strict';
 
-		if (image1.length != image2.length)
-			throw "The given images have different sizes";
+		if (image1.data.length != image2.data.length)
+			throw "The given images have different data length or sizes.";
 
 		const n_channels = 4; // assume grayscale RGBA flat array at 8 bit-depth (255)
 		const p_max = 255; // max pixel value for the bit depth
