@@ -1,4 +1,4 @@
-// makes a new stage with a layer added, and some settings
+/** makes a new stage with a layer added, and some settings */
 function newStageTemplate(parentContainer, w, h) {
 	var $e = $('<div/>').addClass('box').appendTo(parentContainer);
 	var stage = new Konva.Stage({
@@ -135,7 +135,7 @@ function updateDisplayBeamParams(stage, beam, cellSize, userImage) {
 	}
 }
 
-// calculates cell size based on imageRect, rows and cols
+/** calculates cell size based on imageRect, rows and cols */
 function computeCellSize(image, rows, cols){
 	var subregionRect = image.getSelfRect();
 	var cellSize = {
@@ -145,13 +145,13 @@ function computeCellSize(image, rows, cols){
 	return cellSize;
 }
 
-// Calculates the magnification based on the given rectangles' width and scaleX
+/** Calculates the magnification based on the given rectangles' width and scaleX */
 function computeMagLevel(rectBase, rectScaled) {
 	var rW = (rectScaled.width() * rectScaled.scaleX()) / (rectBase.width() * rectBase.scaleX());
 	return rW;
 }
 
-// Display magnification
+/** Display magnification */
 function updateMagInfo(destStage, scaledRect) {
 	var magLevel = computeMagLevel(scaledRect.getStage(), scaledRect);
 	var fmtMag = magLevel.toFixed(2) + 'X';
@@ -210,7 +210,7 @@ function fitImageProportions(w, h, maxDimension, doFill=false){
 	return {w: iw, h: iw};
 }
 
-// scales the give shape, and moves it to preserve original center
+/** scales the give shape, and moves it to preserve original center */
 function scaleOnCenter(stage, shape, oldScale, newScale){
 	var stageCenter = {
 		x: stage.width()/2 - stage.x(),
@@ -463,9 +463,11 @@ function computeResampledFast(sourceStage, destStage, image, probe, rows, cols){
 	}
 }
 
-// Essentially, this is computeResampleFast(), but corrected for spot size larger than the cell size
-// ComputeResampleFast() is limits the sampling to the cell size, and takes in smaller version of the
-// image that is already drawn and "compositied" in a Konva Stage, instead of the original larger image...
+/**
+ * Essentially, this is computeResampleFast(), but corrected for spot size larger than the cell size
+ * ComputeResampleFast() is limits the sampling to the cell size, and takes in smaller version of the
+ * image that is already drawn and "compositied" in a Konva Stage, instead of the original larger image...
+ */
 function computeResampledSlow(sourceStage, destStage, oImage, probe, rows, cols, rect){
 	var destLayer = destStage.getLayers()[0];
 	destLayer.destroyChildren(); 
@@ -558,11 +560,14 @@ function computeResampledSlow(sourceStage, destStage, oImage, probe, rows, cols,
 	}
 }
 
+/** Converts an angle in radians to degrees */
 function toDegrees (angle) { return angle * (180 / Math.PI); }
+
+/** Converts an angle in degrees to radians */
 function toRadians (angle) { return angle * (Math.PI / 180); }
 
-// Gets the average pixel value with a given image and probe.
-// superScale factor to scale up ("blow-up") the image for the sampling
+/** Gets the average pixel value with a given image and probe.
+ * @param {number} superScale factor to scale up ("blow-up") the image for the sampling */
 function ComputeProbeValue_gs(image, probe, superScale=1) {
 	// var iw = image.naturalWidth, ih = image.naturalHeight;
 
