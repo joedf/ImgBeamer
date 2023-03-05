@@ -16,14 +16,14 @@ const NRMSE = {
 		const p_max = 255; // max pixel value for the bit depth
 		
 		// Do sum of squared difference
-		var sum = 0, l = image1.data.length;
-		for (var i = 0; i < l; i += n_channels) {
+		var sum = 0, len = image1.data.length;
+		for (var i = 0; i < len; i += n_channels) {
 			sum += Math.pow(image1.data[i] - image2.data[i], 2);
 		}
 
 		// number of pixels, each having multiple "channels",
 		// or color components (e.g., R, G, B, A)...
-		var pc = l / n_channels;
+		var pc = len / n_channels;
 
 		// final step ("average error over all entries/pixels"),
 		// to obtain MSE (Mean Squared Error)

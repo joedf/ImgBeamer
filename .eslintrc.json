@@ -11,7 +11,17 @@
     },
     "rules": {
         "no-tabs": 0,
-        "semi": [1, "always"]
+        "semi": [1, "always"],
+        "max-len": ["error", {
+            "code": 100,
+            "tabWidth": 4
+        }],
+        "id-length": ["error", {
+            "min": 2,
+            "max": 40,
+            "exceptions": ["i", "j", "x", "y", "e", "w", "h", "c", "d"],
+            "properties": "never"
+        }]
     },
     "globals": {
         "Konva":"readonly",
