@@ -1,3 +1,5 @@
+/* globals NRMSE */
+
 const Utils = {
 	/** makes a new stage with a layer added, and some settings */
 	newStageTemplate: function(parentContainer, w, h) {
@@ -117,10 +119,13 @@ const Utils = {
 		if (e.length > 0) {
 			var element = e.get(0);
 
-			var a = beam.radiusX() * beam.scaleX(), b = beam.radiusY() * beam.scaleY();
-			if (a < b) { [a, b] = [b, a]; } // swap
+			var beamSizeA = beam.radiusX() * beam.scaleX(),
+				beamSizeB = beam.radiusY() * beam.scaleY();
+			
+			// swap them so that is beamSizeA the larger one, for convention
+			if (beamSizeA < beamSizeB) { [beamSizeA, beamSizeB] = [beamSizeB, beamSizeA]; }
 			// https://www.cuemath.com/geometry/eccentricity-of-ellipse/
-			var eccentricity = Math.sqrt(1 - (Math.pow(b,2) / Math.pow(a,2)));
+			var eccentricity = Math.sqrt(1 - (Math.pow(beamSizeB,2) / Math.pow(beamSizeA,2)));
 
 			var spotSizeX = NaN, spotSizeY = NaN;
 			if (typeof userImage != 'undefined'){
@@ -286,9 +291,9 @@ const Utils = {
 		// Optimization note, with greyscale we only need to process one component...
 		for (var i = 0; i < d.length; i += 4) {
 			const px = d[i];
-			const a = d[i+3];
+			const alpha = d[i+3];
 
-			if (px === 0 && a === 0) {
+			if (px === 0 && alpha === 0) {
 				blanks += 1;
 			} else {
 				sum += px;
