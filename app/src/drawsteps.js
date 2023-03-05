@@ -434,14 +434,14 @@ function drawGroundtruthImage(stage, imageObj, subregionImage, maxSize=300){
 	var update = function(){
 		// calc location rect from subregionImage
 		// and update bounds drawn rectangle
-		var s = subregionImage;
+		var si = subregionImage;
 		rect.position({
-			x: (image.x() - s.x()) / s.scaleX(),
-			y: (image.y() - s.y()) / s.scaleY(),
+			x: (image.x() - si.x()) / si.scaleX(),
+			y: (image.y() - si.y()) / si.scaleY(),
 		});
 		rect.size({
-			width: s.width() / s.scaleX(),
-			height: s.height() / s.scaleY(),
+			width: si.width() / si.scaleX(),
+			height: si.height() / si.scaleY(),
 		});
 
 		stage.draw();
