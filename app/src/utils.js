@@ -653,9 +653,11 @@ function getVirtualSEM_KonvaImage(stage){
 }
 
 /** get the imageData (pixels) from a given konva object/image */
-function getKonvaImageData(konvaObject) {
+function getKonvaImageData(konvaObject, pixelRatio) {
+	pixelRatio = (typeof pixelRatio !== "undefined") ? pixelRatio : 2;
 	// TODO: maybe we get higher DPI / density images?
-	var ctx = konvaObject.getContext();
-	var data = ctx.getImageData(0, 0, konvaObject.width(), konvaObject.height());
+	var cnv = konvaObject.toCanvas({"pixelRatio": pixelRatio});
+	var ctx = cnv.getContext('2d');
+	var data = ctx.getImageData(0, 0, cnv.width, cnv.height);
 	return data;
 }
