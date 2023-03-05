@@ -566,6 +566,9 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 		}
 
 		var rowIntensitySum = 0;
+		
+		ctx.imageSmoothingEnabled = false;
+		var rPixels = ctx.createImageData(Math.round(stage.width()), Math.round(cellH));
 
 		// interate over X
 		for (let i = 0; i < cols; i++) {
@@ -592,6 +595,7 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 
 			rowIntensitySum += gsValue;
 
+			/*
 			// optionally, draw with overlap to reduce visual artifacts
 			if ((currentDrawPass < G_DRAW_OVERLAP_PASSES)
 			&& (G_DRAW_WITH_OVERLAP && pixelCount >= G_DRAW_OVERLAP_THRESHOLD)) {
@@ -604,6 +608,23 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 			} else {
 				ctx.fillRect(cellX, cellY, cellW, cellH);
 			}
+			*/
+
+			// fill in pixel data for the width of the cell
+			for (var j=0; j<Math.ceil((rPixels.width*4)/cols); j+=4) {
+				var d = rPixels.data;
+				var pi = j + Math.ceil(i*cellW)*4;
+				d[pi+0] = gsValue; // R
+				d[pi+1] = gsValue; // G
+				d[pi+2] = gsValue; // B
+				d[pi+3] = 0xFF; // A
+			}
+		}
+
+		// TODO: batch the row height draw, instead 1px height line draw * cellH
+		// fill in the pixel data for the height of the rows
+		for(var r=0; r<cellH; r++) {
+			ctx.putImageData(rPixels, 0, r + Math.round(row * cellH));
 		}
 
 		// if the last drawn was essentially completely black
