@@ -135,14 +135,25 @@ function OnImageLoaded(eImg, beam, stages){
 	// compute resampled image
 	$(layoutSampledStage.getContainer()).attr('box_label', 'Sampled Subregion');
 	var layoutSampledBeam = beam.clone();
-	var updateProbeLayoutSamplingPreview = drawProbeLayoutSampling(layoutSampledStage, probeLayout.image, userScaledImage, layoutSampledBeam);
+	var updateProbeLayoutSamplingPreview = drawProbeLayoutSampling(
+		layoutSampledStage,
+		probeLayout.image,
+		userScaledImage,
+		layoutSampledBeam
+	);
 
 	// draw Resulting Subregion
 	$(resampledStage.getContainer())
 		.attr('box_label', 'Resulting Subregion')
 		.css('border-color', 'lime');
 	var resampledBeam = beam.clone();
-	var updateResampled = drawResampled(layoutSampledStage, resampledStage, probeLayout.image, userScaledImage, resampledBeam);
+	var updateResampled = drawResampled(
+		layoutSampledStage,
+		resampledStage,
+		probeLayout.image,
+		userScaledImage,
+		resampledBeam
+	);
 	
 	var updateResamplingSteps = function(internallyCalled){
 		var rows = Utils.getRowsInput();
@@ -165,7 +176,14 @@ function OnImageLoaded(eImg, beam, stages){
 	
 	$(virtualSEMStage.getContainer()).attr('box_label', 'Resulting Image');
 	var vitualSEMBeam = beam.clone();
-	var updateVirtualSEM_Config = drawVirtualSEM(virtualSEMStage, vitualSEMBeam, groundtruthMap.subregionRect, groundtruthMapStage, eImg, userScaledImage);
+	var updateVirtualSEM_Config = drawVirtualSEM(
+		virtualSEMStage,
+		vitualSEMBeam,
+		groundtruthMap.subregionRect,
+		groundtruthMapStage,
+		eImg,
+		userScaledImage
+	);
 	G_UpdateVirtualSEMConfig = updateVirtualSEM_Config;
 
 	// update beams

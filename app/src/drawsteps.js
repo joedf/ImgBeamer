@@ -1,3 +1,5 @@
+/* globals Utils */
+
 function drawBaseBeam(stage) {
 	// default beam shape values
 	var defaultRadius = {
