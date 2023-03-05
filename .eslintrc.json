@@ -19,7 +19,7 @@
         "id-length": ["error", {
             "min": 2,
             "max": 40,
-            "exceptions": ["i", "j", "x", "y", "e", "w", "h", "c", "d"],
+            "exceptions": ["i", "j", "k", "x", "y", "e", "w", "h", "c", "d"],
             "properties": "never"
         }]
     },
