@@ -121,6 +121,7 @@
 
 		<script src="src/utils.js"></script>
 		<script src="src/drawsteps.js"></script>
+		<script src="src/img_metrics.js"></script>
 		<script src="src/main.js"></script>
 
 		<script>
@@ -163,21 +164,16 @@
 			$('#exportPNG').click(function(e){
 				// Export image as file download
 				// https://konvajs.org/docs/data_and_serialization/High-Quality-Export.html
-				
-				// hide the indicator if possible
-				if (G_VirtualSEM_indicator != null)
-					G_VirtualSEM_indicator.hide();
 
+				// get the image without the row/draw indicator
+				var finalImage = getVirtualSEM_KonvaImage(stageFinal);
+				
 				// export the image
-				var url = stageFinal.toDataURL({pixelRatio:2});
+				var url = finalImage.toDataURL({pixelRatio:2});
 				var datestamp = new Date().toISOString().slice(0, 10).replaceAll('-','.');
 				var counter = String(++G_Export_img_count).padStart(3,'0');
 				var filename = "result_image-"+datestamp+"-"+counter+".png";
 				downloadURI(url, filename);
-				
-				// restore the indicator
-				if (G_VirtualSEM_indicator != null)
-					G_VirtualSEM_indicator.show();
 			});
 
 			$('#generateFull').click(function(e){

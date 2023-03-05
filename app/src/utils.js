@@ -171,6 +171,34 @@ function updateMagInfo(destStage, scaledRect) {
 	}
 }
 
+/** Display Image metrics */
+function updateImageMetricsInfo(sourceStage, destStage) {
+	// get ground truth image
+	var refImage = getFirstImageFromStage(sourceStage);
+	var refData = getKonvaImageData(refImage);
+
+	// get the image without the row/draw indicator
+	var finalImage = getVirtualSEM_KonvaImage(destStage);
+	var finalData = getKonvaImageData(finalImage);
+
+	// Do the metric calculation here
+	var metrics = NRMSE.compare(refData, finalData);
+
+	// display it
+	// TODO: this is smiliar/duplicate code from updateDisplayBeamParams()
+	var infoclass = "metricsDisplay";
+	var eStage = $(destStage.getContainer());
+	var e = eStage.children('.'+infoclass+':first');
+	if (e.length < 1) {
+		eStage.prepend('<span class="'+infoclass+'"></span>');
+		e = eStage.children('.'+infoclass+':first');
+	}
+	if (e.length > 0) {
+		var element = e.get(0);
+		element.innerHTML = "NRMSE = " + metrics.inrmse.toFixed(4);
+	}
+}
+
 function fitImageProportions(w, h, maxDimension, doFill=false){
 	// image ratio to "fit" in canvas
 	var ratio = (w > h ? (w / maxDimension) : (h / maxDimension)); // fit
@@ -607,4 +635,27 @@ function ComputeProbeValue_gs(image, probe, superScale=1) {
 	cv = null;
 
 	return pxColor;
+}
+
+/** gets the first "image" type from the first layer of the given Konva stage */
+function getFirstImageFromStage(stage){
+	var image = stage.getLayers()[0].getChildren(function(x){
+		return x.getClassName() == 'Image';
+	})[0];
+
+	return image;
+}
+
+/** get the image without the row/draw indicator */
+function getVirtualSEM_KonvaImage(stage){
+	// should be the only "Image" child on the first layer...
+	return getFirstImageFromStage(stage);
+}
+
+/** get the imageData (pixels) from a given konva object/image */
+function getKonvaImageData(konvaObject) {
+	// TODO: maybe we get higher DPI / density images?
+	var ctx = konvaObject.getContext();
+	var data = ctx.getImageData(0, 0, konvaObject.width(), konvaObject.height());
+	return data;
 }

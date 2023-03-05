@@ -19,7 +19,6 @@ const COMPOSITE_OP = 'source-in';
 var G_UpdateResampled = null;
 var G_UpdateVirtualSEMConfig = null;
 var G_VirtualSEM_animationFrameRequestId = null;
-var G_VirtualSEM_indicator = null;
 
 const G_MAIN_CONTAINER = '#main-container';
 
@@ -82,6 +81,7 @@ function OnImageLoaded(eImg, beam, stages){
 	var groundtruthMapStage = stages[0];
 	var virtualSEMStage = stages[8];
 
+	// called when a change occurs in the spot profile, subregion, or spot content
 	var doUpdate = function(){
 		updateAvgCircle();
 		updateProbeLayout();
@@ -93,6 +93,7 @@ function OnImageLoaded(eImg, beam, stages){
 		var cellSize = computeCellSize(probeLayout.image, getRowsInput(), getColsInput());
 		updateDisplayBeamParams(baseBeamStage, layoutBeam, cellSize, userScaledImage);
 		updateMagInfo(baseImageStage, subregionImage);
+		updateImageMetricsInfo(groundtruthMapStage, virtualSEMStage);
 	};
 
 	// Subregion View

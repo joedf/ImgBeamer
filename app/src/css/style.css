@@ -31,6 +31,7 @@ summary {
 .box:before,
 .box::after,
 .box > span.magDisplay,
+.box > span.metricsDisplay,
 .box > span.parameterDisplay {
 	position: absolute;
 	z-index: 20;
@@ -55,6 +56,7 @@ summary {
 .box.note_colored::after { color: yellow; }
 
 .box > span.magDisplay,
+.box > span.metricsDisplay,
 .box > span.parameterDisplay {
 	top: 0;
 	right: 0;
