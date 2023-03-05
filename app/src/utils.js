@@ -203,7 +203,7 @@ const Utils = {
 		}
 		if (e.length > 0) {
 			var element = e.get(0);
-			element.innerHTML = "NRMSE = " + metrics.inrmse.toFixed(4);
+			element.innerHTML = "iNRMSE = " + metrics.inrmse.toFixed(4);
 		}
 	},
 
