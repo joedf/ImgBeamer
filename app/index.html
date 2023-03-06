@@ -42,6 +42,10 @@
 							</td>
 						</tr>
 						<tr>
+							<td></td>
+							<td><input type="file" id="_fileImgInput" accept="image/*" /></td>
+						</tr>
+						<tr>
 							<td><button id="generateFinal">Generate preview</button></td>
 							<td>
 								<button id="openInNewTab">Open in new tab</button>
@@ -174,6 +178,30 @@
 				var counter = String(++G_Export_img_count).padStart(3,'0');
 				var filename = "result_image-"+datestamp+"-"+counter+".png";
 				Utils.downloadURI(url, filename);
+			});
+
+			$('#_fileImgInput').change(function(e){
+				// https://stackoverflow.com/a/34840295/883015
+				var file    = this.files[0];
+				var reader  = new FileReader();
+
+				reader.onloadend = function () {
+					console.log("Ground Truth Image changed to: "+file.name);
+
+					// clear selection in the combobox for included images
+					$('#sb_groundtruthImage').val('')
+
+					// preview.src = reader.result;
+					G_INPUT_IMAGE = reader.result;
+					$(document.body).trigger('OnGroundtruthImageChange');
+				}
+
+				if (file) {
+					reader.readAsDataURL(file);
+				} else {
+					console.log('Imported image selection cleared.');
+					// preview.src = "";
+				}
 			});
 
 			$('#generateFull').click(function(e){
