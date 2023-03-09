@@ -28,6 +28,19 @@
 							<td><input type="number" id="iCols" placeholder="8"></td>
 						</tr>
 						<tr>
+							<td></td>
+							<td>
+								<button id="generateFinal">Generate preview</button>
+								<svg id="loadspinner" class="load_spinner_svg"
+									style="display:none"
+									xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid" viewBox="0 0 16 16">
+									<circle fill="none" stroke="#00d8ff" stroke-dasharray="28.274333882308138 11.42477796076938" cx="8" cy="8" r="6" stroke-width="2">
+									<animateTransform attributeName="transform" type="rotate" repeatCount="indefinite" keyTimes="0;1" values="0 8 8;360 8 8" dur="1s"></animateTransform>
+									</circle>
+								</svg>
+							</td>
+						</tr>
+						<tr>
 							<td>Ground Truth Image</td>
 							<td>
 								<select id="sb_groundtruthImage" name="sb_groundtruthImage" title="Ground Truth Image">
@@ -44,19 +57,6 @@
 						<tr>
 							<td></td>
 							<td><input type="file" id="_fileImgInput" accept="image/*" /></td>
-						</tr>
-						<tr>
-							<td><button id="generateFinal">Generate preview</button></td>
-							<td>
-								<button id="openInNewTab">Open in new tab</button>
-								<svg id="loadspinner" class="load_spinner_svg"
-									style="display:none"
-									xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid" viewBox="0 0 16 16">
-									<circle fill="none" stroke="#00d8ff" stroke-dasharray="28.274333882308138 11.42477796076938" cx="8" cy="8" r="6" stroke-width="2">
-									<animateTransform attributeName="transform" type="rotate" repeatCount="indefinite" keyTimes="0;1" values="0 8 8;360 8 8" dur="1s"></animateTransform>
-									</circle>
-								</svg>
-							</td>
 						</tr>
 						<tr>
 							<td><button id="exportPNG">Export ...</button></td>
@@ -158,10 +158,6 @@
 			});
 
 			$('#generateFinal').click(doGenerateSubRegion);
-			$('#openInNewTab').click(function(e){
-				var url = stageFinal.toDataURL({pixelRatio:2});
-				window.open(url, '_blank').focus();
-			});
 
 			// used to auto-name the export files with a counter
 			var G_Export_img_count = 0;
