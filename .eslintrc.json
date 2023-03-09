@@ -21,6 +21,9 @@
             "max": 40,
             "exceptions": ["i", "j", "k", "x", "y", "e", "w", "h", "c", "d"],
             "properties": "never"
+        }],
+        "no-magic-numbers": ["error", {
+            "ignore": [0, 1, 2, -1, 100, 180]
         }]
     },
     "globals": {
