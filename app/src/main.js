@@ -44,14 +44,6 @@ for (let i = 0; i < nStages; i++) {
 	stages.push(stage);
 }
 
-// draw Spot Profile
-var baseBeamStage = stages[2];
-$(baseBeamStage.getContainer())
-	.attr('box_label', 'Spot Profile')
-	.attr('note', 'Press [R] to reset shape')
-	.css('border-color', 'red');
-var G_BASE_BEAM = drawBaseBeam(baseBeamStage);
-
 /////////////////////
 
 var G_MAIN_IMAGE_OBJ = null;
@@ -69,12 +61,13 @@ function UpdateBaseImage(){
 		var imageObj = event.target;
 		G_MAIN_IMAGE_OBJ = imageObj;
 		
-		OnImageLoaded(imageObj, G_BASE_BEAM, stages);
+		OnImageLoaded(imageObj, stages);
 	});
 }
 
-function OnImageLoaded(eImg, beam, stages){
+function OnImageLoaded(eImg, stages){
 	var baseImageStage = stages[1];
+	var baseBeamStage = stages[2];
 	var baseCompositeStage = stages[3];
 	var avgCircleStage = stages[4];
 	var probeLayoutStage = stages[5];
@@ -97,6 +90,14 @@ function OnImageLoaded(eImg, beam, stages){
 		Utils.updateMagInfo(baseImageStage, subregionImage);
 		Utils.updateImageMetricsInfo(groundtruthMapStage, virtualSEMStage);
 	};
+
+	// draw Spot Profile
+	$(baseBeamStage.getContainer())
+		.attr('box_label', 'Spot Profile')
+		.attr('note', 'Press [R] to reset shape')
+		.css('border-color', 'red');
+	// TODO: maybe rename this to something more specific?
+	var beam = drawBaseBeam(baseBeamStage);
 
 	// Subregion View
 	// draw base image (can pan & zoom)
