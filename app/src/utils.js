@@ -1,7 +1,13 @@
 /* globals NRMSE */
 
 const Utils = {
-	/** makes a new stage with a layer added, and some settings */
+	/**
+	 * Makes a new stage 'box' with a layer added, and some settings
+	 * @param {Element} parentContainer the DOM element of the parent container in which to add a stage 'box'.
+	 * @param {*} w the width of the stage
+	 * @param {*} h the height of the stage
+	 * @returns the drawing stage.
+	 */
 	newStageTemplate: function(parentContainer, w, h) {
 		var $e = $('<div/>').addClass('box').appendTo(parentContainer);
 		var stage = new Konva.Stage({
@@ -25,12 +31,22 @@ const Utils = {
 		return stage;
 	},
 
+	/**
+	 * Initiates the image resource load with a callback once the image is loaded.
+	 * @param {string} url The url pointing to the image to load.
+	 * @param {function} callback The callback function to call/run once the image is loaded.
+	 */
 	loadImage: function(url, callback) {
 		var imageObj = new Image();
 		imageObj.onload = callback;
 		imageObj.src = url;
 	},
 
+	/**
+	 * Attempts to get the value or text within a given element/control.
+	 * @param {object|jQuery} $e the jquery wrapped DOM element.
+	 * @returns the value contained or represented in the given control/element.
+	 */
 	getInputValueInt: function($e){
 		var rawValue = parseInt($e.val());
 		if (isNaN(rawValue))
@@ -47,6 +63,16 @@ const Utils = {
 	getSpotAngleInput: function(){ return this.getInputValueInt($('#iSpotAngle')); },
 	getGroundtruthImage: function(){ return $('#sb_groundtruthImage').val(); },
 
+	/**
+	 * Creates a Zoom event handler to be used on a stage.
+	 * @param {object} stage the drawing stage
+	 * @param {*} konvaObj the figure or object on the stage to change.
+	 * @param {*} callback a callback for when the zoom event handler is called.
+	 * @param {*} scaleFactor the scale factor per "tick"
+	 * @param {number|function} scaleMin the scale minimum allowed defined as a number or function.
+	 * @param {number|function} scaleMax the scale maximum allowed defined as a number or function.
+	 * @returns the created event handler
+	 */
 	MakeZoomHandler: function(stage, konvaObj, callback=null, scaleFactor=1.2, scaleMin=0, scaleMax=Infinity)
 	{
 		var _self = this;
@@ -91,13 +117,26 @@ const Utils = {
 		return handler;
 	},
 
-	// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random
+	/**
+	 * Creates a random integer between 0 and the given maximum.
+	 * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random
+	 * @param {number} max the largest value possible.
+	 * @returns a random number.
+	 */
 	getRandomInt: function(max) {
 		return Math.floor(Math.random() * max);
 	},
 
-	// https://konvajs.org/docs/data_and_serialization/High-Quality-Export.html
-	// function from https://stackoverflow.com/a/15832662/512042
+	// 
+
+	/**
+	 * Initiates a download of the given resource, like programmatically clicking on a download link.
+	 * function from:
+	 * https://konvajs.org/docs/data_and_serialization/High-Quality-Export.html
+	 * https://stackoverflow.com/a/15832662/512042
+	 * @param {string} uri a url pointing to the resource to download.
+	 * @param {*} name the filename to use for the downloaded file.
+	 */
 	downloadURI: function(uri, name) {
 		var link = document.createElement('a');
 		link.download = name;
@@ -108,6 +147,13 @@ const Utils = {
 		// delete link;
 	},
 
+	/**
+	 * Updates the displayed statistics or parameters on the Spot profile.
+	 * @param {*} stage the drawing stage for the spot profile and where to display the values.
+	 * @param {*} beam the beam used for the spot layout and sampling of the image (after scaling).
+	 * @param {*} cellSize the size of a cell in the raster grid of the resulting image.
+	 * @param {*} userImage the scaled image by the user (in spot content) used to size the beam.
+	 */
 	updateDisplayBeamParams: function(stage, beam, cellSize, userImage) {
 		var infoclass = "parameterDisplay";
 		var eStage = $(stage.getContainer());
@@ -143,7 +189,13 @@ const Utils = {
 		}
 	},
 
-	/** calculates cell size based on imageRect, rows and cols */
+	/**
+	 * Calculates cell size based on imageRect, rows and cols
+	 * @param {*} image the subregion image object.
+	 * @param {number} rows the number of rows to split the subregion into.
+	 * @param {number} cols the number of columns to split the subregion into.
+	 * @returns the size (w,h) of a cell in the raster grid.
+	 */
 	computeCellSize: function(image, rows, cols){
 		var subregionRect = image.getSelfRect();
 		var cellSize = {
@@ -227,6 +279,13 @@ const Utils = {
 		return this.scaleCenteredOnPoint(stageCenter, shape, oldScale, newScale);
 	},
 
+	/**
+	 * Scales the given shaped while keeping it centered on the given point.
+	 * @param {*} point the centering point.
+	 * @param {*} shape the shape to scale and position.
+	 * @param {*} oldScale the shape's original scale
+	 * @param {*} newScale the shape's new scale
+	 */
 	scaleCenteredOnPoint: function(point, shape, oldScale, newScale){
 		// could be expanded to do both x and y scaling
 		shape.scale({x: newScale, y: newScale});
@@ -240,6 +299,11 @@ const Utils = {
 		});
 	},
 
+	/**
+	 * Computes the average pixel value assuming an RGBA format, with a max of 255 for each component.
+	 * @param {ImageData} raw The image data (access to pixel data).
+	 * @returns an array of the average pixel value [R,G,B,A].
+	 */
 	get_avg_pixel_rgba: function(raw) {
 		var blanks = 0;
 		var d = raw.data;
@@ -282,6 +346,12 @@ const Utils = {
 		return avg;
 	},
 
+	/**
+	 * Computes the average grayscale pixel value assuming an RGBA format, with a max of 255 for each component.
+	 * However, only the R (red) component is considered.
+	 * @param {ImageData} raw The image data (access to pixel data).
+	 * @returns a number representing the average pixel value intensity (0 to 255).
+	 */
 	get_avg_pixel_gs: function(raw) {
 		var blanks = 0;
 		var d = raw.data;
@@ -308,8 +378,16 @@ const Utils = {
 		return avg;
 	},
 
-	// based on solution1 from:
-	// https://longviewcoder.com/2021/12/08/konva-a-better-grid/
+	/**
+	 * Draws a grid on a given drawing stage.
+	 * Based on solution-1 from: https://longviewcoder.com/2021/12/08/konva-a-better-grid
+	 * @param {*} gridLayer a layer on the stage to use for drawing the grid on.
+	 * @param {*} rect a rectangle represing the size and position of the grid to draw.
+	 * @param {*} rows the number of rows in the grid.
+	 * @param {*} cols the number of columns in the grid.
+	 * @param {*} lineColor the line color of the grid.
+	 * @returns the cell size (width, height)
+	 */
 	drawGrid: function(gridLayer, rect, rows, cols, lineColor) {
 
 		if (typeof lineColor == 'undefined' || lineColor == null || lineColor.length < 1)
@@ -573,7 +651,7 @@ const Utils = {
 	/** Converts an angle in degrees to radians */
 	toRadians: function(angle) { return angle * (Math.PI / 180); },
 
-	/** Gets the average pixel value with a given image and probe.
+	/** Gets the average pixel value (grayscale intensity) with a given image and probe.
 	 * @param {number} superScale factor to scale up ("blow-up") the image for the sampling */
 	ComputeProbeValue_gs: function(image, probe, superScale=1) {
 		// var iw = image.naturalWidth, ih = image.naturalHeight;
