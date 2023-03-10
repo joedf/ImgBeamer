@@ -192,7 +192,10 @@ function drawBaseComposite(stage, sImage, sBeam, updateCallback) {
 	layer.add(image);
 
 	// "pre-zoom" a bit, and start with center position
-	Utils.scaleOnCenter(stage, image, 1, 4);
+	// zoom/scale so that the spot size starts at 100%
+	var _tempCellWidth = sImage.width() / Utils.getColsInput();
+	var initialSpotScale = sBeam.width() / _tempCellWidth;
+	Utils.scaleOnCenter(stage, image, 1, initialSpotScale);
 
 	layer.draw();
 
