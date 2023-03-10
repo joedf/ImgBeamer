@@ -278,7 +278,9 @@ const Utils = {
 		return {w: iw, h: iw};
 	},
 
-	/** scales the given shape, and moves it to preserve original center */
+	/** scales the given shape, and moves it to preserve original center
+	 * @todo maybe, no need to have oldScale specified, can be obtained from shape.scale() ...
+	 */
 	scaleOnCenter: function(stage, shape, oldScale, newScale){
 		var stageCenter = {
 			/* eslint-disable no-magic-numbers */
@@ -287,6 +289,14 @@ const Utils = {
 			/* eslint-enable no-magic-numbers */
 		};
 		return this.scaleCenteredOnPoint(stageCenter, shape, oldScale, newScale);
+	},
+
+	/**
+	 * shorthand for @see {@link Utils.scaleOnCenter}.
+	 * Uses the stage and scale from the shape directly
+	 */
+	centeredScale: function(shape, newScale){
+		this.scaleOnCenter(shape.getStage(), shape, shape.scaleX(), newScale);
 	},
 
 	/**

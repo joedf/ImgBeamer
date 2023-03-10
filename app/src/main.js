@@ -31,6 +31,9 @@ Konva.autoDrawEnabled = true;
 // the pixel size of the spot used for the subregion render view, updated elsewhere
 var G_BEAMRADIUS_SUBREGION_PX = {x:1,y:1};
 
+// Global reference to function to set the spot width
+var G_SETW = null;
+
 const nStages = 9;
 var boxesPerPageWidth = 5;
 var boxBorderW = 2 * (parseInt($('.box:first').css('border-width')) || 1);
@@ -78,8 +81,8 @@ function OnImageLoaded(eImg, stages){
 	var groundtruthMapStage = stages[0];
 	var virtualSEMStage = stages[8];
 
-	// called when a change occurs in the spot profile, subregion, or spot content
-	var doUpdate = function(){
+	/** called when a change occurs in the spot profile, subregion, or spot content */
+	function doUpdate(){
 		updateAvgCircle();
 		updateProbeLayout();
 		updateResamplingSteps(true);
@@ -91,7 +94,7 @@ function OnImageLoaded(eImg, stages){
 		Utils.updateDisplayBeamParams(baseBeamStage, layoutBeam, cellSize, userScaledImage);
 		Utils.updateMagInfo(baseImageStage, subregionImage);
 		Utils.updateImageMetricsInfo(groundtruthMapStage, virtualSEMStage);
-	};
+	}
 
 	// draw Spot Profile
 	$(baseBeamStage.getContainer())
@@ -120,6 +123,26 @@ function OnImageLoaded(eImg, stages){
 		.attr('note', 'Scroll to adjust spot size\nHold [Shift] for half rate');
 	var compositeBeam = beam.clone();
 	var userScaledImage = drawBaseComposite(baseCompositeStage, image, compositeBeam, doUpdate);
+
+	/**(temporary) publicly exposed function to set the spot width
+	 * @param {number} wp the spot width in percent (%), ex. use 130 for 130%. */
+	G_SETW = function(wp=100){
+		var beam = compositeBeam;
+		var userImage = userScaledImage;
+		
+		// calculate the new scale for spot-content image, based on the given spot width
+		var cellSize = Utils.computeCellSize(userImage, Utils.getRowsInput(), Utils.getColsInput());
+		var maxScale = Math.max(beam.scaleX(), beam.scaleY());
+		var eccScaled = beam.scaleX() / maxScale;
+		var newScale = ((beam.width() * eccScaled) / (wp/100)) / cellSize.w;
+
+		// userImage.scale({x: newScale, y: newScale});
+		Utils.centeredScale(userImage, newScale);
+
+		// propagate changes and update stages
+		updateBeams();
+		doUpdate();
+	};
 
 	// draw Spot Signal
 	$(avgCircleStage.getContainer())
@@ -189,9 +212,8 @@ function OnImageLoaded(eImg, stages){
 	);
 	G_UpdateVirtualSEMConfig = updateVirtualSEM_Config;
 
-	// update beams
-	beam.off('transform'); // prevent "eventHandler doubling" from subsequent calls
-	beam.on('transform', function(){
+	/** propagate changes to the spot-profile (beam) to the beams in the other stages */
+	function updateBeams(){
 		compositeBeam.scale(beam.scale());
 		compositeBeam.rotation(beam.rotation());
 		avgCircleBeam.scale(beam.scale());
@@ -213,7 +235,12 @@ function OnImageLoaded(eImg, stages){
 
 		vitualSEMBeam.size(layoutBeam.size());
 		vitualSEMBeam.rotation(layoutBeam.rotation());
+	}
 
+	// update beams
+	beam.off('transform'); // prevent "eventHandler doubling" from subsequent calls
+	beam.on('transform', function(){
+		updateBeams();
 		doUpdate();
 	});
 
