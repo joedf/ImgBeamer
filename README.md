@@ -23,6 +23,7 @@ Simple demo tool of the image formation[<sup>1</sup>](#references) process used 
 ### Notes
 - Minor pixel value differences in virtualSEM; improved, but could be due to sampling from downsized sampling of the larger full image
 - The application is being documented [here](https://github.com/joedf/CAS741_w23).
+- `main` is the stable branch, `cas741` is the current development branch.
 
 ### References
 1. “Image Formation.” In Scanning Electron Microscopy and X-Ray Microanalysis, edited by Joseph I. Goldstein, Dale E. Newbury, Joseph R. Michael, Nicholas W.M. Ritchie, John Henry J. Scott, and David C. Joy, 93–110. New York, NY: Springer, 2018. https://doi.org/10.1007/978-1-4939-6676-9_6.
