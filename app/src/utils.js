@@ -163,19 +163,13 @@ const Utils = {
 	 * @param {*} userImage the scaled image by the user (in spot content) used to size the beam.
 	 */
 	updateDisplayBeamParams: function(stage, beam, cellSize, userImage) {
-		var infoclass = "parameterDisplay";
-		var eStage = $(stage.getContainer());
-		var e = eStage.children('.'+infoclass+':first');
-		if (e.length < 1) {
-			eStage.prepend('<span class="'+infoclass+'"></span>');
-			e = eStage.children('.'+infoclass+':first');
-		}
-		if (e.length > 0) {
-			var element = e.get(0);
-
+		// calculate and display the values
+		const infoclass = "parameterDisplay";
+		var element = this.ensureInfoBox(stage, infoclass);
+		if (element) {
 			var beamSizeA = beam.radiusX() * beam.scaleX(),
-				beamSizeB = beam.radiusY() * beam.scaleY();
-			
+			beamSizeB = beam.radiusY() * beam.scaleY();
+		
 			// swap them so that is beamSizeA the larger one, for convention
 			if (beamSizeA < beamSizeB) { [beamSizeA, beamSizeB] = [beamSizeB, beamSizeA]; }
 			// https://www.cuemath.com/geometry/eccentricity-of-ellipse/
@@ -190,6 +184,7 @@ const Utils = {
 				spotSizeY = (bh / cellSize.h)*100;
 			}
 
+			// display it
 			element.innerHTML = 'Eccentricity: '+eccentricity.toFixed(G_MATH_TOFIXED.SHORT) +'<br>'
 			+ 'Rotation: '+beam.rotation().toFixed(G_MATH_TOFIXED.MIN)+"°" +'<br>'
 			+ 'Width: '+spotSizeX.toFixed(G_MATH_TOFIXED.MIN)+'%' +'<br>'
@@ -221,50 +216,66 @@ const Utils = {
 
 	/** Display magnification */
 	updateMagInfo: function(destStage, scaledRect) {
-		var magLevel = this.computeMagLevel(scaledRect.getStage(), scaledRect);
-		var fmtMag = magLevel.toFixed(G_MATH_TOFIXED.SHORT) + 'X';
-
 		// add/update the mag disp. text
-		// TODO: this is smiliar/duplicate code from updateDisplayBeamParams()
-		var infoclass = "magDisplay";
-		var eStage = $(destStage.getContainer());
-		var e = eStage.children('.'+infoclass+':first');
-		if (e.length < 1) {
-			eStage.prepend('<span class="'+infoclass+'"></span>');
-			e = eStage.children('.'+infoclass+':first');
-		}
-		if (e.length > 0) {
-			var element = e.get(0);
+		const infoclass = "magDisplay";
+		var element = this.ensureInfoBox(destStage, infoclass);
+		if (element) {
+			var magLevel = this.computeMagLevel(scaledRect.getStage(), scaledRect);
+			var fmtMag = magLevel.toFixed(G_MATH_TOFIXED.SHORT) + 'X';
+
+			// display it
 			element.innerHTML = fmtMag;
 		}
 	},
 
 	/** Display Image metrics */
 	updateImageMetricsInfo: function(sourceStage, destStage) {
-		// get ground truth image
-		var refImage = this.getFirstImageFromStage(sourceStage);
-		var refData = this.getKonvaImageData(refImage);
+		// calculate and display
+		const infoclass = "metricsDisplay";
+		var element = this.ensureInfoBox(destStage, infoclass);
+		if (element) {
+			// get ground truth image
+			var refImage = this.getFirstImageFromStage(sourceStage);
+			var refData = this.getKonvaImageData(refImage);
 
-		// get the image without the row/draw indicator
-		var finalImage = this.getVirtualSEM_KonvaImage(destStage);
-		var finalData = this.getKonvaImageData(finalImage);
+			// get the image without the row/draw indicator
+			var finalImage = this.getVirtualSEM_KonvaImage(destStage);
+			var finalData = this.getKonvaImageData(finalImage);
 
-		// Do the metric calculation here
-		var metrics = NRMSE.compare(refData, finalData);
+			// Do the metric calculation here
+			var metrics = NRMSE.compare(refData, finalData);
 
-		// display it
-		// TODO: this is smiliar/duplicate code from updateDisplayBeamParams()
-		var infoclass = "metricsDisplay";
-		var eStage = $(destStage.getContainer());
-		var e = eStage.children('.'+infoclass+':first');
-		if (e.length < 1) {
-			eStage.prepend('<span class="'+infoclass+'"></span>');
-			e = eStage.children('.'+infoclass+':first');
-		}
-		if (e.length > 0) {
-			var element = e.get(0);
+			// display it
 			element.innerHTML = "iNRMSE = " + metrics.inrmse.toFixed(G_MATH_TOFIXED.LONG);
 		}
+	},
+
+	/**
+	 * Gets or creates an info-box element on the given stage.
+	 * @param {*} stage The stage on which display/have the info-box.
+	 * @param {*} className The class name of the info-box DOM element.
+	 * @returns the info-box DOM element.
+	 */
+	ensureInfoBox: function(stage, className) {
+		// get stage container
+		var eStage = $(stage.getContainer());
+		
+		// check if we create the element already
+		var e = eStage.children('.'+className+':first');
+		if (e.length <= 0) {
+			// not found, so create it
+			eStage.prepend('<span class="'+className+'"></span>');
+			e = eStage.children('.'+className+':first');
+		}
+
+		// return the non-jquery-wrapped DOM element
+		var element = e.get(0);
+
+		// but return false if not found or unsuccessful
+		if (typeof element == 'undefined')
+			return false;
+
+		return element;
 	},
 
 	fitImageProportions: function(w, h, maxDimension, doFill=false){
