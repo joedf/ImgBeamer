@@ -270,11 +270,13 @@ const Utils = {
 		return {w: iw, h: iw};
 	},
 
-	/** scales the give shape, and moves it to preserve original center */
+	/** scales the given shape, and moves it to preserve original center */
 	scaleOnCenter: function(stage, shape, oldScale, newScale){
 		var stageCenter = {
+			/* eslint-disable no-magic-numbers */
 			x: stage.width()/2 - stage.x(),
 			y: stage.height()/2 - stage.y()
+			/* eslint-enable no-magic-numbers */
 		};
 		return this.scaleCenteredOnPoint(stageCenter, shape, oldScale, newScale);
 	},
