@@ -609,7 +609,7 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 		// assume the spot size was too small or no signal
 		// for 1-2 overlapped-draw passes...
 		var rowIntensityAvg = rowIntensitySum / cols;
-		if (rowIntensityAvg <= 2) { // out of 255
+		if (rowIntensityAvg <= G_MIN_AVG_SIGNAL_VALUE) { // out of 255
 			currentDrawPass = -1;
 		}
 

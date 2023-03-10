@@ -6,6 +6,8 @@
  */
 // eslint-disable-next-line no-unused-vars
 const NRMSE = {
+	pixelMaxValue: 255,
+	defaultTolerance: 0.01,
 	compare: function(image1, image2, tolerance) {
 		'use strict';
 
@@ -17,17 +19,19 @@ const NRMSE = {
 				+") or sizes ("+dl1+" vs "+dl2+").";
 			
 			// get the tolerance or use default if not provided
-			tolerance = (typeof tolerance !== 'undefined') ? tolerance : 0.01;
+			tolerance = (typeof tolerance !== 'undefined') ? tolerance : this.defaultTolerance;
 			let relDiff = Math.abs(dl1 - dl2) / Math.max(dl1, dl2);
 			if (relDiff <= tolerance) {
+				// eslint-disable-next-line no-magic-numbers
 				console.warn(errmsg + " Tolerance = "+tolerance+" relDiff = "+relDiff.toFixed(6));
 			} else {
 				throw errmsg;
 			}
 		}
 
-		const n_channels = 4; // assume grayscale RGBA flat array at 8 bit-depth (255)
-		const p_max = 255; // max pixel value for the bit depth
+		const n_channels = 4; // assume grayscale RGBA flat array
+		// max pixel value for the bit depth. At 8 bit-depth, this is 255.
+		const p_max = this.pixelMaxValue;
 		
 		// Do sum of squared difference
 		var sum = 0, len = image1.data.length;
@@ -82,7 +86,8 @@ const NRMSE = {
 		};
 	},
 	psnr: function(mse, max) {
-		if (max === void 0) { max = 255; }
+		if (max === void 0) { max = this.pixelMaxValue; }
+		// eslint-disable-next-line no-magic-numbers
 		return 10 * this.log10((max * max) / mse);
 	},
 	log10: function(value) {

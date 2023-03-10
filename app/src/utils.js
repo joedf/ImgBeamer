@@ -1,5 +1,15 @@
 /* globals NRMSE */
 
+/** Used for display, for number.toFixed() rounding. */
+const G_MATH_TOFIXED = {
+	/** The minimum number of decimal digits. */
+	MIN: 1,
+	/** The short or standard number of decimal digits. */
+	SHORT: 2,
+	/** The maximum or "longest" number of decimal digits. */
+	LONG: 4
+};
+
 const Utils = {
 	/**
 	 * Makes a new stage 'box' with a layer added, and some settings
@@ -127,8 +137,6 @@ const Utils = {
 		return Math.floor(Math.random() * max);
 	},
 
-	// 
-
 	/**
 	 * Initiates a download of the given resource, like programmatically clicking on a download link.
 	 * function from:
@@ -182,10 +190,10 @@ const Utils = {
 				spotSizeY = (bh / cellSize.h)*100;
 			}
 
-			element.innerHTML = 'Eccentricity: '+eccentricity.toFixed(2) +'<br>'
-			+ 'Rotation: '+beam.rotation().toFixed(1)+"°" +'<br>'
-			+ 'Width: '+spotSizeX.toFixed(1)+'%' +'<br>'
-			+ 'Height: '+spotSizeY.toFixed(1)+'%';
+			element.innerHTML = 'Eccentricity: '+eccentricity.toFixed(G_MATH_TOFIXED.SHORT) +'<br>'
+			+ 'Rotation: '+beam.rotation().toFixed(G_MATH_TOFIXED.MIN)+"°" +'<br>'
+			+ 'Width: '+spotSizeX.toFixed(G_MATH_TOFIXED.MIN)+'%' +'<br>'
+			+ 'Height: '+spotSizeY.toFixed(G_MATH_TOFIXED.MIN)+'%';
 		}
 	},
 
@@ -214,7 +222,7 @@ const Utils = {
 	/** Display magnification */
 	updateMagInfo: function(destStage, scaledRect) {
 		var magLevel = this.computeMagLevel(scaledRect.getStage(), scaledRect);
-		var fmtMag = magLevel.toFixed(2) + 'X';
+		var fmtMag = magLevel.toFixed(G_MATH_TOFIXED.SHORT) + 'X';
 
 		// add/update the mag disp. text
 		// TODO: this is smiliar/duplicate code from updateDisplayBeamParams()
@@ -255,7 +263,7 @@ const Utils = {
 		}
 		if (e.length > 0) {
 			var element = e.get(0);
-			element.innerHTML = "iNRMSE = " + metrics.inrmse.toFixed(4);
+			element.innerHTML = "iNRMSE = " + metrics.inrmse.toFixed(G_MATH_TOFIXED.LONG);
 		}
 	},
 

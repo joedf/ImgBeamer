@@ -13,6 +13,8 @@ var G_DRAW_OVERLAP_PIXELS = 1;
 var G_DRAW_OVERLAP_THRESHOLD = 10 * 10; // rows * cols
 // Optionally, to draw normally (w/o overlap) after a number of passes
 var G_DRAW_OVERLAP_PASSES = 1;
+// The minimum average pixel/signal value for an image to be considered "non-blank"
+var G_MIN_AVG_SIGNAL_VALUE = 2;
 
 // const G_INPUT_IMAGE = 'src/testimages/grains2tl.png';
 var G_INPUT_IMAGE = Utils.getGroundtruthImage();
@@ -273,6 +275,7 @@ function ResampleFullImage() {
 	ctx.clearRect(0, 0, cv.width, cv.height);
 
 	// row pixels container array
+	// number of pixels (rows, cols) * 4 (components: RGBA)
 	var pixels = new Uint8ClampedArray(rows * cols * 4);
 	var count = 0;
 
