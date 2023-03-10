@@ -115,7 +115,7 @@ function OnImageLoaded(eImg, stages){
 	$(baseCompositeStage.getContainer())
 		.addClass('grabCursor')
 		.attr('box_label', 'Spot Content')
-		.attr('note', 'Scroll to adjust spot size');
+		.attr('note', 'Scroll to adjust spot size\nHold [Shift] for half rate');
 	var compositeBeam = beam.clone();
 	var userScaledImage = drawBaseComposite(baseCompositeStage, image, compositeBeam, doUpdate);
 
