@@ -162,10 +162,10 @@ const Utils = {
 	 * @param {*} cellSize the size of a cell in the raster grid of the resulting image.
 	 * @param {*} userImage the scaled image by the user (in spot content) used to size the beam.
 	 */
-	updateDisplayBeamParams: function(stage, beam, cellSize, userImage) {
+	updateDisplayBeamParams: function(stage, beam, cellSize, userImage, onDblClick) {
 		// calculate and display the values
 		const infoclass = "parameterDisplay";
-		var element = this.ensureInfoBox(stage, infoclass);
+		var element = this.ensureInfoBox(stage, infoclass, onDblClick);
 		if (element) {
 			var beamSizeA = beam.radiusX() * beam.scaleX(),
 			beamSizeB = beam.radiusY() * beam.scaleY();
@@ -189,6 +189,9 @@ const Utils = {
 			+ 'Rotation: '+beam.rotation().toFixed(G_MATH_TOFIXED.MIN)+"°" +'<br>'
 			+ 'Width: '+spotSizeX.toFixed(G_MATH_TOFIXED.MIN)+'%' +'<br>'
 			+ 'Height: '+spotSizeY.toFixed(G_MATH_TOFIXED.MIN)+'%';
+
+			// tooltip
+			element.title = 'Double-click to change the spot width.';
 		}
 	},
 
@@ -253,10 +256,11 @@ const Utils = {
 	/**
 	 * Gets or creates an info-box element on the given stage.
 	 * @param {*} stage The stage on which display/have the info-box.
-	 * @param {*} className The class name of the info-box DOM element.
+	 * @param {string} className The class name of the info-box DOM element.
+	 * @param {function} [onDblClick] bound on creation, the event handler / callback for on-doubleclick event
 	 * @returns the info-box DOM element.
 	 */
-	ensureInfoBox: function(stage, className) {
+	ensureInfoBox: function(stage, className, onDblClick) {
 		// get stage container
 		var eStage = $(stage.getContainer());
 		
@@ -266,6 +270,9 @@ const Utils = {
 			// not found, so create it
 			eStage.prepend('<span class="'+className+'"></span>');
 			e = eStage.children('.'+className+':first');
+
+			if (typeof onDblClick == 'function')
+				e.dblclick(onDblClick);
 		}
 
 		// return the non-jquery-wrapped DOM element

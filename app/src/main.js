@@ -31,9 +31,6 @@ Konva.autoDrawEnabled = true;
 // the pixel size of the spot used for the subregion render view, updated elsewhere
 var G_BEAMRADIUS_SUBREGION_PX = {x:1,y:1};
 
-// Global reference to function to set the spot width
-var G_SETW = null;
-
 const nStages = 9;
 var boxesPerPageWidth = 5;
 var boxBorderW = 2 * (parseInt($('.box:first').css('border-width')) || 1);
@@ -91,9 +88,17 @@ function OnImageLoaded(eImg, stages){
 
 		// update spot/beam info: size, rotation, shape
 		var cellSize = Utils.computeCellSize(probeLayout.image, Utils.getRowsInput(), Utils.getColsInput());
-		Utils.updateDisplayBeamParams(baseBeamStage, layoutBeam, cellSize, userScaledImage);
+		Utils.updateDisplayBeamParams(baseBeamStage, layoutBeam, cellSize, userScaledImage, promptForSpotWidth);
 		Utils.updateMagInfo(baseImageStage, subregionImage);
 		Utils.updateImageMetricsInfo(groundtruthMapStage, virtualSEMStage);
+	}
+
+	/** prompts the user for the spot width % */
+	function promptForSpotWidth(){
+		var spotWidth = prompt("Spot width (%) - Default is 100%", 100, 0);
+		if (spotWidth > 0) {
+			Utils_SetSpotWidth(spotWidth);
+		}
 	}
 
 	// draw Spot Profile
@@ -125,8 +130,9 @@ function OnImageLoaded(eImg, stages){
 	var userScaledImage = drawBaseComposite(baseCompositeStage, image, compositeBeam, doUpdate);
 
 	/**(temporary) publicly exposed function to set the spot width
-	 * @param {number} wp the spot width in percent (%), ex. use 130 for 130%. */
-	G_SETW = function(wp=100){
+	 * @param {number} spotWidth the spot width in percent (%), ex. use 130 for 130%.
+	 * @todo move into separate file if possible */
+	function Utils_SetSpotWidth(spotWidth=100){
 		var beam = compositeBeam;
 		var userImage = userScaledImage;
 		
@@ -134,7 +140,7 @@ function OnImageLoaded(eImg, stages){
 		var cellSize = Utils.computeCellSize(userImage, Utils.getRowsInput(), Utils.getColsInput());
 		var maxScale = Math.max(beam.scaleX(), beam.scaleY());
 		var eccScaled = beam.scaleX() / maxScale;
-		var newScale = ((beam.width() * eccScaled) / (wp/100)) / cellSize.w;
+		var newScale = ((beam.width() * eccScaled) / (spotWidth/100)) / cellSize.w;
 
 		// userImage.scale({x: newScale, y: newScale});
 		Utils.centeredScale(userImage, newScale);

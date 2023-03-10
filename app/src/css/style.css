@@ -61,7 +61,10 @@ summary {
 	top: 0;
 	right: 0;
 	text-align: right;
+	user-select: none;
 }
+
+.box > span.parameterDisplay { cursor: pointer; }
 
 .final {
 	background-color: #172542;
