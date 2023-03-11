@@ -1,6 +1,9 @@
 /* globals Utils */
 
 function drawBaseBeam(stage) {
+	var layer = stage.getLayers()[0];
+	layer.destroyChildren(); // avoid memory leaks
+
 	// default beam shape values
 	var defaultRadius = {
 		x: 70,
@@ -242,6 +245,8 @@ function drawBaseComposite(stage, sImage, sBeam, updateCallback) {
 function drawAvgCircle(sourceStage, destStage, sBeam) {
 	var sourceLayer = sourceStage.getLayers()[0];
 	var destLayer = destStage.getLayers()[0];
+
+	destLayer.destroyChildren(); // avoid memory leaks
 
 	var beam = sBeam; //.clone();
 
