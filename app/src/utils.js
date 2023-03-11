@@ -689,6 +689,9 @@ const Utils = {
 	/** Converts an angle in degrees to radians */
 	toRadians: function(angle) { return angle * (Math.PI / 180); },
 
+	/** Used internally, for @see {@link Utils.ComputeProbeValue_gs} */
+	_COMPUTE_GS_CANVAS: null,
+
 	/** Gets the average pixel value (grayscale intensity) with a given image and probe.
 	 * @param {number} superScale factor to scale up ("blow-up") the image for the sampling */
 	ComputeProbeValue_gs: function(image, probe, superScale=1) {
@@ -710,18 +713,30 @@ const Utils = {
 		var maxRadius = Math.max(ellipseInfo.radiusX, ellipseInfo.radiusY);
 		var maxDiameter = 2 * maxRadius;
 
-		var cv = document.createElement('canvas');
-		if (G_DEBUG) {
-			document.body.appendChild(cv);
+		var cvSize = maxDiameter * superScale;
+
+		// create an offscreen canvas, if not already done
+		if (this._COMPUTE_GS_CANVAS == null) {
+			this._COMPUTE_GS_CANVAS = new OffscreenCanvas(cvSize, cvSize);
 		}
-		cv.width = maxDiameter * superScale;
-		cv.height = maxDiameter * superScale;
+
+		var cv = this._COMPUTE_GS_CANVAS;
+		// var cv = document.createElement('canvas');
+		// if (G_DEBUG) {
+		// 	document.body.appendChild(cv);
+		// }
+		cv.width = cvSize;
+		cv.height = cvSize;
 
 		if (cv.width == 0 || cv.height == 0)
 			return 0;
 
 		var ctx = cv.getContext('2d');
 		ctx.imageSmoothingEnabled = false;
+
+		// since we are reusing the offscreen canvas, we should clear it each time
+		// to prevent getting artifacts from previous draws
+		ctx.clearRect(0, 0, cv.width, cv.height);
 
 		// draw the image
 		// ctx.drawImage(image, 0, 0);
