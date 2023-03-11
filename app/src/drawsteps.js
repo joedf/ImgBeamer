@@ -31,6 +31,8 @@ function drawBaseBeam(stage) {
 		anchorCornerRadius: 3,
 		borderDash: [3, 3],
 
+		rotationSnaps: [0, 45, 90, 135, 180],
+
 		// resize limits
 		// https://konvajs.org/docs/select_and_transform/Resize_Limits.html
 		boundBoxFunc: function (oldBoundBox, newBoundBox) {
