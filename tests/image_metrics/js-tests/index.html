@@ -4,7 +4,7 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta http-equiv="X-UA-Compatible" content="ie=edge">
-	<title>HTML 5 Boilerplate</title>
+	<title>ImgBeamer | Image Metrics js-tests</title>
 	
 	<style type="text/css">
 		body {
@@ -31,6 +31,7 @@
 
 	<script src="js/ssim.web-3.5.0.js"></script>
 	<script src="js/image-mse.js"></script>
+	<script src="js/image-ssim.js"></script>
 	<script src="js/image-mse-jdf.js"></script>
 
 	<!-- 
@@ -98,8 +99,8 @@
 		}
 
 		function mse_test(msg, im1, im2){
-			im1.channels = 1;
-			im2.channels = 1;
+			im1.channels = 4;
+			im2.channels = 4;
 			var r = ImageMSE.compare(im1, im2);
 			console.log(msg, r);
 		}
@@ -109,7 +110,18 @@
 			console.log(msg, r);
 		}
 
+		function darosh_ssim_test(msg, im1, im2){
+			im1.channels = 4;
+			im2.channels = 4;
+			var r = ImageSSIM.compare(im1, im2);
+			console.log(msg, r);
+		}
+
 		function run_tests(fn, d){
+			// simple js benchmarking
+			// https://stackoverflow.com/a/46649775/883015
+			console.time(fn.name);
+			
 			fn('og v og: ', d['og'], d['og']);
 			fn('og v fant: ', d['og'], d['fant']);
 			fn('og v c010: ', d['og'], d['c010']);
@@ -119,6 +131,8 @@
 			fn('og v c130: ', d['og'], d['c130']);
 			fn('og v c6a5: ', d['og'], d['c6a5']);
 			fn('og v c500: ', d['og'], d['c500']);
+			
+			console.timeEnd(fn.name);
 		}
 
 		function run_all(fant){
@@ -142,10 +156,13 @@
 			console.log('running SSIM ...');
 			run_tests(ssim_test, data);
 
+			console.log('running SSIM (darosh) ...');
+			run_tests(darosh_ssim_test, data);
+
 			console.log('running MSE_JDF ...');
 			run_tests(mse_jdf_test, data);
 
-			console.log('running MSE ...');
+			console.log('running MSE (darosh) ...');
 			run_tests(mse_test, data);
 		}
 
