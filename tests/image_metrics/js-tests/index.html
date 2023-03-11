@@ -142,14 +142,14 @@
 			console.timeEnd(fn.name);
 		}
 
-		function run_all(fant){
+		function run_all(useFant){
 			console.log('reading all pixel data...');
 
 			var ogpx = readPixels($i('og'));
 			var fantpx = readPixels($i('fant'));
 
 			var data = {
-				'og': ((!!fant == true) ? fantpx : ogpx),
+				'og': ((!!useFant == true) ? fantpx : ogpx),
 				'fant': fantpx,
 				'c010': readPixels($i('c010')),
 				'c060': readPixels($i('c060')),
