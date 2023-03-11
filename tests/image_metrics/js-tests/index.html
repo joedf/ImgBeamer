@@ -39,6 +39,7 @@
 	<script src="js/ssim.web-3.5.0.js"></script>
 	<script src="js/image-mse.js"></script>
 	<script src="js/image-ssim.js"></script>
+	<script src="js/image-ms-ssim.js"></script>
 	<script src="js/image-mse-jdf.js"></script>
 
 	<!-- 
@@ -86,6 +87,8 @@
 			return document.getElementById(id);
 		}
 
+		var G_IMG_CHANNEL_COUNT = 4;
+
 		function ssim_test(msg, im1, im2){
 			/* https://github.com/obartra/ssim/wiki/Usage#options
 			Parameter 	Default 	Description
@@ -106,8 +109,8 @@
 		}
 
 		function mse_test(msg, im1, im2){
-			im1.channels = 4;
-			im2.channels = 4;
+			im1.channels = G_IMG_CHANNEL_COUNT;
+			im2.channels = G_IMG_CHANNEL_COUNT;
 			var r = ImageMSE.compare(im1, im2);
 			console.log(msg, r);
 		}
@@ -118,9 +121,16 @@
 		}
 
 		function darosh_ssim_test(msg, im1, im2){
-			im1.channels = 4;
-			im2.channels = 4;
+			im1.channels = G_IMG_CHANNEL_COUNT;
+			im2.channels = G_IMG_CHANNEL_COUNT;
 			var r = ImageSSIM.compare(im1, im2);
+			console.log(msg, r);
+		}
+
+		function darosh_msssim_test(msg, im1, im2){
+			im1.channels = G_IMG_CHANNEL_COUNT;
+			im2.channels = G_IMG_CHANNEL_COUNT;
+			var r = ImageMSSSIM.compare(im1, im2);
 			console.log(msg, r);
 		}
 
@@ -171,6 +181,9 @@
 
 			console.log('running MSE (darosh) ...');
 			run_tests(mse_test, data);
+
+			console.log('running MS-SSIM (darosh) ...');
+			run_tests(darosh_msssim_test, data);
 		}
 
 		setTimeout(run_all, 1000);
