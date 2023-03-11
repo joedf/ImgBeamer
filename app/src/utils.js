@@ -237,13 +237,16 @@ const Utils = {
 		const infoclass = "metricsDisplay";
 		var element = this.ensureInfoBox(destStage, infoclass);
 		if (element) {
+			// compare without Image Smoothing
+			const imageSmoothing = false;
+
 			// get ground truth image
 			var refImage = this.getFirstImageFromStage(sourceStage);
-			var refData = this.getKonvaImageData(refImage);
+			var refData = this.getKonvaImageData(refImage, imageSmoothing);
 
 			// get the image without the row/draw indicator
 			var finalImage = this.getVirtualSEM_KonvaImage(destStage);
-			var finalData = this.getKonvaImageData(finalImage);
+			var finalData = this.getKonvaImageData(finalImage, imageSmoothing);
 
 			// Do the metric calculation here
 			var metrics = NRMSE.compare(refData, finalData);
@@ -796,10 +799,9 @@ const Utils = {
 	},
 
 	/** get the imageData (pixels) from a given konva object/image */
-	getKonvaImageData: function(konvaObject, pixelRatio) {
-		pixelRatio = (typeof pixelRatio !== "undefined") ? pixelRatio : 2;
+	getKonvaImageData: function(konvaObject, pixelRatio=2, imageSmoothing=true) {
 		// TODO: maybe we get higher DPI / density images?
-		var cnv = konvaObject.toCanvas({"pixelRatio": pixelRatio});
+		var cnv = konvaObject.toCanvas({"pixelRatio": pixelRatio, "imageSmoothingEnabled": imageSmoothing});
 		var ctx = cnv.getContext('2d');
 		var data = ctx.getImageData(0, 0, cnv.width, cnv.height);
 		return data;
