@@ -35,7 +35,8 @@ const nStages = 9;
 var boxesPerPageWidth = 5;
 var boxBorderW = 2 * (parseInt($('.box:first').css('border-width')) || 1);
 var scrollBarW = 15;
-var G_BoxSize = Math.max((document.body.clientWidth / boxesPerPageWidth) - boxBorderW - scrollBarW, 300);
+// make sure to have an integer value to prevent slight sizing differences between each box
+var G_BoxSize = Math.ceil(Math.max((document.body.clientWidth / boxesPerPageWidth) - boxBorderW - scrollBarW, 300));
 var G_MainContainer = $(G_MAIN_CONTAINER);
 
 
