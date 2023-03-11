@@ -24,11 +24,25 @@ function drawBaseBeam(stage) {
 	var tr = new Konva.Transformer({
 		nodes: [beam],
 		centeredScaling: true,
+
 		// style the transformer:
 		// https://konvajs.org/docs/select_and_transform/Transformer_Styling.html
 		anchorSize: 11,
 		anchorCornerRadius: 3,
 		borderDash: [3, 3],
+
+		// resize limits
+		// https://konvajs.org/docs/select_and_transform/Resize_Limits.html
+		boundBoxFunc: function (oldBoundBox, newBoundBox) {
+			// if the new bounding box is too large or small
+			// small than the stage size, but more than 1 px.
+			// then, we return the old bounding box
+			if ( newBoundBox.width > stage.width() || newBoundBox.width < 1
+			|| newBoundBox.height > stage.height() || newBoundBox.height < 1) {
+				return oldBoundBox;
+			}
+			return newBoundBox;
+		}
 	});
 	layer.listening(true);
 	layer.add(tr);
