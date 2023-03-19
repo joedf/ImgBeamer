@@ -32,7 +32,7 @@
 						<tr>
 							<td></td>
 							<td>
-								<button id="generateFinal">Generate preview</button>
+								<button id="btn_updateViews">Update views</button>
 								<svg id="loadspinner" class="load_spinner_svg"
 									style="display:none"
 									xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid" viewBox="0 0 16 16">
@@ -159,7 +159,7 @@
 				$(document.body).trigger('OnGroundtruthImageChange');
 			});
 
-			$('#generateFinal').click(doGenerateSubRegion);
+			$('#btn_updateViews').click(doGenerateSubRegion);
 
 			// used to auto-name the export files with a counter
 			var G_Export_img_count = 0;
