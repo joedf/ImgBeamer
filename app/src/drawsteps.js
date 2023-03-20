@@ -102,6 +102,9 @@ function drawBaseBeam(stage) {
 	return beam;
 }
 
+/**
+ * @todo TODO: rename this to drawSubregionImage
+ */
 function drawBaseImage(stage, oImg, size, doFill = false, updateCallback = null) {
 	var max = size;
 
@@ -113,6 +116,7 @@ function drawBaseImage(stage, oImg, size, doFill = false, updateCallback = null)
 	// image ratio to "fit" in canvas
 	var fitSize = Utils.fitImageProportions(img_width, img_height, max, doFill);
 
+	// TODO: this shouldnt be need or it at least duplicate with part of drawGroundtruthImage()
 	var kImage = new Konva.Image({
 		x: (max - fitSize.w)/2,
 		y: (max - fitSize.h)/2,
@@ -432,6 +436,8 @@ function drawGroundtruthImage(stage, imageObj, subregionImage, maxSize=300){
 	var layer = stage.getLayers()[0];
 	layer.destroyChildren(); // avoid memory leaks
 
+	// TODO: this shouldnt be need or it at least duplicate with
+	// part of drawBaseImage() / drawSubregionimage()
 	var image = new Konva.Image({
 		x: (maxSize - fit.w)/2,
 		y: (maxSize - fit.h)/2,
