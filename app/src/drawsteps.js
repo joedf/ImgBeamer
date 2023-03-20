@@ -247,6 +247,7 @@ function drawBaseComposite(stage, sImage, sBeam, updateCallback) {
 	return image;
 }
 
+// TODO: rename this to drawSpotSignal
 function drawAvgCircle(sourceStage, destStage, sBeam) {
 	var sourceLayer = sourceStage.getLayers()[0];
 	var destLayer = destStage.getLayers()[0];
