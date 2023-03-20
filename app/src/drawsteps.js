@@ -359,6 +359,7 @@ function drawProbeLayout(drawStage, baseImage, userImage, beam) {
 	// run once immediately
 	updateProbeLayout();
 
+	// TODO: do we really to forward the image here???
 	return {
 		updateCallback: updateProbeLayout,
 		image: imageCopy
