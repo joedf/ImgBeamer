@@ -207,6 +207,7 @@ function OnImageLoaded(eImg, stages){
 	var groundtruthMap = drawGroundtruthImage(groundtruthMapStage, eImg, subregionImage, G_BoxSize);
 	var updateGroundtruthMap = groundtruthMap.updateFunc;
 	
+	// draw Resulting Image
 	$(virtualSEMStage.getContainer()).attr('box_label', 'Resulting Image');
 	var vitualSEMBeam = beam.clone();
 	var updateVirtualSEM_Config = drawVirtualSEM(
