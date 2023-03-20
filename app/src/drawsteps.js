@@ -1,5 +1,6 @@
 /* globals Utils */
 
+// TODO: rename this to drawSpotProfile
 function drawBaseBeam(stage) {
 	var layer = stage.getLayers()[0];
 	layer.destroyChildren(); // avoid memory leaks
