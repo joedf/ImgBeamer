@@ -492,6 +492,8 @@ function drawGroundtruthImage(stage, imageObj, subregionImage, maxSize=300){
 // TODO: do we really need both subregionRect and subregionRectStage as
 // separate parameters? maybe the info needed can be obtained with less
 // or more cleanly?
+//
+// TODO: can we get rid userScaleImage / userImage throughout the source if possible, cleaner?
 function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, originalImageObj, userScaledImage){
 	var rows = 0, cols = 0;
 	var cellW = 0, cellH = 0;
