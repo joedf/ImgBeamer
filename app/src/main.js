@@ -70,7 +70,7 @@ function UpdateBaseImage(){
 
 function OnImageLoaded(eImg, stages){
 	var baseImageStage = stages[1];
-	var baseBeamStage = stages[2];
+	var spotProfileStage = stages[2];
 	var baseCompositeStage = stages[3];
 	var avgCircleStage = stages[4];
 	var probeLayoutStage = stages[5];
@@ -89,7 +89,7 @@ function OnImageLoaded(eImg, stages){
 
 		// update spot/beam info: size, rotation, shape
 		var cellSize = Utils.computeCellSize(probeLayout.image, Utils.getRowsInput(), Utils.getColsInput());
-		Utils.updateDisplayBeamParams(baseBeamStage, layoutBeam, cellSize, userScaledImage, promptForSpotWidth);
+		Utils.updateDisplayBeamParams(spotProfileStage, layoutBeam, cellSize, userScaledImage, promptForSpotWidth);
 		Utils.updateMagInfo(baseImageStage, subregionImage);
 		Utils.updateImageMetricsInfo(groundtruthMapStage, virtualSEMStage);
 	}
@@ -103,12 +103,11 @@ function OnImageLoaded(eImg, stages){
 	}
 
 	// draw Spot Profile
-	$(baseBeamStage.getContainer())
+	$(spotProfileStage.getContainer())
 		.attr('box_label', 'Spot Profile')
 		.attr('note', 'Press [R] to reset shape')
 		.css('border-color', 'red');
-	// TODO: maybe rename this to something more specific?
-	var beam = drawBaseBeam(baseBeamStage);
+	var beam = drawSpotProfileEdit(spotProfileStage);
 
 	// Subregion View
 	// draw base image (can pan & zoom)

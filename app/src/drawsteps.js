@@ -1,7 +1,6 @@
 /* globals Utils */
 
-// TODO: rename this to drawSpotProfile
-function drawBaseBeam(stage) {
+function drawSpotProfileEdit(stage) {
 	var layer = stage.getLayers()[0];
 	layer.destroyChildren(); // avoid memory leaks
 
@@ -174,7 +173,8 @@ function drawBaseImage(stage, oImg, size, doFill = false, updateCallback = null)
 	stage.draw();
 	
 	// keyboard events
-	// TODO: similar or duplicate from drawBaseBeam()/"Spot Profile" keyboard event code
+	// TODO: similar or duplicate from drawSpotProfileEdit() or 
+	// "Spot Profile" keyboard event code
 	var container = stage.container();
 	// make it focusable
 	container.tabIndex = 1;
