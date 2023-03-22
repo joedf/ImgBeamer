@@ -1,8 +1,14 @@
 /* globals NRMSE */
 
-/** Used for display, for number.toFixed() rounding. */
+/**
+ * Used for display, for number.toFixed() rounding.
+ * @namespace G_MATH_TOFIXED
+ */
 const G_MATH_TOFIXED = {
-	/** The minimum number of decimal digits. */
+	/**
+	 * @type {number}
+	 * @description The minimum number of decimal digits.
+	 */
 	MIN: 1,
 	/** The short or standard number of decimal digits. */
 	SHORT: 2,
