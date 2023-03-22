@@ -116,7 +116,7 @@ function OnImageLoaded(eImg, stages){
 		.attr('box_label', 'Subregion/ROI View')
 		.attr('note', 'Pan & Zoom: Drag and Scroll\nPress [R] to reset')
 		.css('border-color', 'blue');
-	var subregionImage = drawBaseImage(baseImageStage, eImg, G_BoxSize, false, doUpdate);
+	var subregionImage = drawSubregionImage(baseImageStage, eImg, G_BoxSize, false, doUpdate);
 
 	// make a clone without copying over the event bindings
 	var image = subregionImage.clone().off();

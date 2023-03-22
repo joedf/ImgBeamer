@@ -103,9 +103,18 @@ function drawSpotProfileEdit(stage) {
 }
 
 /**
- * @todo TODO: rename this to drawSubregionImage
+ * Draws the subregion image display.
+ * @param {*} stage The stage to draw it on.
+ * @param {*} oImg The ground truth image.
+ * @param {Number} size (to be removed) The mix size (width or height) of the image to draw.
+ * @param {Boolean} doFill (to be removed?) Fill or letterbox mode to fit the image.
+ * @param {Function} updateCallback 
+ * @returns a reference to the subregion image object that can be panned and zoomed by the user.
+ * 
+ * @todo remove 'size' ... confusing and not useful.
+ * @todo likely remove 'doFill' ... maybe confusing and not useful.
  */
-function drawBaseImage(stage, oImg, size, doFill = false, updateCallback = null) {
+function drawSubregionImage(stage, oImg, size, doFill = false, updateCallback = null) {
 	var max = size;
 
 	if (G_DEBUG)
@@ -440,7 +449,7 @@ function drawGroundtruthImage(stage, imageObj, subregionImage, maxSize=300){
 	layer.destroyChildren(); // avoid memory leaks
 
 	// TODO: this shouldnt be need or it at least duplicate with
-	// part of drawBaseImage() / drawSubregionimage()
+	// part of drawSubregionImage()
 	var image = new Konva.Image({
 		x: (maxSize - fit.w)/2,
 		y: (maxSize - fit.h)/2,
