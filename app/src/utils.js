@@ -10,6 +10,10 @@ const G_MATH_TOFIXED = {
 	LONG: 4
 };
 
+/**
+ * Various utility and helper functions
+ * @namespace Utils
+ */
 const Utils = {
 	/**
 	 * Makes a new stage 'box' with a layer added, and some settings
