@@ -24,5 +24,17 @@ Simple demo tool of the image formation[<sup>1</sup>](#references) process used 
 - Minor pixel value differences in virtualSEM; improved, but could be due to sampling from downsized sampling of the larger full image
 - The application is being documented [here](https://github.com/joedf/CAS741_w23).
 
+### Developer Instructions and Notes
+- The main application is implemented entirely in javascript
+	- You can run it either using the auto-deployed GitHub pages version ("live" link above).
+	- Or you can run it on your own machine with a local web server pointed to the `app/` folder
+		- either [XAMPP](https://www.apachefriends.org/) or even just a python HTTP server with `python -m http.server --directory app/`
+- Tests for the image metrics are available under `tests/`:
+	- `js-tests/`: for javascript implementations
+		- open the `index.html` and look in the webconsole.
+	- `py-tests/`: for python implementations
+		- run `imgquality.py`
+	- The other folders and files are from preliminary and manual testing that was done in the past.
+
 ### References
 1. “Image Formation.” In Scanning Electron Microscopy and X-Ray Microanalysis, edited by Joseph I. Goldstein, Dale E. Newbury, Joseph R. Michael, Nicholas W.M. Ritchie, John Henry J. Scott, and David C. Joy, 93–110. New York, NY: Springer, 2018. https://doi.org/10.1007/978-1-4939-6676-9_6.
