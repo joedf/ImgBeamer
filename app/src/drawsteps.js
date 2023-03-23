@@ -111,7 +111,7 @@ function drawSpotProfileEdit(stage) {
  * Draws the subregion image display.
  * @param {*} stage The stage to draw it on.
  * @param {*} oImg The ground truth image.
- * @param {Number} size (to be removed) The mix size (width or height) of the image to draw.
+ * @param {Number} size (to be removed) The max size (width or height) of the image to draw.
  * @param {Boolean} doFill (to be removed?) Fill or letterbox mode to fit the image.
  * @param {Function} updateCallback 
  * @returns a reference to the subregion image object that can be panned and zoomed by the user.
@@ -218,7 +218,7 @@ function drawSubregionImage(stage, oImg, size, doFill = false, updateCallback = 
  * @param {*} stage the drawing stage.
  * @param {*} sImage the subregion image (will be cloned for the image object displayed).
  * @param {*} sBeam the beam/spot shape (used by reference).
- * @param {*} updateCallback a function to call when a change occurs such as pan-and-zoom.
+ * @param {function} updateCallback a function to call when a change occurs such as pan-and-zoom.
  * @returns a reference to the image object being scaled by the user.
  */
 function drawSpotContent(stage, sImage, sBeam, updateCallback = null) {
@@ -313,6 +313,16 @@ function drawSpotSignal(sourceStage, destStage, sBeam) {
 	return doUpdateAvgSpot;
 }
 
+/**
+ * Draws the probe layout.
+ * @param {*} drawStage The stage to draw on.
+ * @param {*} baseImage The subregion image to draw with (cloned).
+ * @param {*} userImage The image scaled by Spot content
+ * @param {*} beam the beam/spot shape to draw with (cloned and scaled).
+ * @returns an object with an update function to call when a redraw is needed,
+ * 	and a reference to the subregion image drawn.
+ * @todo maybe we dont need both baseImage and userImage? or cleaner way to just get the scale and image from userImage.
+ */
 function drawProbeLayout(drawStage, baseImage, userImage, beam) {
 	// draws probe layout
 	var layers = drawStage.getLayers();
@@ -321,6 +331,7 @@ function drawProbeLayout(drawStage, baseImage, userImage, beam) {
 
 	var baseGridRect = new Konva.Rect(baseImage.getSelfRect());
 	
+	// TODO: maybe this could instead be? userImage.clone();
 	var imageCopy = baseImage.clone();
 
 	baseLayer.add(imageCopy);
@@ -394,6 +405,15 @@ function drawProbeLayout(drawStage, baseImage, userImage, beam) {
 	};
 }
 
+/**
+ * Draws the spot layout sampled image content. The image stenciled by the spot shape over a grid.
+ * @param {*} drawStage The stage to draw on
+ * @param {*} originalImage The image to "stencil" / "clip" or sample.
+ * @param {*} userImage the scaled image from spot content (used by reference)
+ * @param {*} sBeam the spot/beam shape to use (cloned and scaled)
+ * @returns an update function to call when a redraw is needed.
+ * @todo maybe only userImage is needed, no originalImage?
+ */
 function drawProbeLayoutSampling(drawStage, originalImage, userImage, sBeam) {
 	var baseImage = originalImage; //.clone();
 	var beam = sBeam; //.clone();
@@ -425,6 +445,15 @@ function drawProbeLayoutSampling(drawStage, originalImage, userImage, sBeam) {
 	return updateProbeLayoutSampling;
 }
 
+/**
+ * Draws the sampled subregion.
+ * @param {*} sourceStage The source stage to sample from
+ * @param {*} destStage The stage to draw on
+ * @param {*} originalImage the subregion image to sample or 'stencil' over.
+ * @param {*} userImage the image scaled by spot content.
+ * @param {*} sBeam the beam to sample with (cloned and scaled)
+ * @returns an update function to call when a redraw is needed
+ */
 function drawResampled(sourceStage, destStage, originalImage, userImage, sBeam) {
 	var baseImage = originalImage; //.clone();
 	var beam = sBeam; //.clone();
@@ -460,6 +489,16 @@ function drawResampled(sourceStage, destStage, originalImage, userImage, sBeam) 
 	return updateResampledDraw;
 }
 
+/**
+ * Draws the ground truth image and the subregion bounds overlay.
+ * @param {*} stage the stage to draw on.
+ * @param {*} imageObj the original/full-size image to draw
+ * @param {*} subregionImage the subregion image (to get the bounds from)
+ * @param {number} maxSize (to be removed) the maximum size (width or height) of the stage to fit the image?
+ * @returns an object with an update function to call for needed redraws and the subregion bounds.
+ * @todo remove maxSize if possible?
+ * @todo do we really need to return the subregioRect as well?
+ */
 function drawGroundtruthImage(stage, imageObj, subregionImage, maxSize=300){
 
 	var fit = Utils.fitImageProportions(imageObj.naturalWidth, imageObj.naturalHeight, maxSize);
@@ -517,11 +556,21 @@ function drawGroundtruthImage(stage, imageObj, subregionImage, maxSize=300){
 	};
 }
 
-// TODO: do we really need both subregionRect and subregionRectStage as
-// separate parameters? maybe the info needed can be obtained with less
-// or more cleanly?
-//
-// TODO: can we get rid userScaleImage / userImage throughout the source if possible, cleaner?
+/**
+ * Draws the resulting image continously row-by-row.
+ * @param {*} stage the stage to draw on
+ * @param {*} beam the beam to sample with
+ * @param {*} subregionRect the bounds on the subregion
+ * @param {*} subregionRectStage the stage for the gorund truth
+ * @param {*} originalImageObj the ground truth image
+ * @param {*} userScaledImage the image scale by spot content
+ * @returns an update function to call when the spot profile or the cell/pixel size changes.
+ * @todo do we really need both subregionRect and subregionRectStage as
+ * separate parameters? maybe the info needed can be obtained with less
+ * or more cleanly?
+ * @todo rename confusing subregionRectStage to groundTruthStage?
+ * @todo can we get rid userScaleImage / userImage throughout the source if possible, cleaner?
+ */
 function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, originalImageObj, userScaledImage){
 	var rows = 0, cols = 0;
 	var cellW = 0, cellH = 0;

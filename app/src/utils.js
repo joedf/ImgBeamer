@@ -600,8 +600,8 @@ const Utils = {
 	},
 
 	/**
-	 * Essentially, this is computeResampleFast(), but corrected for spot size larger than the cell size
-	 * ComputeResampleFast() is limits the sampling to the cell size, and takes in smaller version of the
+	 * Essentially, this is computeResampleFast(), but corrected for spot size larger than the cell size.
+	 * ComputeResampleFast() limits the sampling to the cell size, and takes in smaller version of the
 	 * image that is already drawn and "compositied" in a Konva Stage, instead of the original larger image...
 	 */
 	computeResampledSlow: function(sourceStage, destStage, oImage, probe, rows, cols, rect){
