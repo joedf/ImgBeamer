@@ -18,7 +18,7 @@ var G_MIN_AVG_SIGNAL_VALUE = 2;
 
 // const G_INPUT_IMAGE = 'src/testimages/grains2tl.png';
 var G_INPUT_IMAGE = Utils.getGroundtruthImage();
-const COMPOSITE_OP = 'source-in';
+const COMPOSITE_OP = 'source-in'; // TODO: maybe we dont need this a global anymore?
 // const COMPOSITE_OP = 'destination-in';
 var G_UpdateResampled = null;
 var G_UpdateVirtualSEMConfig = null;
