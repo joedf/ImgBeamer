@@ -172,9 +172,7 @@
 				
 				// export the image
 				var url = finalImage.toDataURL({pixelRatio:2});
-				var datestamp = new Date().toISOString().slice(0, 10).replaceAll('-','.');
-				var counter = String(++G_Export_img_count).padStart(3,'0');
-				var filename = "result_image-"+datestamp+"-"+counter+".png";
+				var filename = Utils.GetSuggestedFileName("result_image",++G_Export_img_count);
 				Utils.downloadURI(url, filename);
 			});
 

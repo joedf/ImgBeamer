@@ -702,6 +702,20 @@ const Utils = {
 	/** Converts an angle in degrees to radians */
 	toRadians: function(angle) { return angle * (Math.PI / 180); },
 
+	/**
+	 * Generate a filename with a timestamp and the given prefix and counter.
+	 * @param {string} prefix the filename prefix
+	 * @param {number} counter a counter that has been incremented elsewhere
+	 * @param {string} [fileExt="png"] the file extension
+	 * @returns the filename.
+	 */
+	GetSuggestedFileName: function(prefix, counter, fileExt = "png"){
+		var datestamp = new Date().toISOString().slice(0, 10).replaceAll('-','.');
+		var sCounter = String(counter).padStart(3,'0');
+		var filename = prefix+"-"+datestamp+"-"+sCounter+"."+fileExt;
+		return filename;
+	},
+
 	/** Used internally, for @see {@link Utils.ComputeProbeValue_gs} */
 	_COMPUTE_GS_CANVAS: null,
 
