@@ -71,8 +71,8 @@ function UpdateBaseImage(){
 function OnImageLoaded(eImg, stages){
 	var baseImageStage = stages[1];
 	var spotProfileStage = stages[2];
-	var baseCompositeStage = stages[3];
-	var avgCircleStage = stages[4];
+	var spotContentStage = stages[3];
+	var spotSignalStage = stages[4];
 	var probeLayoutStage = stages[5];
 	var layoutSampledStage = stages[6];
 	var resampledStage = stages[7];
@@ -81,7 +81,7 @@ function OnImageLoaded(eImg, stages){
 
 	/** called when a change occurs in the spot profile, subregion, or spot content */
 	function doUpdate(){
-		updateAvgCircle();
+		updateSpotSignal();
 		updateProbeLayout();
 		updateResamplingSteps(true);
 		updateGroundtruthMap();
@@ -122,18 +122,18 @@ function OnImageLoaded(eImg, stages){
 	var image = subregionImage.clone().off();
 
 	// draw Spot Content
-	$(baseCompositeStage.getContainer())
+	$(spotContentStage.getContainer())
 		.addClass('grabCursor')
 		.attr('box_label', 'Spot Content')
 		.attr('note', 'Scroll to adjust spot size\nHold [Shift] for half rate');
-	var compositeBeam = beam.clone();
-	var userScaledImage = drawBaseComposite(baseCompositeStage, image, compositeBeam, doUpdate);
+	var spotContentBeam = beam.clone();
+	var userScaledImage = drawSpotContent(spotContentStage, image, spotContentBeam, doUpdate);
 
 	/**(temporary) publicly exposed function to set the spot width
 	 * @param {number} spotWidth the spot width in percent (%), ex. use 130 for 130%.
 	 * @todo move into separate file if possible */
 	function Utils_SetSpotWidth(spotWidth=100){
-		var beam = compositeBeam;
+		var beam = spotContentBeam;
 		var userImage = userScaledImage;
 		
 		// calculate the new scale for spot-content image, based on the given spot width
@@ -151,11 +151,11 @@ function OnImageLoaded(eImg, stages){
 	};
 
 	// draw Spot Signal
-	$(avgCircleStage.getContainer())
+	$(spotSignalStage.getContainer())
 		.addClass('note_colored')
 		.attr('box_label', 'Spot Signal');
-	var avgCircleBeam = beam.clone();
-	var updateAvgCircle = drawAvgCircle(baseCompositeStage, avgCircleStage, avgCircleBeam);
+	var spotSignalBeam = beam.clone();
+	var updateSpotSignal = drawSpotSignal(spotContentStage, spotSignalStage, spotSignalBeam);
 
 	// draw Spot Layout
 	$(probeLayoutStage.getContainer()).attr('box_label', 'Spot Layout');
@@ -221,10 +221,10 @@ function OnImageLoaded(eImg, stages){
 
 	/** propagate changes to the spot-profile (beam) to the beams in the other stages */
 	function updateBeams(){
-		compositeBeam.scale(beam.scale());
-		compositeBeam.rotation(beam.rotation());
-		avgCircleBeam.scale(beam.scale());
-		avgCircleBeam.rotation(beam.rotation());
+		spotContentBeam.scale(beam.scale());
+		spotContentBeam.rotation(beam.rotation());
+		spotSignalBeam.scale(beam.scale());
+		spotSignalBeam.rotation(beam.rotation());
 
 		// keep the shape of the ellipse, not the actual size of it...
 		var maxScale = Math.max(beam.scaleX(), beam.scaleY());

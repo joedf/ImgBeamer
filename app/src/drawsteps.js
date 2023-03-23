@@ -1,5 +1,10 @@
 /* globals Utils */
 
+/**
+ * Draws an node-editable ellipse shape on the given drawing stage.
+ * @param {*} stage the stage to draw on.
+ * @returns the spot/beam (Ellipse) object
+ */
 function drawSpotProfileEdit(stage) {
 	var layer = stage.getLayers()[0];
 	layer.destroyChildren(); // avoid memory leaks
@@ -207,7 +212,16 @@ function drawSubregionImage(stage, oImg, size, doFill = false, updateCallback = 
 	return kImage;
 }
 
-function drawBaseComposite(stage, sImage, sBeam, updateCallback) {
+/**
+ * Draws the spot content on the given drawing stage.
+ * The given image is draggable (pan) and zoomable (scroll).
+ * @param {*} stage the drawing stage.
+ * @param {*} sImage the subregion image (will be cloned for the image object displayed).
+ * @param {*} sBeam the beam/spot shape (used by reference).
+ * @param {*} updateCallback a function to call when a change occurs such as pan-and-zoom.
+ * @returns a reference to the image object being scaled by the user.
+ */
+function drawSpotContent(stage, sImage, sBeam, updateCallback = null) {
 	var layer = stage.getLayers()[0];
 	layer.destroyChildren();  // avoid memory leaks
 	layer.listening(true);
@@ -215,13 +229,12 @@ function drawBaseComposite(stage, sImage, sBeam, updateCallback) {
 	// Give yellow box border to indicate interactive
 	$(stage.getContainer()).css('border-color','yellow');
 
-	var beam = sBeam;//.clone();
 	var image = sImage.clone();
 	image.draggable(true);
 	
 	image.globalCompositeOperation(COMPOSITE_OP);
 
-	layer.add(beam);
+	layer.add(sBeam);
 	layer.add(image);
 
 	// "pre-zoom" a bit, and start with center position
@@ -256,8 +269,14 @@ function drawBaseComposite(stage, sImage, sBeam, updateCallback) {
 	return image;
 }
 
-// TODO: rename this to drawSpotSignal
-function drawAvgCircle(sourceStage, destStage, sBeam) {
+/**
+ * Draws the Spot Signal - previews the averaged signal for a given spot.
+ * @param {*} sourceStage the source stage to sample from.
+ * @param {*} destStage the stage to draw on.
+ * @param {*} sBeam the beam to sample (or "stencil") to with.
+ * @returns an update function to call when a redraw is needed.
+ */
+function drawSpotSignal(sourceStage, destStage, sBeam) {
 	var sourceLayer = sourceStage.getLayers()[0];
 	var destLayer = destStage.getLayers()[0];
 
@@ -265,23 +284,23 @@ function drawAvgCircle(sourceStage, destStage, sBeam) {
 
 	var beam = sBeam; //.clone();
 
-	var updateAvgCircle = function(){
+	var doUpdateAvgSpot = function(){
 		var pCtx = sourceLayer.getContext();
 		var allPx = pCtx.getImageData(0, 0, pCtx.canvas.width, pCtx.canvas.height);
 		// var avgPx = Utils.get_avg_pixel_rgba(allPx);
 		var avgPx = Utils.get_avg_pixel_gs(allPx); avgPx = [avgPx,avgPx,avgPx,1];
 
-		var avgCircle = null;
+		var avgSpot = null;
 		if (destLayer.getChildren().length <= 0){
-			avgCircle = beam;
-			destLayer.add(avgCircle);
+			avgSpot = beam;
+			destLayer.add(avgSpot);
 		} else {
-			avgCircle = destLayer.getChildren()[0];
+			avgSpot = destLayer.getChildren()[0];
 		}
 
 		var avgColor = "rgba("+ avgPx.join(',') +")";
-		avgCircle.stroke(avgColor);
-		avgCircle.fill(avgColor);
+		avgSpot.stroke(avgColor);
+		avgSpot.fill(avgColor);
 
 		destStage.getContainer().setAttribute('note', avgColor);
 
@@ -289,9 +308,9 @@ function drawAvgCircle(sourceStage, destStage, sBeam) {
 	};
 
 	// run once immediately
-	updateAvgCircle();
+	doUpdateAvgSpot();
 
-	return updateAvgCircle;
+	return doUpdateAvgSpot;
 }
 
 function drawProbeLayout(drawStage, baseImage, userImage, beam) {
