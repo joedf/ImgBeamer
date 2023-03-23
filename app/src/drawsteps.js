@@ -1,5 +1,11 @@
 /* globals Utils */
 
+/* exported
+ * drawSpotProfileEdit, drawSubregionImage, drawSpotContent, drawSpotSignal,
+ * drawProbeLayout, drawProbeLayoutSampling, drawResampled, drawGroundtruthImage,
+ * drawVirtualSEM
+ */
+
 /**
  * Draws an node-editable ellipse shape on the given drawing stage.
  * @param {*} stage the stage to draw on.
@@ -24,7 +30,6 @@ function drawSpotProfileEdit(stage) {
 		strokeWidth: 0,
 	});
 
-	var layer = stage.getLayers()[0];
 	layer.add(beam);
 	layer.draw();
 

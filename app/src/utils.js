@@ -1,4 +1,4 @@
-/* globals NRMSE */
+/* globals G_DEBUG, COMPOSITE_OP, NRMSE */
 
 /**
  * Used for display, for number.toFixed() rounding.
