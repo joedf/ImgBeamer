@@ -65,6 +65,9 @@
 		<div class="img" title="130%"><img id="c130" src="imgs/c10-130-130.png"></div>
 		<div class="img" title="60%-500% Astig."><img id="c6a5" src="imgs/c10-060-500.png"></div>
 		<div class="img" title="500%"><img id="c500" src="imgs/c10-500-500.png"></div>
+		<div class="img" title="Black"><img id="blak" src="imgs/black.png"></div>
+		<div class="img" title="White"><img id="wite" src="imgs/white.png"></div>
+		<div class="img" title="Half"><img id="half" src="imgs/half.png"></div>
 	</div>
 
 	<!--
@@ -150,6 +153,13 @@
 			fn('og v c130: ', d['og'], d['c130']);
 			fn('og v c6a5: ', d['og'], d['c6a5']);
 			fn('og v c500: ', d['og'], d['c500']);
+			fn('og v blak: ', d['og'], d['blak']);
+			fn('og v wite: ', d['og'], d['wite']);
+			fn('og v half: ', d['og'], d['half']);
+			
+			fn('blak v wite: ', d['blak'], d['wite']);
+			fn('blak v half: ', d['blak'], d['half']);
+			fn('wite v half: ', d['wite'], d['half']);
 			
 			console.timeEnd(fn.name);
 		}
@@ -170,7 +180,10 @@
 				'c120': readPixels($i('c120')),
 				'c130': readPixels($i('c130')),
 				'c6a5': readPixels($i('c6a5')),
-				'c500': readPixels($i('c500'))
+				'c500': readPixels($i('c500')),
+				'blak': readPixels($i('blak')),
+				'wite': readPixels($i('wite')),
+				'half': readPixels($i('half')),
 			};
 
 			console.log('running SSIM ...');
