@@ -21,8 +21,9 @@ def compare(msg, im1, im2):
 	pprint(msg + ": " + str(q))
 
 
-# og = iio.imread(IMG_DIR+'original_500-crop.png')
-og = iio.imread('../downsize_algorithms/og-fant.png')
+og = iio.imread(IMG_DIR + 'original_500-crop.png')
+fant = iio.imread('../downsize_algorithms/og-fant.png')
+mDef = iio.imread(IMG_DIR + 'og-minor_defects.png')
 c010 = iio.imread(IMG_DIR + 'c10-010-010.png')
 c060 = iio.imread(IMG_DIR + 'c10-060-060.png')
 c100 = iio.imread(IMG_DIR + 'c10-100-100.png')
@@ -33,6 +34,8 @@ c6a5 = iio.imread(IMG_DIR + 'c10-060-500.png')
 
 
 compare("og, og", og, og)
+compare("og, fant", og, fant)
+compare("og, mDef", og, mDef)
 compare("og, c010", og, c010)
 compare("og, c060", og, c060)
 compare("og, c100", og, c100)
