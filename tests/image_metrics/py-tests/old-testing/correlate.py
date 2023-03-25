@@ -1,7 +1,7 @@
 from scipy import signal as sg
 import imageio as iio
 
-IMG_DIR = "../cropped/"
+IMG_DIR = "../../cropped/"
 
 def saveCorrelate(name, im1, im2):
 	cor = sg.correlate(im1, im2)
