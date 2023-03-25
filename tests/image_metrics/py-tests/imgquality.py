@@ -22,7 +22,7 @@ def compare(msg, im1, im2):
 
 
 og = iio.imread(IMG_DIR + 'original_500-crop.png')
-fant = iio.imread('../downsize_algorithms/og-fant.png')
+fant = iio.imread(IMG_DIR + 'og-fant.png')
 mDef = iio.imread(IMG_DIR + 'og-minor_defects.png')
 c010 = iio.imread(IMG_DIR + 'c10-010-010.png')
 c060 = iio.imread(IMG_DIR + 'c10-060-060.png')
