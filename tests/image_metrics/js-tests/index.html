@@ -68,6 +68,7 @@
 		<div class="img" title="Black"><img id="blak" src="imgs/black.png"></div>
 		<div class="img" title="White"><img id="wite" src="imgs/white.png"></div>
 		<div class="img" title="Half"><img id="half" src="imgs/half.png"></div>
+		<div class="img" title="Gray"><img id="gray" src="imgs/gray.png"></div>
 	</div>
 
 	<!--
@@ -160,6 +161,10 @@
 			fn('blak v wite: ', d['blak'], d['wite']);
 			fn('blak v half: ', d['blak'], d['half']);
 			fn('wite v half: ', d['wite'], d['half']);
+
+			fn('blak v gray: ', d['blak'], d['gray']);
+			fn('wite v gray: ', d['wite'], d['gray']);
+			fn('half v gray: ', d['half'], d['gray']);
 			
 			console.timeEnd(fn.name);
 		}
@@ -184,6 +189,7 @@
 				'blak': readPixels($i('blak')),
 				'wite': readPixels($i('wite')),
 				'half': readPixels($i('half')),
+				'gray': readPixels($i('gray')),
 			};
 
 			console.log('running SSIM ...');

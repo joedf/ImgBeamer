@@ -34,6 +34,7 @@ c6a5 = iio.imread(IMG_DIR + 'c10-060-500.png')
 blak = iio.imread(IMG_DIR + 'black.png')
 wite = iio.imread(IMG_DIR + 'white.png')
 half = iio.imread(IMG_DIR + 'half.png')
+gray = iio.imread(IMG_DIR + 'gray.png')
 
 
 compare("og, og", og, og)
@@ -49,6 +50,11 @@ compare("og, c500", og, c500)
 compare("og, blak", og, blak)
 compare("og, wite", og, wite)
 compare("og, half", og, half)
+
 compare("blak, wite", blak, wite)
 compare("blak, half", blak, half)
 compare("wite, half", wite, half)
+
+compare("blak, gray", blak, gray)
+compare("wite, gray", wite, gray)
+compare("half, gray", half, gray)
