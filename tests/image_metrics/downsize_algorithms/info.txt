@@ -1,4 +1,4 @@
-Done using the following steps:
+Done using the following steps in the paint.net (v5.0.2) editor:
 1. Input original image 500x500
 2. Resize with algorithm down to 50x50
 3. Resize with nearest neighbor back up to 500x500
