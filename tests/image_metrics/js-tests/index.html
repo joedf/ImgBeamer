@@ -40,7 +40,7 @@
 	<script src="js/image-mse.js"></script>
 	<script src="js/image-ssim.js"></script>
 	<script src="js/image-ms-ssim.js"></script>
-	<script src="js/image-mse-jdf.js"></script>
+	<script src="js/imgbeamer_metrics.js"></script>
 
 	<!-- 
 		Some impl. paper of Fant's algorithm
@@ -120,8 +120,8 @@
 			console.log(msg, r);
 		}
 
-		function mse_jdf_test(msg, im1, im2){
-			var r = ImageMSE_JDF.compare(im1, im2);
+		function NRMSE_test(msg, im1, im2){
+			var r = NRMSE.compare(im1, im2);
 			console.log(msg, r);
 		}
 
@@ -198,8 +198,8 @@
 			console.log('running SSIM (darosh) ...');
 			run_tests(darosh_ssim_test, data);
 
-			console.log('running MSE_JDF ...');
-			run_tests(mse_jdf_test, data);
+			console.log('running NRMSE_test (ImgBeamer) ...');
+			run_tests(NRMSE_test, data);
 
 			console.log('running MSE (darosh) ...');
 			run_tests(mse_test, data);
