@@ -22,6 +22,7 @@ Simple demo tool of the image formation[<sup>1</sup>](#references) process used 
 
 ### Notes
 - Minor pixel value differences in virtualSEM; improved, but could be due to sampling from downsized sampling of the larger full image
+	- This is possibly due to canvas "alpha premultiplication", see [here](https://github.com/joedf/ImgBeamer/issues/25).
 - The application design is being documented [here](https://github.com/joedf/CAS741_w23).
 
 ### Developer Instructions and Notes
