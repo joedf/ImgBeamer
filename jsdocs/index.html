@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Home</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Home</h1>
+
+    
+
+
+
+    
+
+
+    <h3> </h3>
+
+
+
+
+
+
+
+
+
+
+    
+
+
+
+
+    <section>
+        <article><h1 id="imgbeamer">ImgBeamer</h1>
+<img src="app/src/img/icon.svg" width="128">
+<p>Try it live <a href="https://joedf.github.io/ImgBeamer/app/index.html">here</a>, no setup or installation required!</p>
+<p>Simple demo tool of the image formation<a href="#references"><sup>1</sup></a> process used in a Scanning Electron Microscope (SEM).</p>
+<h3 id="description-of-stages-%2F-boxes">Description of Stages / Boxes</h3>
+<ol>
+<li>Sample Ground Truth (map navigation)</li>
+<li>Subregion/ROI (Region of Interest) View (&quot;zoomed&quot; view)</li>
+<li>Spot Profile</li>
+<li>Spot Content</li>
+<li>Spot Signal (rgba)</li>
+<li>Spot Layout</li>
+<li>Sampled Subregion</li>
+<li>Resulting Subregion</li>
+<li>Resulting Image (full, &quot;virtual SEM&quot;)</li>
+</ol>
+<h3 id="screenshot">Screenshot</h3>
+<p><img src="misc/screenshot3.png" alt="screenshot"></p>
+<h3 id="notes">Notes</h3>
+<ul>
+<li>Minor pixel value differences in virtualSEM; improved, but could be due to sampling from downsized sampling of the larger full image</li>
+<li>The application design is being documented <a href="https://github.com/joedf/CAS741_w23">here</a>.</li>
+</ul>
+<h3 id="developer-instructions-and-notes">Developer Instructions and Notes</h3>
+<ul>
+<li>The main application is implemented entirely in javascript
+<ul>
+<li>You can run it either using the auto-deployed GitHub pages version (&quot;live&quot; link above).</li>
+<li>Or you can run it on your own machine with a local web server pointed to the <code>app/</code> folder
+<ul>
+<li>either <a href="https://www.apachefriends.org/">XAMPP</a> or even just a python HTTP server with <code>python -m http.server --directory app/</code></li>
+</ul>
+</li>
+<li>jsdocs-generated <strong>documentation</strong> pages are available <a href="https://joedf.github.io/ImgBeamer/jsdocs/index.html">here</a></li>
+</ul>
+</li>
+<li>Tests for the image metrics are available under <code>tests/</code>:
+<ul>
+<li><code>og</code> is code for &quot;original&quot; (unmodified) image, and <code>fant</code> refers to a down-sampled image using Fant's algorithm<a href="#references"><sup>2</sup></a>.</li>
+<li><code>js-tests/</code>: for javascript implementations
+<ul>
+<li>open the <code>index.html</code> page (using a local web server as described above) and look in the webconsole.</li>
+<li>mainly in the webconsole, you can use <code>run_all(fant)</code> where if <code>fant</code> is true, all the image comparison tests will be run using the &quot;fant-sampled&quot; image as the ground truth. Otherwise (false), it will use the &quot;original&quot; image as the ground truth instead.</li>
+</ul>
+</li>
+<li><code>py-tests/</code>: for python implementations
+<ul>
+<li>run <code>imgquality.py</code></li>
+</ul>
+</li>
+<li>The other folders and files are from preliminary and manual testing that was done in the past.</li>
+</ul>
+</li>
+</ul>
+<h3 id="references">References</h3>
+<ol>
+<li>“Image Formation.” In Scanning Electron Microscopy and X-Ray Microanalysis, edited by Joseph I. Goldstein, Dale E. Newbury, Joseph R. Michael, Nicholas W.M. Ritchie, John Henry J. Scott, and David C. Joy, 93–110. New York, NY: Springer, 2018. https://doi.org/10.1007/978-1-4939-6676-9_6.</li>
+<li>Fant, Karl M. “A Nonaliasing, Real-Time Spatial Transform Technique.” IEEE Computer Graphics and Applications 6, no. 1 (January 1986): 71–80. https://doi.org/10.1109/MCG.1986.276613.</li>
+</ol></article>
+    </section>
+
+
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="G_MATH_TOFIXED.html">G_MATH_TOFIXED</a></li><li><a href="NRMSE.html">NRMSE</a></li><li><a href="Utils.html">Utils</a></li></ul><h3>Global</h3><ul><li><a href="global.html#G_AUTO_PREVIEW_LIMIT">G_AUTO_PREVIEW_LIMIT</a></li><li><a href="global.html#G_BOX_SIZE">G_BOX_SIZE</a></li><li><a href="global.html#G_INPUT_IMAGE">G_INPUT_IMAGE</a></li><li><a href="global.html#G_MAIN_CONTAINER">G_MAIN_CONTAINER</a></li><li><a href="global.html#G_MAIN_IMAGE_OBJ">G_MAIN_IMAGE_OBJ</a></li><li><a href="global.html#G_UpdateResampled">G_UpdateResampled</a></li><li><a href="global.html#G_UpdateVirtualSEMConfig">G_UpdateVirtualSEMConfig</a></li><li><a href="global.html#GetOptimalBoxWidth">GetOptimalBoxWidth</a></li><li><a href="global.html#OnImageLoaded">OnImageLoaded</a></li><li><a href="global.html#ResampleFullImage">ResampleFullImage</a></li><li><a href="global.html#UpdateBaseImage">UpdateBaseImage</a></li><li><a href="global.html#drawGroundtruthImage">drawGroundtruthImage</a></li><li><a href="global.html#drawProbeLayout">drawProbeLayout</a></li><li><a href="global.html#drawProbeLayoutSampling">drawProbeLayoutSampling</a></li><li><a href="global.html#drawResampled">drawResampled</a></li><li><a href="global.html#drawSpotContent">drawSpotContent</a></li><li><a href="global.html#drawSpotProfileEdit">drawSpotProfileEdit</a></li><li><a href="global.html#drawSpotSignal">drawSpotSignal</a></li><li><a href="global.html#drawSubregionImage">drawSubregionImage</a></li><li><a href="global.html#drawVirtualSEM">drawVirtualSEM</a></li><li><a href="global.html#nStages">nStages</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Mon Mar 27 2023 01:01:46 GMT-0400 (Eastern Daylight Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
