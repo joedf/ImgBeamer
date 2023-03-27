@@ -187,7 +187,7 @@
 					// clear selection in the combobox for included images
 					$('#sb_groundtruthImage').val('')
 
-					// preview.src = reader.result;
+					// returns a data base64 url
 					G_INPUT_IMAGE = reader.result;
 					$(document.body).trigger('OnGroundtruthImageChange');
 				}

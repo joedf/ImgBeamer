@@ -1,4 +1,4 @@
-/* globals G_DEBUG, COMPOSITE_OP, NRMSE */
+/* globals G_DEBUG, NRMSE */
 /* exported GetOptimalBoxWidth */
 
 /**
@@ -541,7 +541,7 @@ const Utils = {
 		previewLayer.destroyChildren();
 
 		var gr = image.clone();
-		gr.globalCompositeOperation(COMPOSITE_OP);
+		gr.globalCompositeOperation('source-in');
 
 		this.repeatDrawOnGrid(previewLayer, rect, probe, rows, cols);
 		previewLayer.add(gr);
@@ -801,7 +801,7 @@ const Utils = {
 			cv.height);
 
 		// then, set the composite operation
-		ctx.globalCompositeOperation = 'destination-in';
+		ctx.globalCompositeOperation = 'destination-in'; //TODO: Is this right? or 'source-in'?
 
 		// then draw the pixel selection shape
 		ctx.beginPath();

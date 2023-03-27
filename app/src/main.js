@@ -7,6 +7,8 @@
  drawVirtualSEM
  */
 
+/* exported G_UpdateResampled, G_UpdateVirtualSEMConfig, ResampleFullImage */
+
 var G_DEBUG = false;
 
 Konva.autoDrawEnabled = true;
@@ -15,39 +17,24 @@ Konva.autoDrawEnabled = true;
 // eslint-disable-next-line no-magic-numbers
 var G_AUTO_PREVIEW_LIMIT = 16 * 16;
 
-// used by "Resulting Image" box / drawVirtualSEM()
-// to reduce artifacts from drawing pixel-by-pixel in canvas
-var G_DRAW_WITH_OVERLAP = true;
 
-// overlap amount in pixels to all edges (top, left, right, bottom)
-var G_DRAW_OVERLAP_PIXELS = 1;
-
-// Optionally draw with overlap when above a certain pixel (cell) count
-// set to 0 to essentially ignore this threshold value...
-// eslint-disable-next-line no-magic-numbers
-var G_DRAW_OVERLAP_THRESHOLD = 10 * 10; // rows * cols
-
-// Optionally, to draw normally (w/o overlap) after a number of passes
-var G_DRAW_OVERLAP_PASSES = 1;
-
-// The minimum average pixel/signal value for an image to be considered "non-blank"
-var G_MIN_AVG_SIGNAL_VALUE = 2;
-
-// const G_INPUT_IMAGE = 'src/testimages/grains2tl.png';
+/**global variable to set the input ground truth image */
 var G_INPUT_IMAGE = Utils.getGroundtruthImage();
-const COMPOSITE_OP = 'source-in'; // TODO: maybe we dont need this a global anymore?
-// const COMPOSITE_OP = 'destination-in';
+
+/** global reference to update the resampling steps (spot layout,
+ * sampled subregion, resulting subregion) displays,
+ * This is mainly to be called when the auto-preview is disabled/off */
 var G_UpdateResampled = null;
+
+/** global reference to update the beam values for the Virtual SEM view */
 var G_UpdateVirtualSEMConfig = null;
-var G_VirtualSEM_animationFrameRequestId = null;
 
 
+// TODO: do we still need this? Maybe remove...
 // a global reference to the main container
 const G_MAIN_CONTAINER = '#main-container';
 var G_MainContainer = $(G_MAIN_CONTAINER);
 
-// the pixel size of the spot used for the subregion render view, updated elsewhere
-var G_BEAMRADIUS_SUBREGION_PX = {x:1,y:1};
 
 // Calculate the size of each box/stage
 var G_BOX_SIZE = GetOptimalBoxWidth();
@@ -166,7 +153,7 @@ function OnImageLoaded(eImg, stages){
 		// propagate changes and update stages
 		updateBeams();
 		doUpdate();
-	};
+	}
 
 	// draw Spot Signal
 	$(spotSignalStage.getContainer())
@@ -272,6 +259,11 @@ function OnImageLoaded(eImg, stages){
 	doUpdate();
 }
 
+/** Draws the full resample image given the parameters in the GUI and logs
+ * the progress in the webconsole. Very heavy and slow. Could may be optimized
+ * with an offscreenCanvas and webworkers...
+ * @todo Maybe no longer needed and can be removed?
+ */
 function ResampleFullImage() {
 	var image = G_MAIN_IMAGE_OBJ;
 

@@ -1,4 +1,4 @@
-/* globals Utils, G_BOX_SIZE */
+/* globals Utils, G_BOX_SIZE, G_DEBUG */
 
 /* exported
  * drawSpotProfileEdit, drawSubregionImage, drawSpotContent, drawSpotSignal,
@@ -6,10 +6,34 @@
  * drawVirtualSEM
  */
 
+// used by "Resulting Image" box / drawVirtualSEM()
+// to reduce artifacts from drawing pixel-by-pixel in canvas
+var G_DRAW_WITH_OVERLAP = true;
+
+// overlap amount in pixels to all edges (top, left, right, bottom)
+var G_DRAW_OVERLAP_PIXELS = 1;
+
+// Optionally draw with overlap when above a certain pixel (cell) count
+// set to 0 to essentially ignore this threshold value...
+// eslint-disable-next-line no-magic-numbers
+var G_DRAW_OVERLAP_THRESHOLD = 10 * 10; // rows * cols
+
+// Optionally, to draw normally (w/o overlap) after a number of passes
+var G_DRAW_OVERLAP_PASSES = 1;
+
+// The minimum average pixel/signal value for an image to be considered "non-blank"
+var G_MIN_AVG_SIGNAL_VALUE = 2;
+
+// the pixel size of the spot used for the subregion render view, updated elsewhere
+var G_BEAMRADIUS_SUBREGION_PX = {x:1,y:1};
+
+
 const KEYCODE_R = 82;
 const KEYCODE_ESC = 27;
 
 const G_ZOOM_FACTOR_PER_TICK = 1.2;
+
+var G_VirtualSEM_animationFrameRequestId = null;
 
 /**
  * Draws an node-editable ellipse shape on the given drawing stage.
@@ -243,7 +267,7 @@ function drawSpotContent(stage, sImage, sBeam, updateCallback = null) {
 	var image = sImage.clone();
 	image.draggable(true);
 	
-	image.globalCompositeOperation(COMPOSITE_OP);
+	image.globalCompositeOperation('source-in');
 
 	layer.add(sBeam);
 	layer.add(image);
