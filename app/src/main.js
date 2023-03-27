@@ -1,5 +1,12 @@
 /* globals Utils, GetOptimalBoxWidth */
 
+// global functions from drawsteps.js
+/* globals
+ drawSpotProfileEdit, drawSubregionImage, drawSpotContent, drawSpotSignal,
+ drawProbeLayout, drawProbeLayoutSampling, drawResampled, drawGroundtruthImage,
+ drawVirtualSEM
+ */
+
 var G_DEBUG = false;
 
 Konva.autoDrawEnabled = true;
