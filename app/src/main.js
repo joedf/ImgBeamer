@@ -13,12 +13,12 @@ var G_DEBUG = false;
 
 Konva.autoDrawEnabled = true;
 
-// The number of cell in the raster grid at which auto-preview stops, for responsiveness
+/** The number of cells in the raster grid at which auto-preview stops, for responsiveness */
 // eslint-disable-next-line no-magic-numbers
 var G_AUTO_PREVIEW_LIMIT = 16 * 16;
 
 
-/**global variable to set the input ground truth image */
+/** global variable to set the input ground truth image */
 var G_INPUT_IMAGE = Utils.getGroundtruthImage();
 
 /** global reference to update the resampling steps (spot layout,
@@ -30,27 +30,28 @@ var G_UpdateResampled = null;
 var G_UpdateVirtualSEMConfig = null;
 
 
-// TODO: do we still need this? Maybe remove...
-// a global reference to the main container
-const G_MAIN_CONTAINER = '#main-container';
-var G_MainContainer = $(G_MAIN_CONTAINER);
+/** a global reference to the main body container that holds the boxes/stages.
+ * @todo do we still need this? Maybe remove... */
+var G_MAIN_CONTAINER = $('#main-container');
 
 
-// Calculate the size of each box/stage
+/** The calculated size of each box/stage */
 var G_BOX_SIZE = GetOptimalBoxWidth();
 
-// the number of stages to create
+/** The number of stages to create */
 const nStages = 9;
 
 // first create the stages
 var stages = [];
 for (let i = 0; i < nStages; i++) {
-	var stage = Utils.newStageTemplate(G_MainContainer, G_BOX_SIZE, G_BOX_SIZE);
+	var stage = Utils.newStageTemplate(G_MAIN_CONTAINER, G_BOX_SIZE, G_BOX_SIZE);
 	stages.push(stage);
 }
 
 /////////////////////
 
+/**Currently only used by {@link ResampleFullImage}
+ * @todo Possibly, to be removed along with it. */
 var G_MAIN_IMAGE_OBJ = null;
 
 // call once on App start
@@ -59,7 +60,8 @@ UpdateBaseImage();
 // update event for ground truth image change
 $(document.body).on('OnGroundtruthImageChange', UpdateBaseImage);
 
-// once the image is loaded, updates/draws all the stages/boxes
+/** Updates everything needed assuming that {@link G_INPUT_IMAGE} has changed,
+ * updates/draws all the stages/boxes once. */
 function UpdateBaseImage(){
 	// load image and wait for when ready
 	Utils.loadImage(G_INPUT_IMAGE, function(event){
@@ -70,6 +72,12 @@ function UpdateBaseImage(){
 	});
 }
 
+/**
+ * Called by {@link UpdateBaseImage} once the image data has been loaded,
+ * Draws and manages all the drawing stages with each their event handlers.
+ * @param {*} eImg The Element/Object of the loaded image.
+ * @param {*} stages The array of stages to use for drawing.
+ */
 function OnImageLoaded(eImg, stages){
 	/* eslint-disable no-magic-numbers */
 	// Edit these numbers to change the display order
@@ -306,7 +314,7 @@ function ResampleFullImage() {
 		cv = document.createElement('canvas');
 		cv.id = 'finalCanvas';
 		cv.width = cols; cv.height = rows;
-		var cc = $('<div/>').addClass('box final').appendTo(G_MainContainer); cc.append(cv);
+		var cc = $('<div/>').addClass('box final').appendTo(G_MAIN_CONTAINER); cc.append(cv);
 	}
 
 	cv.width = cols;

@@ -244,13 +244,22 @@ const Utils = {
 		return cellSize;
 	},
 
-	/** Calculates the magnification based on the given rectangles' width and scaleX */
+	/**
+	 * Calculates the magnification based on the given rectangles' width and scaleX
+	 * @param {*} rectBase The original object
+	 * @param {*} rectScaled The scaled object
+	 * @returns The magnification (ratio)
+	 */
 	computeMagLevel: function(rectBase, rectScaled) {
 		var rW = (rectScaled.width() * rectScaled.scaleX()) / (rectBase.width() * rectBase.scaleX());
 		return rW;
 	},
 
-	/** Display magnification */
+	/**
+	 * Displays and updates the magnification.
+	 * @param {*} destStage The stage to display the info on.
+	 * @param {*} scaledRect The shape to calculate the magnification from compared to its stage.
+	 */
 	updateMagInfo: function(destStage, scaledRect) {
 		// add/update the mag disp. text
 		const infoclass = "magDisplay";
@@ -264,7 +273,11 @@ const Utils = {
 		}
 	},
 
-	/** Display Image metrics */
+	/**
+	 * Displays and updates the Image metrics
+	 * @param {*} sourceStage The stage for the ground truth / reference image
+	 * @param {*} destStage The stage for the image to compare
+	 */
 	updateImageMetricsInfo: function(sourceStage, destStage) {
 		// calculate and display
 		const infoclass = "metricsDisplay";
@@ -321,6 +334,14 @@ const Utils = {
 		return element;
 	},
 
+	/**
+	 * Calculates a new size (width and height) for the given object to fit in a stage's view bounds.
+	 * @param {number} w the original width
+	 * @param {number} h the original height
+	 * @param {number} maxDimension The largest dimension (whether width or height) to fit in.
+	 * @param {boolean} doFill Whether to a fill-in fit or do a stretch fit otherwise.
+	 * @returns the new calculated size
+	 */
 	fitImageProportions: function(w, h, maxDimension, doFill=false){
 		// image ratio to "fit" in canvas
 		var ratio = (w > h ? (w / maxDimension) : (h / maxDimension)); // fit
@@ -332,20 +353,28 @@ const Utils = {
 		return {w: iw, h: iw};
 	},
 
-	/** scales the given shape, and moves it to preserve original center
+	/**
+	 * Scales the given shape, and moves it to preserve original center
 	 * @todo maybe, no need to have oldScale specified, can be obtained from shape.scale() ...
+	 * @todo possibly simplify this like {@link Utils.centeredScale} and remove the other?
+	 * @param {*} stage The stage of the shape object
+	 * @param {*} shape the shape object itself
+	 * @param {*} oldScale the shapes old scale
+	 * @param {*} newScale the new scale
 	 */
 	scaleOnCenter: function(stage, shape, oldScale, newScale){
 		var stageCenter = {
 			x: stage.width()/2 - stage.x(),
 			y: stage.height()/2 - stage.y()
 		};
-		return this.scaleCenteredOnPoint(stageCenter, shape, oldScale, newScale);
+		this.scaleCenteredOnPoint(stageCenter, shape, oldScale, newScale);
 	},
 
 	/**
 	 * shorthand for @see {@link Utils.scaleOnCenter}.
-	 * Uses the stage and scale from the shape directly
+	 * Gets the stage and original scale from the shape directly.
+	 * @param {*} shape the shape to scale
+	 * @param {*} newScale the new scale.
 	 */
 	centeredScale: function(shape, newScale){
 		this.scaleOnCenter(shape.getStage(), shape, shape.scaleX(), newScale);
@@ -455,8 +484,8 @@ const Utils = {
 	 * Based on solution-1 from: https://longviewcoder.com/2021/12/08/konva-a-better-grid
 	 * @param {*} gridLayer a layer on the stage to use for drawing the grid on.
 	 * @param {*} rect a rectangle represing the size and position of the grid to draw.
-	 * @param {*} rows the number of rows in the grid.
-	 * @param {*} cols the number of columns in the grid.
+	 * @param {number} rows the number of rows in the grid.
+	 * @param {number} cols the number of columns in the grid.
 	 * @param {*} lineColor the line color of the grid.
 	 * @returns the cell size (width, height)
 	 */
@@ -509,7 +538,16 @@ const Utils = {
 		return cellInfo;
 	},
 
-	// originally based from drawGrid() ...
+	/**
+	 * Draws a given shape repeatedly (clones) in a grid pattern.
+	 * The shape will be drawn {@link rows} by {@link cols} times.
+	 * Originally based from drawGrid() ...
+	 * @param {*} layer The layer to draw on
+	 * @param {*} rect The bounds of the grid pattern
+	 * @param {*} shape The shape to draw
+	 * @param {number} rows the number of rows for the grid
+	 * @param {number} cols the number of columns for the grid
+	 */
 	repeatDrawOnGrid: function(layer, rect, shape, rows, cols) {
 		var startX = rect.x();
 		var startY = rect.y();
@@ -536,6 +574,16 @@ const Utils = {
 		layer.batchDraw();
 	},
 
+	/**
+	 * Draws a "stenciled" version of the given image and probe/shape based the grid parameters.
+	 * "Stenciles" on a grid with an array of "cloned" spots.
+	 * @param {*} previewStage The stage to draw on.
+	 * @param {*} image The image to draw and "stencil".
+	 * @param {*} probe The shape to stencil image with repeatedly in a grid pattern
+	 * @param {number} rows The number of rows for the grid
+	 * @param {number} cols The number of columns for the grid
+	 * @param {*} rect The bounds for the grid
+	 */
 	computeResampledPreview: function(previewStage, image, probe, rows, cols, rect){
 		var previewLayer = previewStage.getLayers()[0];
 		previewLayer.destroyChildren();
@@ -547,6 +595,19 @@ const Utils = {
 		previewLayer.add(gr);
 	},
 
+	/**
+	 * Draws a resampled image with the given spot/probe.
+	 * Samples on a grid with an array of "cloned" spots.
+	 * The sampling grid fits the full size of the destination stage.
+	 * @deprecated This has been replaced by {@link Utils.computeResampledSlow} due to accuracy concerns.
+	 * @todo review this function, maybe remove or improve.
+	 * @param {*} sourceStage The stage for the original image to pixel data from.
+	 * @param {*} destStage The destination stage to draw on.
+	 * @param {*} image The image size and position.
+	 * @param {*} probe The sampling shape or probe
+	 * @param {number} rows The number of rows for the sampling grid
+	 * @param {number} cols The number of columns for the sampling grid
+	 */
 	computeResampledFast: function(sourceStage, destStage, image, probe, rows, cols){
 		var destLayer = destStage.getLayers()[0];
 		destLayer.destroyChildren(); 
@@ -621,9 +682,17 @@ const Utils = {
 	},
 
 	/**
-	 * Essentially, this is computeResampleFast(), but corrected for spot size larger than the cell size.
-	 * ComputeResampleFast() limits the sampling to the cell size, and takes in smaller version of the
+	 * Essentially, this is {@link Utils.computeResampledFast}, but corrected for spot size larger than the cell size.
+	 * Samples on a grid with an array of "cloned" spots.
+	 * {@link Utils.computeResampledFast} limits the sampling to the cell size, and takes in smaller version of the
 	 * image that is already drawn and "compositied" in a Konva Stage, instead of the original larger image...
+	 * @param {*} sourceStage The stage to get the subregion area
+	 * @param {*} destStage The stage to draw on
+	 * @param {*} oImage The ground truth/source/original image to get data from.
+	 * @param {*} probe The spot/probe to sample with
+	 * @param {number} rows The number of rows for the sampling grid
+	 * @param {number} cols The number of columns for the sampling grid
+	 * @param {number} rect The bounds of the sampling grid
 	 */
 	computeResampledSlow: function(sourceStage, destStage, oImage, probe, rows, cols, rect){
 		var destLayer = destStage.getLayers()[0];
@@ -717,10 +786,18 @@ const Utils = {
 		}
 	},
 
-	/** Converts an angle in radians to degrees */
+	/**
+	 * Converts an angle in radians to degrees
+	 * @param {number} angle the angle in radians.
+	 * @returns the angle in degrees
+	 */
 	toDegrees: function(angle) { return angle * (180 / Math.PI); },
 
-	/** Converts an angle in degrees to radians */
+	/**
+	 * Converts an angle in degrees to radians
+	 * @param {number} angle the angle in degrees.
+	 * @returns the angle in radians
+	 */
 	toRadians: function(angle) { return angle * (Math.PI / 180); },
 
 	/**
@@ -741,8 +818,13 @@ const Utils = {
 	/** Used internally, for @see {@link Utils.ComputeProbeValue_gs} */
 	_COMPUTE_GS_CANVAS: null,
 
-	/** Gets the average pixel value (grayscale intensity) with a given image and probe.
-	 * @param {number} superScale factor to scale up ("blow-up") the image for the sampling */
+	/**
+	 * Gets the average pixel value (grayscale intensity) with the given image and one probe.
+	 * @param {*} image the image to get pixel data from
+	 * @param {*} probe the sampling shape/spot.
+	 * @param {number} superScale factor to scale up ("blow-up") the image for the sampling.
+	 * @returns the computed grayscale color
+	 */
 	ComputeProbeValue_gs: function(image, probe, superScale=1) {
 		// var iw = image.naturalWidth, ih = image.naturalHeight;
 
@@ -829,7 +911,11 @@ const Utils = {
 		return pxColor;
 	},
 
-	/** gets the first "image" type from the first layer of the given Konva stage */
+	/**
+	 * Find and gets the first "image" type from the first layer of the given Konva stage
+	 * @param {*} stage the stage to search through
+	 * @returns the first image object
+	 */
 	getFirstImageFromStage: function(stage){
 		var image = stage.getLayers()[0].getChildren(function(x){
 			return x.getClassName() == 'Image';
@@ -838,13 +924,23 @@ const Utils = {
 		return image;
 	},
 
-	/** get the image without the row/draw indicator */
+	/**
+	 * get the image without the row/draw indicator
+	 * @param {*} stage the stage to search through
+	 * @returns the image object
+	 */
 	getVirtualSEM_KonvaImage: function(stage){
 		// should be the only "Image" child on the first layer...
 		return this.getFirstImageFromStage(stage);
 	},
 
-	/** get the imageData (pixels) from a given konva object/image */
+	/**
+	 * get the imageData (pixels) from a given konva object/image
+	 * @param {*} konvaObject the shape/image/object to get image data from
+	 * @param {number} pixelRatio the pixel ratio to scale (larger means ~higher resolution)
+	 * @param {boolean} imageSmoothing Set to true to use image smoothing
+	 * @returns The image data
+	 */
 	getKonvaImageData: function(konvaObject, pixelRatio=2, imageSmoothing=true) {
 		// TODO: maybe we get higher DPI / density images?
 		var cnv = konvaObject.toCanvas({"pixelRatio": pixelRatio, "imageSmoothingEnabled": imageSmoothing});

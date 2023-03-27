@@ -4,10 +4,27 @@
  * MIT License
  * Copyright (c) 2023 Joachim de Fourestier (Joe DF)
  */
-// eslint-disable-next-line no-unused-vars
+
+/* exported NRMSE */
+
+/**
+ * The NRMSE (normalized root mean square error) - reference-based image metric.
+ * @namespace NRMSE
+ */
 const NRMSE = {
+	/** The maximum value of a pixel component. 255 for 8 bit depth */
 	pixelMaxValue: 255,
+	/** The allowed size difference when comparing images.
+	 * The leftover extra pixels of the larger image will be ignored. */
 	defaultTolerance: 0.01,
+	/**
+	 * Compares two images.
+	 * @param {*} image1 Preferably the ground truth / reference (convention, shouldnt matter otherwise)
+	 * @param {*} image2 An image to compare
+	 * @param {*} tolerance The allowed size ratio difference, default is {@link NRMSE.defaultTolerance}.
+	 * @returns An object with the calculate metric values of MSE, PSNR, RMSE, NRMSE,
+	 * Inverted NRMSE, NMSE, and Inverted NMSE.
+	 */
 	compare: function(image1, image2, tolerance) {
 		'use strict';
 
@@ -91,11 +108,18 @@ const NRMSE = {
 			inmse: 1 - nmse,
 		};
 	},
+	/**
+	 * Calculates PRNR (Peak Signal-to-Noise Ratio).
+	 * @param {*} mse a Mean Squared Error (MSE) value
+	 * @param {*} max the maximum value of a pixel component, default is {@link NRMSE.pixelMaxValue}
+	 * @returns the calculated value
+	 */
 	psnr: function(mse, max) {
 		if (max === void 0) { max = this.pixelMaxValue; }
 		// eslint-disable-next-line no-magic-numbers
 		return 10 * this.log10((max * max) / mse);
 	},
+	/** Utility function that performs a Log base 10 calculation. */
 	log10: function(value) {
 		return Math.log(value) / Math.LN10;
 	}
