@@ -1,10 +1,15 @@
-/* globals Utils */
+/* globals Utils, G_BOX_SIZE */
 
 /* exported
  * drawSpotProfileEdit, drawSubregionImage, drawSpotContent, drawSpotSignal,
  * drawProbeLayout, drawProbeLayoutSampling, drawResampled, drawGroundtruthImage,
  * drawVirtualSEM
  */
+
+const KEYCODE_R = 82;
+const KEYCODE_ESC = 27;
+
+const G_ZOOM_FACTOR_PER_TICK = 1.2;
 
 /**
  * Draws an node-editable ellipse shape on the given drawing stage.
@@ -44,6 +49,7 @@ function drawSpotProfileEdit(stage) {
 		anchorCornerRadius: 3,
 		borderDash: [3, 3],
 
+		// eslint-disable-next-line no-magic-numbers
 		rotationSnaps: [0, 45, 90, 135, 180],
 
 		// resize limits
@@ -92,7 +98,7 @@ function drawSpotProfileEdit(stage) {
 			return;
 
 		switch (e.keyCode) {
-			case 82: // 'r' key, reset beam shape
+			case KEYCODE_R: // 'r' key, reset beam shape
 				beam.rotation(0);
 				beam.scale({x:1, y:1});
 				// update other beams based on this one
@@ -100,7 +106,7 @@ function drawSpotProfileEdit(stage) {
 				beam.fire('transform');
 				break;
 			
-			case 27: // 'esc' key, deselect all
+			case KEYCODE_ESC: // 'esc' key, deselect all
 				tr.nodes([]);
 				break;
 		
@@ -185,7 +191,7 @@ function drawSubregionImage(stage, oImg, size, doFill = false, updateCallback = 
 
 		// callback here, e.g. doUpdate();
 		doUpdate();
-	}, 1.2, 1));
+	}, G_ZOOM_FACTOR_PER_TICK, 1));
 
 	layer.add(kImage);
 
@@ -204,7 +210,7 @@ function drawSubregionImage(stage, oImg, size, doFill = false, updateCallback = 
 			return;
 
 		switch (e.keyCode) {
-			case 82: // 'r' key, reset scale & position
+			case KEYCODE_R: // 'r' key, reset scale & position
 				kImage.setAttrs({scaleX:1,scaleY:1,x:0,y:0});
 				doUpdate();
 				break;
@@ -260,7 +266,7 @@ function drawSpotContent(stage, sImage, sBeam, updateCallback = null) {
 	image.on('dragmove', function() { stage.draw(); });
 	image.on('wheel', Utils.MakeZoomHandler(stage, image, function(){
 		doUpdate();
-	}, 1.2, 0, function(oldScale,newScale){
+	}, G_ZOOM_FACTOR_PER_TICK, 0, function(oldScale,newScale){
 		// limit the max zoom from scrolling, to prevent blank pixel data
 		// because of too small of a spot size...
 		const tolerance = -0.1;
@@ -504,7 +510,7 @@ function drawResampled(sourceStage, destStage, originalImage, userImage, sBeam) 
  * @todo remove maxSize if possible?
  * @todo do we really need to return the subregioRect as well?
  */
-function drawGroundtruthImage(stage, imageObj, subregionImage, maxSize=300){
+function drawGroundtruthImage(stage, imageObj, subregionImage, maxSize=G_BOX_SIZE){
 
 	var fit = Utils.fitImageProportions(imageObj.naturalWidth, imageObj.naturalHeight, maxSize);
 
@@ -581,6 +587,9 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 	var cellW = 0, cellH = 0;
 	var currentRow = 0;
 
+	const indicatorWidth = 20;
+	const indicatorHeight = 3;
+
 	var pixelCount = 0;
 
 	var currentDrawPass = 0;
@@ -605,9 +614,9 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 
 	// draw an indicator to show which row was last drawn
 	var indicator = new Konva.Rect({
-		x: stage.width() - 20, y: 0,
-		width: 20,
-		height: 3,
+		x: stage.width() - indicatorWidth, y: 0,
+		width: indicatorWidth,
+		height: indicatorHeight,
 		fill: 'red',
 	});
 	layer.add(indicator);

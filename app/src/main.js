@@ -1,18 +1,28 @@
-/* globals Utils */
+/* globals Utils, GetOptimalBoxWidth */
 
 var G_DEBUG = false;
+
+Konva.autoDrawEnabled = true;
+
+// The number of cell in the raster grid at which auto-preview stops, for responsiveness
+// eslint-disable-next-line no-magic-numbers
 var G_AUTO_PREVIEW_LIMIT = 16 * 16;
 
 // used by "Resulting Image" box / drawVirtualSEM()
 // to reduce artifacts from drawing pixel-by-pixel in canvas
 var G_DRAW_WITH_OVERLAP = true;
+
 // overlap amount in pixels to all edges (top, left, right, bottom)
 var G_DRAW_OVERLAP_PIXELS = 1;
+
 // Optionally draw with overlap when above a certain pixel (cell) count
 // set to 0 to essentially ignore this threshold value...
+// eslint-disable-next-line no-magic-numbers
 var G_DRAW_OVERLAP_THRESHOLD = 10 * 10; // rows * cols
+
 // Optionally, to draw normally (w/o overlap) after a number of passes
 var G_DRAW_OVERLAP_PASSES = 1;
+
 // The minimum average pixel/signal value for an image to be considered "non-blank"
 var G_MIN_AVG_SIGNAL_VALUE = 2;
 
@@ -24,26 +34,24 @@ var G_UpdateResampled = null;
 var G_UpdateVirtualSEMConfig = null;
 var G_VirtualSEM_animationFrameRequestId = null;
 
-const G_MAIN_CONTAINER = '#main-container';
 
-Konva.autoDrawEnabled = true;
+// a global reference to the main container
+const G_MAIN_CONTAINER = '#main-container';
+var G_MainContainer = $(G_MAIN_CONTAINER);
 
 // the pixel size of the spot used for the subregion render view, updated elsewhere
 var G_BEAMRADIUS_SUBREGION_PX = {x:1,y:1};
 
-const nStages = 9;
-var boxesPerPageWidth = 5;
-var boxBorderW = 2 * (parseInt($('.box:first').css('border-width')) || 1);
-var scrollBarW = 15;
-// make sure to have an integer value to prevent slight sizing differences between each box
-var G_BoxSize = Math.ceil(Math.max((document.body.clientWidth / boxesPerPageWidth) - boxBorderW - scrollBarW, 300));
-var G_MainContainer = $(G_MAIN_CONTAINER);
+// Calculate the size of each box/stage
+var G_BOX_SIZE = GetOptimalBoxWidth();
 
+// the number of stages to create
+const nStages = 9;
 
 // first create the stages
 var stages = [];
 for (let i = 0; i < nStages; i++) {
-	var stage = Utils.newStageTemplate(G_MainContainer, G_BoxSize, G_BoxSize);
+	var stage = Utils.newStageTemplate(G_MainContainer, G_BOX_SIZE, G_BOX_SIZE);
 	stages.push(stage);
 }
 
@@ -69,6 +77,8 @@ function UpdateBaseImage(){
 }
 
 function OnImageLoaded(eImg, stages){
+	/* eslint-disable no-magic-numbers */
+	// Edit these numbers to change the display order
 	var baseImageStage = stages[1];
 	var spotProfileStage = stages[2];
 	var spotContentStage = stages[3];
@@ -78,6 +88,7 @@ function OnImageLoaded(eImg, stages){
 	var resampledStage = stages[7];
 	var groundtruthMapStage = stages[0];
 	var virtualSEMStage = stages[8];
+	/* eslint-enable no-magic-numbers */
 
 	/** called when a change occurs in the spot profile, subregion, or spot content */
 	function doUpdate(){
@@ -116,7 +127,7 @@ function OnImageLoaded(eImg, stages){
 		.attr('box_label', 'Subregion/ROI View')
 		.attr('note', 'Pan & Zoom: Drag and Scroll\nPress [R] to reset')
 		.css('border-color', 'blue');
-	var subregionImage = drawSubregionImage(baseImageStage, eImg, G_BoxSize, false, doUpdate);
+	var subregionImage = drawSubregionImage(baseImageStage, eImg, G_BOX_SIZE, false, doUpdate);
 
 	// make a clone without copying over the event bindings
 	var image = subregionImage.clone().off();
@@ -203,7 +214,7 @@ function OnImageLoaded(eImg, stages){
 
 	// draw Sample Ground Truth
 	$(groundtruthMapStage.getContainer()).attr('box_label', 'Sample Ground Truth');
-	var groundtruthMap = drawGroundtruthImage(groundtruthMapStage, eImg, subregionImage, G_BoxSize);
+	var groundtruthMap = drawGroundtruthImage(groundtruthMapStage, eImg, subregionImage, G_BOX_SIZE);
 	var updateGroundtruthMap = groundtruthMap.updateFunc;
 	
 	// draw Resulting Image
@@ -360,7 +371,8 @@ function ResampleFullImage() {
 	ctx.putImageData(imageData, 0, 0);
 
 	var Elapsed = Date.now() - StartTime;
-	msg = 'ResampleFullImage End: took '+ Math.floor(Elapsed / 1000).toString()+" seconds.";
+	const second = 1000; //ms
+	msg = 'ResampleFullImage End: took '+ Math.floor(Elapsed / second).toString()+" seconds.";
 	console.log(msg);
 	eStatus.innerHTML = msg;
 }

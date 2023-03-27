@@ -1,4 +1,5 @@
 /* globals G_DEBUG, COMPOSITE_OP, NRMSE */
+/* exported GetOptimalBoxWidth */
 
 /**
  * Used for display, for number.toFixed() rounding.
@@ -15,6 +16,27 @@ const G_MATH_TOFIXED = {
 	/** The maximum or "longest" number of decimal digits. */
 	LONG: 4
 };
+
+/**
+ * Calculated the size to use for each drawing box/stage.
+ * Edit the values in the functions to change the box sizing.
+ * @returns The size to use.
+ */
+function GetOptimalBoxWidth(){
+	// Values used to calculate the size of each box/stage
+	var boxesPerPageWidth = 5;
+	// count-in the width of the borders of the boxes
+	var boxBorderW = 2 * (parseInt($('.box:first').css('border-width')) || 1);
+	var scrollBarW = 15; // scroll bar width
+	var boxSizeMax = 300; //max width for the boxes
+
+	// make sure to have an integer value to prevent slight sizing differences between each box
+	var calculatedBoxSize = Math.ceil(Math.max(
+		(document.body.clientWidth / boxesPerPageWidth) - boxBorderW - scrollBarW,
+		boxSizeMax));
+	
+	return calculatedBoxSize;
+}
 
 /**
  * Various utility and helper functions
@@ -93,6 +115,7 @@ const Utils = {
 	 * @param {number|function} scaleMax the scale maximum allowed defined as a number or function.
 	 * @returns the created event handler
 	 */
+	// eslint-disable-next-line no-magic-numbers
 	MakeZoomHandler: function(stage, konvaObj, callback=null, scaleFactor=1.2, scaleMin=0, scaleMax=Infinity)
 	{
 		var _self = this;
@@ -314,10 +337,8 @@ const Utils = {
 	 */
 	scaleOnCenter: function(stage, shape, oldScale, newScale){
 		var stageCenter = {
-			/* eslint-disable no-magic-numbers */
 			x: stage.width()/2 - stage.x(),
 			y: stage.height()/2 - stage.y()
-			/* eslint-enable no-magic-numbers */
 		};
 		return this.scaleCenteredOnPoint(stageCenter, shape, oldScale, newScale);
 	},
@@ -710,7 +731,8 @@ const Utils = {
 	 * @returns the filename.
 	 */
 	GetSuggestedFileName: function(prefix, counter, fileExt = "png"){
-		var datestamp = new Date().toISOString().slice(0, 10).replaceAll('-','.');
+		const ISODateEnd = 10;
+		var datestamp = new Date().toISOString().slice(0, ISODateEnd).replaceAll('-','.');
 		var sCounter = String(counter).padStart(3,'0');
 		var filename = prefix+"-"+datestamp+"-"+sCounter+"."+fileExt;
 		return filename;
