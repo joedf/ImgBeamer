@@ -30,7 +30,7 @@ Simple demo tool of the image formation[<sup>1</sup>](#references) process used 
 	- You can run it either using the auto-deployed GitHub pages version ("live" link above).
 	- Or you can run it on your own machine with a local web server pointed to the `app/` folder
 		- either [XAMPP](https://www.apachefriends.org/) or even just a python HTTP server with `python -m http.server --directory app/`
-	- jsdocs-generated **documentation** pages are available [here](https://joedf.github.io/ImgBeamer/jsdocs/index.html)
+	- jsdoc-generated **documentation** pages are available [here](https://joedf.github.io/ImgBeamer/jsdocs/index.html)
 - Tests for the image metrics are available under `tests/`:
 	- `og` is code for "original" (unmodified) image, and `fant` refers to a down-sampled image using Fant's algorithm[<sup>2</sup>](#references).
 	- `js-tests/`: for javascript implementations
