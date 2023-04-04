@@ -107,6 +107,7 @@ const Utils = {
 
 	/**
 	 * Creates a Zoom event handler to be used on a stage.
+	 * Holding the shift key scales at half the rate.
 	 * @param {object} stage the drawing stage
 	 * @param {*} konvaObj the figure or object on the stage to change.
 	 * @param {*} callback a callback for when the zoom event handler is called.
