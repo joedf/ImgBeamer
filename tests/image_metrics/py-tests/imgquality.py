@@ -22,6 +22,7 @@ def compare(msg, im1, im2):
 
 	pprint(msg + ": " + str(q))
 
+
 print('Reading all image data...')
 og = iio.imread(IMG_DIR + 'original_500-crop.png')
 fant = iio.imread(IMG_DIR + 'og-fant.png')
