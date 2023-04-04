@@ -35,6 +35,7 @@ Simple demo tool of the image formation[<sup>1</sup>](#references) process used 
 	- `og` is code for "original" (unmodified) image, and `fant` refers to a down-sampled image using Fant's algorithm[<sup>2</sup>](#references).
 	- `js-tests/`: for javascript implementations
 		- open the `index.html` page (using a local web server as described above) and look in the webconsole.
+		- Optionally, online hosted version exist [here](https://joedf.github.io/ImgBeamer/tests/image_metrics/js-tests/).
 		- mainly in the webconsole, you can use `run_all(fant)` where if `fant` is true, all the image comparison tests will be run using the "fant-sampled" image as the ground truth. Otherwise (false), it will use the "original" image as the ground truth instead.
 	- `py-tests/`: for python implementations
 		- Install Python v3.10.6 or better (has not been tested on other versions)
