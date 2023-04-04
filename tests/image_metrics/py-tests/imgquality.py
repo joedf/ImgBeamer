@@ -3,6 +3,8 @@ import imageio as iio
 
 from pprint import pprint
 
+import time
+
 IMG_DIR = "../cropped/"
 
 
@@ -20,7 +22,7 @@ def compare(msg, im1, im2):
 
 	pprint(msg + ": " + str(q))
 
-
+print('Reading all image data...')
 og = iio.imread(IMG_DIR + 'original_500-crop.png')
 fant = iio.imread(IMG_DIR + 'og-fant.png')
 mDef = iio.imread(IMG_DIR + 'og-minor_defects.png')
@@ -36,6 +38,8 @@ wite = iio.imread(IMG_DIR + 'white.png')
 half = iio.imread(IMG_DIR + 'half.png')
 gray = iio.imread(IMG_DIR + 'gray.png')
 
+print('starting tests...')
+start = time.process_time()
 
 compare("og, og", og, og)
 compare("og, fant", og, fant)
@@ -58,3 +62,7 @@ compare("wite, half", wite, half)
 compare("blak, gray", blak, gray)
 compare("wite, gray", wite, gray)
 compare("half, gray", half, gray)
+timetotal = time.process_time() - start
+
+print('\nDone.')
+print("Total time (s): " + str(timetotal))
