@@ -6,7 +6,10 @@
 	},
 	"templates": {
 		"cleverLinks": true,
-		"monospaceLinks": true
+		"monospaceLinks": true,
+		"default": {
+			"layoutFile": "misc/jsdoc_custom_layout.tmpl.html"
+		}
 	},
 	"opts": {
 		"recurse": false,
