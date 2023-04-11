@@ -318,7 +318,7 @@ const Utils = {
 		var e = eStage.children('.'+className+':first');
 		if (e.length <= 0) {
 			// not found, so create it
-			eStage.prepend('<span class="'+className+'"></span>');
+			eStage.prepend('<span class="infoBox '+className+'"></span>');
 			e = eStage.children('.'+className+':first');
 
 			if (typeof onDblClick == 'function')

@@ -29,10 +29,8 @@ summary {
 }
 
 .box:before,
-.box::after,
-.box > span.magDisplay,
-.box > span.metricsDisplay,
-.box > span.parameterDisplay {
+.box[note]:after,
+.box > span.infoBox {
 	position: absolute;
 	z-index: 20;
 	font-size: 12px;
@@ -43,7 +41,7 @@ summary {
 
 .box:before { content: attr(box_label); }
 
-.box::after {
+.box[note]::after {
 	content: attr(note);
 	white-space: pre;
 	text-align: right;
@@ -55,9 +53,7 @@ summary {
 
 .box.note_colored::after { color: yellow; }
 
-.box > span.magDisplay,
-.box > span.metricsDisplay,
-.box > span.parameterDisplay {
+.box > span.infoBox {
 	top: 0;
 	right: 0;
 	text-align: right;
