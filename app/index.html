@@ -111,7 +111,7 @@
 					</table>
 				</details>
 				
-				<details>
+				<details id="links2readBox" style="display:none">
 					<summary style="cursor: pointer; user-select: none;">References or people to look at...</summary>
 					<ul>
 						<li><a href="https://www.physik.hu-berlin.de/en/sem/software/software_qstem">sem/software/software_qstem</a></li>
@@ -131,6 +131,10 @@
 		<script src="src/main.js"></script>
 
 		<script>
+			if (G_DEBUG) {
+				$('#links2readBox').show();
+			}
+
 			$("#options").draggable();
 
 			var stageFinal = stages[stages.length - 1];
