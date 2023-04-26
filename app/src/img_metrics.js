@@ -109,7 +109,7 @@ const NRMSE = {
 		};
 	},
 	/**
-	 * Calculates PRNR (Peak Signal-to-Noise Ratio).
+	 * Calculates PSNR (Peak Signal-to-Noise Ratio).
 	 * @param {*} mse a Mean Squared Error (MSE) value
 	 * @param {*} max the maximum value of a pixel component, default is {@link NRMSE.pixelMaxValue}
 	 * @returns the calculated value
