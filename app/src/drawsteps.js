@@ -38,9 +38,10 @@ var G_VirtualSEM_animationFrameRequestId = null;
 /**
  * Draws an node-editable ellipse shape on the given drawing stage.
  * @param {*} stage the stage to draw on.
+ * @param {Function} updateCallback optional callback when a change occurs in spotSize
  * @returns the spot/beam (Ellipse) object
  */
-function drawSpotProfileEdit(stage) {
+function drawSpotProfileEdit(stage, updateCallback = null) {
 	var layer = stage.getLayers()[0];
 	layer.destroyChildren(); // avoid memory leaks
 
@@ -139,7 +140,69 @@ function drawSpotProfileEdit(stage) {
 		e.preventDefault();
 	});
 
-	return beam;
+	// Replacing userScaledImage / userImage
+	// invisible shape to get scale X/Y as a control for spot size/mag
+	// by mouse scroll or values being set on a konva object to call .ScaleX/Y()
+	var rectW = stage.width(); 
+	var magRect = new Konva.Rect({
+		width: rectW,
+		height: rectW,
+		// fill: 'red',
+		fillEnabled: false,
+		// strokeWidth: 0,
+		strokeWidth: 1,
+		stroke: 'lime',
+		// strokeEnabled: false,
+		strokeScaleEnabled: false,
+		listening: false,
+		visible: false,
+		perfectDrawEnabled: false,
+	});
+
+	// "pre-zoom" a bit, and start with center position
+	// zoom/scale so that the spot size starts at 100%
+	var _tempCellWidth = magRect.width() / Utils.getColsInput();
+	var initialSpotScale = beam.width() / _tempCellWidth;
+	Utils.scaleOnCenter(stage, magRect, 1, initialSpotScale);
+	
+	// optional event callback
+	var doUpdate = function(){
+		if (typeof updateCallback == 'function')
+			return updateCallback();
+	};
+
+	stage.off('wheel').on('wheel', function(e){
+		e.evt.preventDefault(); // stop default scrolling
+			
+		var scaleBy = G_ZOOM_FACTOR_PER_TICK;
+		
+		// Do half rate scaling, if shift is pressed
+		if (e.evt.shiftKey) {
+			scaleBy = 1 +((scaleBy-1) / 2);
+		}
+
+		// how to scale? Zoom in? Or zoom out?
+		let direction = e.evt.deltaY > 0 ? -1 : 1;
+
+		var oldScale = magRect.scaleX();
+		var newScale = direction > 0 ? oldScale * scaleBy : oldScale / scaleBy;
+
+		// limit the max zoom from scrolling, to prevent blank pixel data
+		// because of too small of a spot size...
+		const tolerance = -0.1;
+		if (G_BEAMRADIUS_SUBREGION_PX.x + tolerance < 1
+		|| G_BEAMRADIUS_SUBREGION_PX.y + tolerance < 1) {
+			newScale = Math.min(oldScale, newScale);
+		}
+		
+		Utils.centeredScale(magRect, newScale);
+
+		doUpdate();
+	});
+
+	layer.add(magRect);
+
+	return {beam: beam, spotSize: magRect};
 }
 
 /**
@@ -254,7 +317,7 @@ function drawSubregionImage(stage, oImg, size, doFill = false, updateCallback = 
  * @param {*} sImage the subregion image (will be cloned for the image object displayed).
  * @param {*} sBeam the beam/spot shape (used by reference).
  * @param {function} updateCallback a function to call when a change occurs such as pan-and-zoom.
- * @returns a reference to the image object being scaled by the user.
+ * @returns a reference to the image object being scaled by the user => "userScaledImage".
  */
 function drawSpotContent(stage, sImage, sBeam, updateCallback = null) {
 	var layer = stage.getLayers()[0];
@@ -352,13 +415,12 @@ function drawSpotSignal(sourceStage, destStage, sBeam) {
  * Draws the probe layout.
  * @param {*} drawStage The stage to draw on.
  * @param {*} baseImage The subregion image to draw with (cloned).
- * @param {*} userImage The image scaled by Spot content
+ * @param {*} spotScale an object to query for the spot scale X/Y.
  * @param {*} beam the beam/spot shape to draw with (cloned and scaled).
  * @returns an object with an update function to call when a redraw is needed,
  * 	and a reference to the subregion image drawn.
- * @todo maybe we dont need both baseImage and userImage? or cleaner way to just get the scale and image from userImage.
  */
-function drawProbeLayout(drawStage, baseImage, userImage, beam) {
+function drawProbeLayout(drawStage, baseImage, spotScale, beam) {
 	// draws probe layout
 	var layers = drawStage.getLayers();
 	var baseLayer = layers[0];
@@ -366,7 +428,6 @@ function drawProbeLayout(drawStage, baseImage, userImage, beam) {
 
 	var baseGridRect = new Konva.Rect(baseImage.getSelfRect());
 	
-	// TODO: maybe this could instead be? userImage.clone();
 	var imageCopy = baseImage.clone();
 
 	baseLayer.add(imageCopy);
@@ -418,8 +479,8 @@ function drawProbeLayout(drawStage, baseImage, userImage, beam) {
 
 		var probe = new Konva.Ellipse({
 			radius : {
-				x : (beam.width() / userImage.scaleX()) / 2, //(cell.width/2) * .8,
-				y : (beam.height() / userImage.scaleY()) / 2 //(cell.height/2) * .8
+				x : (beam.width() / spotScale.scaleX()) / 2, //(cell.width/2) * .8,
+				y : (beam.height() / spotScale.scaleY()) / 2 //(cell.height/2) * .8
 			},
 			rotation: beam.rotation(),
 			fill: 'rgba(255,0,0,.4)',
@@ -444,12 +505,11 @@ function drawProbeLayout(drawStage, baseImage, userImage, beam) {
  * Draws the spot layout sampled image content. The image stenciled by the spot shape over a grid.
  * @param {*} drawStage The stage to draw on
  * @param {*} originalImage The image to "stencil" / "clip" or sample.
- * @param {*} userImage the scaled image from spot content (used by reference)
+ * @param {*} spotScale an object to query for the spot scale X/Y.
  * @param {*} sBeam the spot/beam shape to use (cloned and scaled)
  * @returns an update function to call when a redraw is needed.
- * @todo maybe only userImage is needed, no originalImage?
  */
-function drawProbeLayoutSampling(drawStage, originalImage, userImage, sBeam) {
+function drawProbeLayoutSampling(drawStage, originalImage, spotScale, sBeam) {
 	var baseImage = originalImage; //.clone();
 	var beam = sBeam; //.clone();
 
@@ -461,8 +521,8 @@ function drawProbeLayoutSampling(drawStage, originalImage, userImage, sBeam) {
 
 		var probe = new Konva.Ellipse({
 			radius : {
-				x : (beam.width() / userImage.scaleX()) / 2,
-				y : (beam.height() / userImage.scaleY()) / 2
+				x : (beam.width() / spotScale.scaleX()) / 2,
+				y : (beam.height() / spotScale.scaleY()) / 2
 			},
 			rotation: beam.rotation(),
 			fill: 'white',
@@ -485,11 +545,11 @@ function drawProbeLayoutSampling(drawStage, originalImage, userImage, sBeam) {
  * @param {*} sourceStage The source stage to sample from
  * @param {*} destStage The stage to draw on
  * @param {*} originalImage the subregion image to sample or 'stencil' over.
- * @param {*} userImage the image scaled by spot content.
+ * @param {*} spotScale an object to query for the spot scale X/Y.
  * @param {*} sBeam the beam to sample with (cloned and scaled)
  * @returns an update function to call when a redraw is needed
  */
-function drawResampled(sourceStage, destStage, originalImage, userImage, sBeam) {
+function drawResampled(sourceStage, destStage, originalImage, spotScale, sBeam) {
 	var baseImage = originalImage; //.clone();
 	var beam = sBeam; //.clone();
 
@@ -501,8 +561,8 @@ function drawResampled(sourceStage, destStage, originalImage, userImage, sBeam) 
 
 		var probe = new Konva.Ellipse({
 			radius : {
-				x : (beam.width() / userImage.scaleX()) / 2,
-				y : (beam.height() / userImage.scaleY()) / 2
+				x : (beam.width() / spotScale.scaleX()) / 2,
+				y : (beam.height() / spotScale.scaleY()) / 2
 			},
 			rotation: beam.rotation(),
 			fill: 'white',
@@ -598,7 +658,7 @@ function drawGroundtruthImage(stage, imageObj, subregionImage, maxSize=G_BOX_SIZ
  * @param {*} subregionRect the bounds on the subregion
  * @param {*} subregionRectStage the stage for the gorund truth
  * @param {*} originalImageObj the ground truth image
- * @param {*} userScaledImage the image scale by spot content
+ * @param {*} spotScale an object to query for the spot scale X/Y.
  * @returns an update function to call when the spot profile or the cell/pixel size changes.
  * @todo do we really need both subregionRect and subregionRectStage as
  * separate parameters? maybe the info needed can be obtained with less
@@ -606,7 +666,7 @@ function drawGroundtruthImage(stage, imageObj, subregionImage, maxSize=G_BOX_SIZ
  * @todo rename confusing subregionRectStage to groundTruthStage?
  * @todo can we get rid userScaleImage / userImage throughout the source if possible, cleaner?
  */
-function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, originalImageObj, userScaledImage){
+function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, originalImageObj, spotScale){
 	var rows = 0, cols = 0;
 	var cellW = 0, cellH = 0;
 	var currentRow = 0;
@@ -678,8 +738,8 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 		beamRadius = {
 			// divide by the ratio, since the spot should be smaller when mapped onto
 			// the full image which is scaled down to the same stage size...
-			x : (beam.width() / userScaledImage.scaleX()) / 2 / ratioX,
-			y : (beam.height() / userScaledImage.scaleY()) / 2 / ratioY
+			x : (beam.width() / spotScale.scaleX()) / 2 / ratioX,
+			y : (beam.height() / spotScale.scaleY()) / 2 / ratioY
 		};
 
 		// check if we need to scale up the image for sampling...

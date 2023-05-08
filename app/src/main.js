@@ -102,7 +102,7 @@ function OnImageLoaded(eImg, stages){
 
 		// update spot/beam info: size, rotation, shape
 		var cellSize = Utils.computeCellSize(probeLayout.image, Utils.getRowsInput(), Utils.getColsInput());
-		Utils.updateDisplayBeamParams(spotProfileStage, layoutBeam, cellSize, userScaledImage, promptForSpotWidth);
+		Utils.updateDisplayBeamParams(spotProfileStage, layoutBeam, cellSize, spotScaling, promptForSpotWidth);
 		Utils.updateMagInfo(baseImageStage, subregionImage);
 		Utils.updateImageMetricsInfo(groundtruthMapStage, virtualSEMStage);
 	}
@@ -120,7 +120,9 @@ function OnImageLoaded(eImg, stages){
 		.attr('box_label', 'Spot Profile')
 		.attr('note', 'Press [R] to reset shape')
 		.css('border-color', 'red');
-	var beam = drawSpotProfileEdit(spotProfileStage);
+	var _spotProfileInfo = drawSpotProfileEdit(spotProfileStage, doUpdate);
+	var beam = _spotProfileInfo.beam;
+	var spotScaling = _spotProfileInfo.spotSize;
 
 	// Subregion View
 	// draw base image (can pan & zoom)
@@ -140,23 +142,22 @@ function OnImageLoaded(eImg, stages){
 		.attr('box_label', 'Spot Content')
 		.attr('note', 'Scroll to adjust spot size\nHold [Shift] for half rate');
 	var spotContentBeam = beam.clone();
-	var userScaledImage = drawSpotContent(spotContentStage, image, spotContentBeam, doUpdate);
+	drawSpotContent(spotContentStage, image, spotContentBeam, doUpdate);
 
 	/**(temporary) publicly exposed function to set the spot width
 	 * @param {number} spotWidth the spot width in percent (%), ex. use 130 for 130%.
 	 * @todo move into separate file if possible */
 	function Utils_SetSpotWidth(spotWidth=100){
 		var beam = spotContentBeam;
-		var userImage = userScaledImage;
+		var spotScaler = spotScaling;
 		
 		// calculate the new scale for spot-content image, based on the given spot width
-		var cellSize = Utils.computeCellSize(userImage, Utils.getRowsInput(), Utils.getColsInput());
+		var cellSize = Utils.computeCellSize(spotScaler, Utils.getRowsInput(), Utils.getColsInput());
 		var maxScale = Math.max(beam.scaleX(), beam.scaleY());
 		var eccScaled = beam.scaleX() / maxScale;
 		var newScale = ((beam.width() * eccScaled) / (spotWidth/100)) / cellSize.w;
 
-		// userImage.scale({x: newScale, y: newScale});
-		Utils.centeredScale(userImage, newScale);
+		Utils.centeredScale(spotScaler, newScale);
 
 		// propagate changes and update stages
 		updateBeams();
@@ -173,7 +174,7 @@ function OnImageLoaded(eImg, stages){
 	// draw Spot Layout
 	$(probeLayoutStage.getContainer()).attr('box_label', 'Spot Layout');
 	var layoutBeam = beam.clone();
-	var probeLayout = drawProbeLayout(probeLayoutStage, subregionImage, userScaledImage, layoutBeam);
+	var probeLayout = drawProbeLayout(probeLayoutStage, subregionImage, spotScaling, layoutBeam);
 	var updateProbeLayout = probeLayout.updateCallback;
 	
 	// draw Sampled Subregion
@@ -183,7 +184,7 @@ function OnImageLoaded(eImg, stages){
 	var updateProbeLayoutSamplingPreview = drawProbeLayoutSampling(
 		layoutSampledStage,
 		probeLayout.image,
-		userScaledImage,
+		spotScaling,
 		layoutSampledBeam
 	);
 
@@ -196,7 +197,7 @@ function OnImageLoaded(eImg, stages){
 		layoutSampledStage,
 		resampledStage,
 		probeLayout.image,
-		userScaledImage,
+		spotScaling,
 		resampledBeam
 	);
 	
@@ -228,7 +229,7 @@ function OnImageLoaded(eImg, stages){
 		groundtruthMap.subregionRect,
 		groundtruthMapStage,
 		eImg,
-		userScaledImage
+		spotScaling
 	);
 	G_UpdateVirtualSEMConfig = updateVirtualSEM_Config;
 
