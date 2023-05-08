@@ -1,4 +1,75 @@
-/* globals G_DEBUG, NRMSE */
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: utils.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+
+    <!-- Some minor style overrides on the default jsdoc template -->
+    <style>
+        /* Style Program main title in included readme.md */
+        article h1:first-child {
+            margin-left: 0;
+            margin-top: 0;
+            border-bottom: 1px solid #ccc;
+            font-weight: bold;
+        }
+        /* fix the v-margin between "returns" and next func/method declaration */
+        article h4.name {
+            padding-top: 1.0em;
+            margin-top: 1.0em;
+            border-top: 1px solid #eee;
+        }
+        article h4.name::before {
+            width: 5px;
+            height: 2em;
+            background: red;
+            display: inline-block;
+            content: '';
+            vertical-align: middle;
+            margin-right: 0.5em;
+        }
+        article dl {
+            margin-bottom: 30px;
+        }
+        /* implement a basic back-to-top feature */
+        #backtotop {
+            position: fixed;
+            bottom: 12px;
+            right: 16px;
+        }
+        #backtotop div {
+            padding: 4px 8px;
+            border: 1px solid #888;
+        }
+        /* Code display: fix line-height of empty/blank new lines */
+        li > code {
+            min-height: 1em;
+        }
+    </style>
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: utils.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/* globals G_DEBUG, NRMSE */
 /* exported GetOptimalBoxWidth */
 
 /**
@@ -51,7 +122,7 @@ const Utils = {
 	 * @returns the drawing stage.
 	 */
 	newStageTemplate: function(parentContainer, w, h) {
-		var $e = $('<div/>').addClass('box').appendTo(parentContainer);
+		var $e = $('&lt;div/>').addClass('box').appendTo(parentContainer);
 		var stage = new Konva.Stage({
 			container: $e.get(0),
 			width: w,
@@ -205,7 +276,7 @@ const Utils = {
 			beamSizeB = beam.radiusY() * beam.scaleY();
 		
 			// swap them so that is beamSizeA the larger one, for convention
-			if (beamSizeA < beamSizeB) { [beamSizeA, beamSizeB] = [beamSizeB, beamSizeA]; }
+			if (beamSizeA &lt; beamSizeB) { [beamSizeA, beamSizeB] = [beamSizeB, beamSizeA]; }
 			// https://www.cuemath.com/geometry/eccentricity-of-ellipse/
 			var eccentricity = Math.sqrt(1 - (Math.pow(beamSizeB,2) / Math.pow(beamSizeA,2)));
 
@@ -219,9 +290,9 @@ const Utils = {
 			}
 
 			// display it
-			element.innerHTML = 'Eccentricity: '+eccentricity.toFixed(G_MATH_TOFIXED.SHORT) +'<br>'
-			+ 'Rotation: '+beam.rotation().toFixed(G_MATH_TOFIXED.MIN)+"°" +'<br>'
-			+ 'Width: '+spotSizeX.toFixed(G_MATH_TOFIXED.MIN)+'%' +'<br>'
+			element.innerHTML = 'Eccentricity: '+eccentricity.toFixed(G_MATH_TOFIXED.SHORT) +'&lt;br>'
+			+ 'Rotation: '+beam.rotation().toFixed(G_MATH_TOFIXED.MIN)+"°" +'&lt;br>'
+			+ 'Width: '+spotSizeX.toFixed(G_MATH_TOFIXED.MIN)+'%' +'&lt;br>'
 			+ 'Height: '+spotSizeY.toFixed(G_MATH_TOFIXED.MIN)+'%';
 
 			// tooltip
@@ -316,9 +387,9 @@ const Utils = {
 		
 		// check if we create the element already
 		var e = eStage.children('.'+className+':first');
-		if (e.length <= 0) {
+		if (e.length &lt;= 0) {
 			// not found, so create it
-			eStage.prepend('<span class="infoBox '+className+'"></span>');
+			eStage.prepend('&lt;span class="infoBox '+className+'">&lt;/span>');
 			e = eStage.children('.'+className+':first');
 
 			if (typeof onDblClick == 'function')
@@ -412,7 +483,7 @@ const Utils = {
 
 		var sum = [0, 0, 0, 0];
 
-		for (var i = 0; i < d.length; i += 4) {
+		for (var i = 0; i &lt; d.length; i += 4) {
 			// Optimization note, with greyscale we only need to process one component...
 			const px = [d[i], d[i+1], d[i+2], d[1+3]];
 			// var r = px[0], g = px[1], b = px[2], a = px[3];
@@ -461,11 +532,11 @@ const Utils = {
 		var sum = 0;
 
 		// Optimization note, with greyscale we only need to process one component...
-		for (var i = 0; i < d.length; i += 4) {
+		for (var i = 0; i &lt; d.length; i += 4) {
 			const px = d[i];
 			const alpha = d[i+3];
 
-			if (px === 0 && alpha === 0) {
+			if (px === 0 &amp;&amp; alpha === 0) {
 				blanks += 1;
 			} else {
 				sum += px;
@@ -492,7 +563,7 @@ const Utils = {
 	 */
 	drawGrid: function(gridLayer, rect, rows, cols, lineColor) {
 
-		if (typeof lineColor == 'undefined' || lineColor == null || lineColor.length < 1)
+		if (typeof lineColor == 'undefined' || lineColor == null || lineColor.length &lt; 1)
 			lineColor = 'rgba(255, 255, 255, 0.8)';
 
 		var startX = rect.x();
@@ -507,7 +578,7 @@ const Utils = {
 				ySteps = rows; //Math.round(ySize / stepSizeY);
 
 		// draw vertical lines
-		for (let i = 0; i <= xSteps; i++) {
+		for (let i = 0; i &lt;= xSteps; i++) {
 			gridLayer.add(
 				new Konva.Line({
 					x: startX + (i * stepSizeX),
@@ -518,7 +589,7 @@ const Utils = {
 			);
 		}
 		//draw Horizontal lines
-		for (let i = 0; i <= ySteps; i++) {
+		for (let i = 0; i &lt;= ySteps; i++) {
 			gridLayer.add(
 				new Konva.Line({
 					y: startY + (i * stepSizeY),
@@ -560,9 +631,9 @@ const Utils = {
 		var cellCenterY = stepSizeY / 2;
 
 		// interate over X
-		for (let i = 0; i < cols; i++) {
+		for (let i = 0; i &lt; cols; i++) {
 			// interate over Y
-			for (let j = 0; j < rows; j++) {
+			for (let j = 0; j &lt; rows; j++) {
 				var shapeCopy = shape.clone();
 
 				shapeCopy.x(startX + (i * stepSizeX) + cellCenterX);
@@ -626,9 +697,9 @@ const Utils = {
 		var stepSizeX = image.width() / cols, stepSizeY = image.height() / rows;
 
 		// interate over X
-		for (let i = 0; i < cols; i++) {
+		for (let i = 0; i &lt; cols; i++) {
 			// interate over Y
-			for (let j = 0; j < rows; j++) {
+			for (let j = 0; j &lt; rows; j++) {
 				var cellX = startX + (i * stepSizeX);
 				var cellY = startY + (j * stepSizeY);
 				var cellW = stepSizeX;
@@ -753,9 +824,9 @@ const Utils = {
 		var stepSizeX_stage = rect.width() / cols, stepSizeY_stage = rect.height() / rows;
 
 		// interate over X
-		for (let i = 0; i < cols; i++) {
+		for (let i = 0; i &lt; cols; i++) {
 			// interate over Y
-			for (let j = 0; j < rows; j++) {
+			for (let j = 0; j &lt; rows; j++) {
 				var cellX = startX + (i * stepSizeX);
 				var cellY = startY + (j * stepSizeY);
 				var cellW = stepSizeX;
@@ -950,3 +1021,28 @@ const Utils = {
 		return data;
 	}
 };
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="G_MATH_TOFIXED.html">G_MATH_TOFIXED</a></li><li><a href="NRMSE.html">NRMSE</a></li><li><a href="Utils.html">Utils</a></li></ul><h3>Global</h3><ul><li><a href="global.html#G_AUTO_PREVIEW_LIMIT">G_AUTO_PREVIEW_LIMIT</a></li><li><a href="global.html#G_BOX_SIZE">G_BOX_SIZE</a></li><li><a href="global.html#G_INPUT_IMAGE">G_INPUT_IMAGE</a></li><li><a href="global.html#G_MAIN_CONTAINER">G_MAIN_CONTAINER</a></li><li><a href="global.html#G_MAIN_IMAGE_OBJ">G_MAIN_IMAGE_OBJ</a></li><li><a href="global.html#G_UpdateResampled">G_UpdateResampled</a></li><li><a href="global.html#G_UpdateVirtualSEMConfig">G_UpdateVirtualSEMConfig</a></li><li><a href="global.html#GetOptimalBoxWidth">GetOptimalBoxWidth</a></li><li><a href="global.html#OnImageLoaded">OnImageLoaded</a></li><li><a href="global.html#ResampleFullImage">ResampleFullImage</a></li><li><a href="global.html#UpdateBaseImage">UpdateBaseImage</a></li><li><a href="global.html#drawGroundtruthImage">drawGroundtruthImage</a></li><li><a href="global.html#drawProbeLayout">drawProbeLayout</a></li><li><a href="global.html#drawProbeLayoutSampling">drawProbeLayoutSampling</a></li><li><a href="global.html#drawResampled">drawResampled</a></li><li><a href="global.html#drawSpotContent">drawSpotContent</a></li><li><a href="global.html#drawSpotProfileEdit">drawSpotProfileEdit</a></li><li><a href="global.html#drawSpotSignal">drawSpotSignal</a></li><li><a href="global.html#drawSubregionImage">drawSubregionImage</a></li><li><a href="global.html#drawVirtualSEM">drawVirtualSEM</a></li><li><a href="global.html#nStages">nStages</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Tue Apr 25 2023 21:00:10 GMT-0400 (Eastern Daylight Time)
+</footer>
+
+<a id="backtotop" href="#"><div>&uarr; Top</div></a>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

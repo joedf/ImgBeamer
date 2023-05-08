@@ -1,4 +1,75 @@
-/* globals Utils, G_BOX_SIZE, G_DEBUG */
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: drawsteps.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+
+    <!-- Some minor style overrides on the default jsdoc template -->
+    <style>
+        /* Style Program main title in included readme.md */
+        article h1:first-child {
+            margin-left: 0;
+            margin-top: 0;
+            border-bottom: 1px solid #ccc;
+            font-weight: bold;
+        }
+        /* fix the v-margin between "returns" and next func/method declaration */
+        article h4.name {
+            padding-top: 1.0em;
+            margin-top: 1.0em;
+            border-top: 1px solid #eee;
+        }
+        article h4.name::before {
+            width: 5px;
+            height: 2em;
+            background: red;
+            display: inline-block;
+            content: '';
+            vertical-align: middle;
+            margin-right: 0.5em;
+        }
+        article dl {
+            margin-bottom: 30px;
+        }
+        /* implement a basic back-to-top feature */
+        #backtotop {
+            position: fixed;
+            bottom: 12px;
+            right: 16px;
+        }
+        #backtotop div {
+            padding: 4px 8px;
+            border: 1px solid #888;
+        }
+        /* Code display: fix line-height of empty/blank new lines */
+        li > code {
+            min-height: 1em;
+        }
+    </style>
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: drawsteps.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/* globals Utils, G_BOX_SIZE, G_DEBUG */
 
 /* exported
  * drawSpotProfileEdit, drawSubregionImage, drawSpotContent, drawSpotSignal,
@@ -82,8 +153,8 @@ function drawSpotProfileEdit(stage) {
 			// if the new bounding box is too large or small
 			// small than the stage size, but more than 1 px.
 			// then, we return the old bounding box
-			if ( newBoundBox.width > stage.width() || newBoundBox.width < 1
-			|| newBoundBox.height > stage.height() || newBoundBox.height < 1) {
+			if ( newBoundBox.width > stage.width() || newBoundBox.width &lt; 1
+			|| newBoundBox.height > stage.height() || newBoundBox.height &lt; 1) {
 				return oldBoundBox;
 			}
 			return newBoundBox;
@@ -187,9 +258,9 @@ function drawSubregionImage(stage, oImg, size, doFill = false, updateCallback = 
 		var sy = stage.y(), sh = stage.height();
 		
 		if (x > sx) { kImage.x(sx); }
-		if (x < (sx - w + sw) ) { kImage.x(sx - w + sw); }
+		if (x &lt; (sx - w + sw) ) { kImage.x(sx - w + sw); }
 		if (y > sy) { kImage.y(sy); }
-		if (y < (sy - h + sh) ) { kImage.y(sy - h + sh); }
+		if (y &lt; (sy - h + sh) ) { kImage.y(sy - h + sh); }
 
 		stage.draw();
 	};
@@ -234,7 +305,7 @@ function drawSubregionImage(stage, oImg, size, doFill = false, updateCallback = 
 			return;
 
 		switch (e.keyCode) {
-			case KEYCODE_R: // 'r' key, reset scale & position
+			case KEYCODE_R: // 'r' key, reset scale &amp; position
 				kImage.setAttrs({scaleX:1,scaleY:1,x:0,y:0});
 				doUpdate();
 				break;
@@ -294,8 +365,8 @@ function drawSpotContent(stage, sImage, sBeam, updateCallback = null) {
 		// limit the max zoom from scrolling, to prevent blank pixel data
 		// because of too small of a spot size...
 		const tolerance = -0.1;
-		if (G_BEAMRADIUS_SUBREGION_PX.x + tolerance < 1
-		|| G_BEAMRADIUS_SUBREGION_PX.y + tolerance < 1) {
+		if (G_BEAMRADIUS_SUBREGION_PX.x + tolerance &lt; 1
+		|| G_BEAMRADIUS_SUBREGION_PX.y + tolerance &lt; 1) {
 			return Math.min(oldScale, newScale);
 		}
 		return newScale;
@@ -326,7 +397,7 @@ function drawSpotSignal(sourceStage, destStage, sBeam) {
 		var avgPx = Utils.get_avg_pixel_gs(allPx); avgPx = [avgPx,avgPx,avgPx,1];
 
 		var avgSpot = null;
-		if (destLayer.getChildren().length <= 0){
+		if (destLayer.getChildren().length &lt;= 0){
 			avgSpot = beam;
 			destLayer.add(avgSpot);
 		} else {
@@ -376,7 +447,7 @@ function drawProbeLayout(drawStage, baseImage, userImage, beam) {
 		// get the over-layer, create if not already added
 		var gridLayer = null;
 		var gridDrawn = false;
-		if (layers.length < 2) {
+		if (layers.length &lt; 2) {
 			gridLayer = new Konva.Layer();
 			drawStage.add(gridLayer);
 		} else {
@@ -386,7 +457,7 @@ function drawProbeLayout(drawStage, baseImage, userImage, beam) {
 
 		// get probe layer, make a new if not already there
 		var probesLayer = null;
-		if (layers.length < 3) {
+		if (layers.length &lt; 3) {
 			probesLayer = new Konva.Layer();
 			drawStage.add(probesLayer);
 		} else {
@@ -645,9 +716,6 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 	});
 	layer.add(indicator);
 
-	// global reference, so we can show/hide the indicator
-	G_VirtualSEM_indicator = indicator;
-
 	var context = canvas.getContext('2d');
 	context.imageSmoothingEnabled = false;
 
@@ -672,7 +740,7 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 		cellW = stage.width() / cols;
 		cellH = stage.height() / rows;
 
-		var significantChange = (cellW != lastCellW) && (cellH != lastCellH);
+		var significantChange = (cellW != lastCellW) &amp;&amp; (cellH != lastCellH);
 
 		// get beam size based on user-scaled image
 		beamRadius = {
@@ -685,7 +753,7 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 		// check if we need to scale up the image for sampling...
 		// if the avg spot radius is less than 1, scale up at 1 / x (inversely proportional)
 		var radiusAvg = (beamRadius.x+beamRadius.y)/2;
-		superScale = (radiusAvg < 1) ? 1 / radiusAvg : 1;
+		superScale = (radiusAvg &lt; 1) ? 1 / radiusAvg : 1;
 
 		// we can clear the screen here, if we want to avoid lines from previous configs...
 		if (significantChange) { // if it affects the drawing
@@ -720,7 +788,7 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 		var rowIntensitySum = 0;
 
 		// interate over X
-		for (let i = 0; i < cols; i++) {
+		for (let i = 0; i &lt; cols; i++) {
 			const cellX = i * cellW;
 			const cellY = row * cellH;
 
@@ -745,8 +813,8 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 			rowIntensitySum += gsValue;
 
 			// optionally, draw with overlap to reduce visual artifacts
-			if ((currentDrawPass < G_DRAW_OVERLAP_PASSES)
-			&& (G_DRAW_WITH_OVERLAP && pixelCount >= G_DRAW_OVERLAP_THRESHOLD)) {
+			if ((currentDrawPass &lt; G_DRAW_OVERLAP_PASSES)
+			&amp;&amp; (G_DRAW_WITH_OVERLAP &amp;&amp; pixelCount >= G_DRAW_OVERLAP_THRESHOLD)) {
 				ctx.fillRect(
 					cellX -G_DRAW_OVERLAP_PIXELS,
 					cellY -G_DRAW_OVERLAP_PIXELS,
@@ -762,7 +830,7 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 		// assume the spot size was too small or no signal
 		// for 1-2 overlapped-draw passes...
 		var rowIntensityAvg = rowIntensitySum / cols;
-		if (rowIntensityAvg <= G_MIN_AVG_SIGNAL_VALUE) { // out of 255
+		if (rowIntensityAvg &lt;= G_MIN_AVG_SIGNAL_VALUE) { // out of 255
 			currentDrawPass = -1;
 		}
 
@@ -799,3 +867,28 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 
 	return updateConfigValues;
 }
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="G_MATH_TOFIXED.html">G_MATH_TOFIXED</a></li><li><a href="NRMSE.html">NRMSE</a></li><li><a href="Utils.html">Utils</a></li></ul><h3>Global</h3><ul><li><a href="global.html#G_AUTO_PREVIEW_LIMIT">G_AUTO_PREVIEW_LIMIT</a></li><li><a href="global.html#G_BOX_SIZE">G_BOX_SIZE</a></li><li><a href="global.html#G_INPUT_IMAGE">G_INPUT_IMAGE</a></li><li><a href="global.html#G_MAIN_CONTAINER">G_MAIN_CONTAINER</a></li><li><a href="global.html#G_MAIN_IMAGE_OBJ">G_MAIN_IMAGE_OBJ</a></li><li><a href="global.html#G_UpdateResampled">G_UpdateResampled</a></li><li><a href="global.html#G_UpdateVirtualSEMConfig">G_UpdateVirtualSEMConfig</a></li><li><a href="global.html#GetOptimalBoxWidth">GetOptimalBoxWidth</a></li><li><a href="global.html#OnImageLoaded">OnImageLoaded</a></li><li><a href="global.html#ResampleFullImage">ResampleFullImage</a></li><li><a href="global.html#UpdateBaseImage">UpdateBaseImage</a></li><li><a href="global.html#drawGroundtruthImage">drawGroundtruthImage</a></li><li><a href="global.html#drawProbeLayout">drawProbeLayout</a></li><li><a href="global.html#drawProbeLayoutSampling">drawProbeLayoutSampling</a></li><li><a href="global.html#drawResampled">drawResampled</a></li><li><a href="global.html#drawSpotContent">drawSpotContent</a></li><li><a href="global.html#drawSpotProfileEdit">drawSpotProfileEdit</a></li><li><a href="global.html#drawSpotSignal">drawSpotSignal</a></li><li><a href="global.html#drawSubregionImage">drawSubregionImage</a></li><li><a href="global.html#drawVirtualSEM">drawVirtualSEM</a></li><li><a href="global.html#nStages">nStages</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Tue Apr 25 2023 21:00:10 GMT-0400 (Eastern Daylight Time)
+</footer>
+
+<a id="backtotop" href="#"><div>&uarr; Top</div></a>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

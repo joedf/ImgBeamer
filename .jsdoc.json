@@ -1,0 +1,21 @@
+{
+	"source": {
+		"include": "./app/src",
+		"includePattern": ".js$",
+		"excludePattern": "(node_modules/|docs)"
+	},
+	"templates": {
+		"cleverLinks": true,
+		"monospaceLinks": true,
+		"default": {
+			"layoutFile": "misc/jsdoc_custom_layout.tmpl.html"
+		}
+	},
+	"opts": {
+		"recurse": false,
+		"readme": "./README.md"
+	},
+	"markdown": {
+		"idInHeadings": true
+	}
+}

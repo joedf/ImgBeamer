@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>ImgBeamer | Image Metrics js-tests</title>
+	
+	<style type="text/css">
+		body {
+			background: #1A1A1A;
+		}
+		.notice {
+			color: tan;
+			font-family: monospace;
+			font-size: 11px;
+		}
+		img {
+			width: 300px;
+		}
+		.img {
+			display: inline-block;
+		}
+		.img::before {
+			content: attr(title);
+			position: absolute;
+			font-family: monospace;
+			font-size: .9em;
+			padding: .5em;
+			background: rgba(0,0,0,0.7);
+			color: white;
+		}
+	</style>
+</head>
+<body>
+
+	<h4 class="notice">Look at the webconsole for results, use run_all() to try again.</h4>
+
+	<script src="js/ssim.web-3.5.0.js"></script>
+	<script src="js/image-mse.js"></script>
+	<script src="js/image-ssim.js"></script>
+	<script src="js/image-ms-ssim.js"></script>
+	<script src="js/imgbeamer_metrics.js"></script>
+
+	<!-- 
+		Some impl. paper of Fant's algorithm
+		https://ieeexplore.ieee.org/document/5764000
+
+		Fant's original paper
+		https://ieeexplore.ieee.org/document/4056711
+		
+		> "The algorithm is complete in the sense that all the pixels of 
+		the input image under the map of the output image fully 
+		contribute to the output image."
+	 -->
+	
+	<div>
+		<div class="img" title="Original"><img id="og" src="imgs/original_500-crop.png"></div>
+		<div class="img" title="Fant"><img id="fant" src="imgs/og-fant.png"></div>
+		<div class="img" title="Minor defects"><img id="mDef" src="imgs/og-minor_defects.png"></div>
+		<div class="img" title="10%"><img id="c010" src="imgs/c10-010-010.png"></div>
+		<div class="img" title="60%"><img id="c060" src="imgs/c10-060-060.png"></div>
+		<div class="img" title="100%"><img id="c100" src="imgs/c10-100-100.png"></div>
+		<div class="img" title="120%"><img id="c120" src="imgs/c10-120-120.png"></div>
+		<div class="img" title="130%"><img id="c130" src="imgs/c10-130-130.png"></div>
+		<div class="img" title="60%-500% Astig."><img id="c6a5" src="imgs/c10-060-500.png"></div>
+		<div class="img" title="500%"><img id="c500" src="imgs/c10-500-500.png"></div>
+		<div class="img" title="Black"><img id="blak" src="imgs/black.png"></div>
+		<div class="img" title="White"><img id="wite" src="imgs/white.png"></div>
+		<div class="img" title="Half"><img id="half" src="imgs/half.png"></div>
+		<div class="img" title="Gray"><img id="gray" src="imgs/gray.png"></div>
+	</div>
+
+	<!--
+		can run simple py http server with:
+		python -m http.server 8000
+	-->
+	
+	<script>
+		function readPixels(img){
+			var canvas = document.createElement('canvas');
+			canvas.width = img.width;
+			canvas.height = img.height;
+			var ctx = canvas.getContext('2d');
+			ctx.drawImage(img, 0, 0, img.width, img.height);
+			imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+			return imageData;
+		}
+
+		function $i(id){
+			return document.getElementById(id);
+		}
+
+		var G_IMG_CHANNEL_COUNT = 4;
+
+		function ssim_test(msg, im1, im2){
+			/* https://github.com/obartra/ssim/wiki/Usage#options
+			Parameter 	Default 	Description
+			windowSize 	11 			window size for the SSIM map
+			k1 			0.01 		The first stability constant
+			k2 			0.03 		The second stability constant
+			bitDepth 	8 			The number of bits used to encode each pixel
+			downsample 	'original' 	false / 'original' / 'fast'
+			ssim 		'weber' 	'original' / 'fast' / 'bezkrovny' / 'weber'
+			*/
+			var opts = {
+				windowSize: 8,
+				// ssim: 'original',
+				// downsample: 'original'
+			}
+			var r = ssim.ssim(im1, im2, opts);
+			console.log(msg, r);
+		}
+
+		function mse_test(msg, im1, im2){
+			im1.channels = G_IMG_CHANNEL_COUNT;
+			im2.channels = G_IMG_CHANNEL_COUNT;
+			var r = ImageMSE.compare(im1, im2);
+			console.log(msg, r);
+		}
+
+		function NRMSE_test(msg, im1, im2){
+			var r = NRMSE.compare(im1, im2);
+			console.log(msg, r);
+		}
+
+		function darosh_ssim_test(msg, im1, im2){
+			im1.channels = G_IMG_CHANNEL_COUNT;
+			im2.channels = G_IMG_CHANNEL_COUNT;
+			var r = ImageSSIM.compare(im1, im2);
+			console.log(msg, r);
+		}
+
+		function darosh_msssim_test(msg, im1, im2){
+			im1.channels = G_IMG_CHANNEL_COUNT;
+			im2.channels = G_IMG_CHANNEL_COUNT;
+			var r = ImageMSSSIM.compare(im1, im2);
+			console.log(msg, r);
+		}
+
+		function run_tests(fn, d){
+			// simple js benchmarking
+			// https://stackoverflow.com/a/46649775/883015
+			console.time(fn.name);
+			
+			fn('og v og: ', d['og'], d['og']);
+			fn('og v fant: ', d['og'], d['fant']);
+			fn('og v mDef: ', d['og'], d['mDef']);
+			fn('og v c010: ', d['og'], d['c010']);
+			fn('og v c060: ', d['og'], d['c060']);
+			fn('og v c100: ', d['og'], d['c100']);
+			fn('og v c120: ', d['og'], d['c120']);
+			fn('og v c130: ', d['og'], d['c130']);
+			fn('og v c6a5: ', d['og'], d['c6a5']);
+			fn('og v c500: ', d['og'], d['c500']);
+			fn('og v blak: ', d['og'], d['blak']);
+			fn('og v wite: ', d['og'], d['wite']);
+			fn('og v half: ', d['og'], d['half']);
+			
+			fn('blak v wite: ', d['blak'], d['wite']);
+			fn('blak v half: ', d['blak'], d['half']);
+			fn('wite v half: ', d['wite'], d['half']);
+
+			fn('blak v gray: ', d['blak'], d['gray']);
+			fn('wite v gray: ', d['wite'], d['gray']);
+			fn('half v gray: ', d['half'], d['gray']);
+			
+			console.timeEnd(fn.name);
+		}
+
+		function run_all(useFant){
+			console.log('reading all pixel data...');
+
+			var ogpx = readPixels($i('og'));
+			var fantpx = readPixels($i('fant'));
+
+			var data = {
+				'og': ((!!useFant == true) ? fantpx : ogpx),
+				'fant': fantpx,
+				'mDef': readPixels($i('mDef')),
+				'c010': readPixels($i('c010')),
+				'c060': readPixels($i('c060')),
+				'c100': readPixels($i('c100')),
+				'c120': readPixels($i('c120')),
+				'c130': readPixels($i('c130')),
+				'c6a5': readPixels($i('c6a5')),
+				'c500': readPixels($i('c500')),
+				'blak': readPixels($i('blak')),
+				'wite': readPixels($i('wite')),
+				'half': readPixels($i('half')),
+				'gray': readPixels($i('gray')),
+			};
+
+			console.log('running SSIM ...');
+			run_tests(ssim_test, data);
+
+			console.log('running SSIM (darosh) ...');
+			run_tests(darosh_ssim_test, data);
+
+			console.log('running NRMSE_test (ImgBeamer) ...');
+			run_tests(NRMSE_test, data);
+
+			console.log('running MSE (darosh) ...');
+			run_tests(mse_test, data);
+
+			console.log('running MS-SSIM (darosh) ...');
+			run_tests(darosh_msssim_test, data);
+		}
+
+		setTimeout(run_all, 1000);
+	</script>
+
+</body>
+</html>

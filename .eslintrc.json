@@ -1,0 +1,33 @@
+{
+    "env": {
+        "browser": true,
+        "es2021": true
+    },
+    "extends": "eslint:recommended",
+    "overrides": [
+    ],
+    "parserOptions": {
+        "ecmaVersion": "latest"
+    },
+    "rules": {
+        "no-tabs": 0,
+        "semi": [1, "always"],
+        "max-len": ["error", {
+            "code": 120,
+            "tabWidth": 4
+        }],
+        "id-length": ["error", {
+            "min": 2,
+            "max": 40,
+            "exceptions": ["i", "j", "k", "x", "y", "e", "w", "h", "c", "d"],
+            "properties": "never"
+        }],
+        "no-magic-numbers": ["error", {
+            "ignore": [0, 1, 2, 3, 4, -1, 100, 180, 255]
+        }]
+    },
+    "globals": {
+        "Konva":"readonly",
+        "$":"readonly"
+    }
+}

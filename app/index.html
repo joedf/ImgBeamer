@@ -5,6 +5,8 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<meta http-equiv="X-UA-Compatible" content="ie=edge">
 		<title>ImgBeamer</title>
+
+		<link rel="icon" href="src/img/favicon.ico" type="image/x-icon" />
 		
 		<link rel="stylesheet" href="src/css/style.css">
 		<script src="src/3rd-party/konva/konva.js"></script>
@@ -27,10 +29,18 @@
 							<td>Columns</td>
 							<td><input type="number" id="iCols" placeholder="8"></td>
 						</tr>
-						<!-- Using requestAnimationFrame() instead of timers for now -->
-						<tr style="display: none;">
-							<td>Refresh delay (ms)</td>
-							<td><input type="number" id="iDelaySEM" placeholder="10"></td>
+						<tr>
+							<td></td>
+							<td>
+								<button id="btn_updateViews">Update views</button>
+								<svg id="loadspinner" class="load_spinner_svg"
+									style="display:none"
+									xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid" viewBox="0 0 16 16">
+									<circle fill="none" stroke="#00d8ff" stroke-dasharray="28.274333882308138 11.42477796076938" cx="8" cy="8" r="6" stroke-width="2">
+									<animateTransform attributeName="transform" type="rotate" repeatCount="indefinite" keyTimes="0;1" values="0 8 8;360 8 8" dur="1s"></animateTransform>
+									</circle>
+								</svg>
+							</td>
 						</tr>
 						<tr>
 							<td>Ground Truth Image</td>
@@ -47,17 +57,11 @@
 							</td>
 						</tr>
 						<tr>
-							<td><button id="generateFinal">Generate preview</button></td>
-							<td>
-								<button id="openInNewTab">Open in new tab</button>
-								<svg id="loadspinner" class="load_spinner_svg"
-									style="display:none"
-									xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid" viewBox="0 0 16 16">
-									<circle fill="none" stroke="#00d8ff" stroke-dasharray="28.274333882308138 11.42477796076938" cx="8" cy="8" r="6" stroke-width="2">
-									<animateTransform attributeName="transform" type="rotate" repeatCount="indefinite" keyTimes="0;1" values="0 8 8;360 8 8" dur="1s"></animateTransform>
-									</circle>
-								</svg>
-							</td>
+							<td></td>
+							<td><input type="file" id="_fileImgInput" accept="image/*" /></td>
+						</tr>
+						<tr>
+							<td><button id="exportPNG">Export ...</button></td>
 						</tr>
 						<tr>
 							<td><button id="exportPNG">Export ...</button></td>
@@ -110,7 +114,7 @@
 					</table>
 				</details>
 				
-				<details>
+				<details id="links2readBox" style="display:none">
 					<summary style="cursor: pointer; user-select: none;">References or people to look at...</summary>
 					<ul>
 						<li><a href="https://www.physik.hu-berlin.de/en/sem/software/software_qstem">sem/software/software_qstem</a></li>
@@ -126,9 +130,14 @@
 
 		<script src="src/utils.js"></script>
 		<script src="src/drawsteps.js"></script>
+		<script src="src/img_metrics.js"></script>
 		<script src="src/main.js"></script>
 
 		<script>
+			if (G_DEBUG) {
+				$('#links2readBox').show();
+			}
+
 			$("#options").draggable();
 
 			var stageFinal = stages[stages.length - 1];
@@ -152,15 +161,50 @@
 			});
 
 			$('#sb_groundtruthImage').on('change', function(e){
-				INPUT_IMAGE = getGroundtruthImage();
-				console.log("Ground Truth Image changed to: "+INPUT_IMAGE);
+				G_INPUT_IMAGE = Utils.getGroundtruthImage();
+				console.log("Ground Truth Image changed to: "+G_INPUT_IMAGE);
 				$(document.body).trigger('OnGroundtruthImageChange');
 			});
 
-			$('#generateFinal').click(doGenerateSubRegion);
-			$('#openInNewTab').click(function(e){
-				var url = stageFinal.toDataURL({pixelRatio:2});
-				window.open(url, '_blank').focus();
+			$('#btn_updateViews').click(doGenerateSubRegion);
+
+			// used to auto-name the export files with a counter
+			var G_Export_img_count = 0;
+			$('#exportPNG').click(function(e){
+				// Export image as file download
+				// https://konvajs.org/docs/data_and_serialization/High-Quality-Export.html
+
+				// get the image without the row/draw indicator
+				var finalImage = Utils.getVirtualSEM_KonvaImage(stageFinal);
+				
+				// export the image
+				var url = finalImage.toDataURL({pixelRatio:2});
+				var filename = Utils.GetSuggestedFileName("result_image",++G_Export_img_count);
+				Utils.downloadURI(url, filename);
+			});
+
+			$('#_fileImgInput').change(function(e){
+				// https://stackoverflow.com/a/34840295/883015
+				var file    = this.files[0];
+				var reader  = new FileReader();
+
+				reader.onloadend = function () {
+					console.log("Ground Truth Image changed to: "+file.name);
+
+					// clear selection in the combobox for included images
+					$('#sb_groundtruthImage').val('')
+
+					// returns a data base64 url
+					G_INPUT_IMAGE = reader.result;
+					$(document.body).trigger('OnGroundtruthImageChange');
+				}
+
+				if (file) {
+					reader.readAsDataURL(file);
+				} else {
+					console.log('Imported image selection cleared.');
+					// preview.src = "";
+				}
 			});
 
 			// used to auto-name the export files with a counter

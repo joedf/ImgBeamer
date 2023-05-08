@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: img_metrics.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+
+    <!-- Some minor style overrides on the default jsdoc template -->
+    <style>
+        /* Style Program main title in included readme.md */
+        article h1:first-child {
+            margin-left: 0;
+            margin-top: 0;
+            border-bottom: 1px solid #ccc;
+            font-weight: bold;
+        }
+        /* fix the v-margin between "returns" and next func/method declaration */
+        article h4.name {
+            padding-top: 1.0em;
+            margin-top: 1.0em;
+            border-top: 1px solid #eee;
+        }
+        article h4.name::before {
+            width: 5px;
+            height: 2em;
+            background: red;
+            display: inline-block;
+            content: '';
+            vertical-align: middle;
+            margin-right: 0.5em;
+        }
+        article dl {
+            margin-bottom: 30px;
+        }
+        /* implement a basic back-to-top feature */
+        #backtotop {
+            position: fixed;
+            bottom: 12px;
+            right: 16px;
+        }
+        #backtotop div {
+            padding: 4px 8px;
+            border: 1px solid #888;
+        }
+        /* Code display: fix line-height of empty/blank new lines */
+        li > code {
+            min-height: 1em;
+        }
+    </style>
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: img_metrics.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/* Image Metrics
+ * ===========================================================
+ * derived from image-mse.js (https://github.com/darosh/image-mse-js)
+ * MIT License
+ * Copyright (c) 2023 Joachim de Fourestier (Joe DF)
+ */
+
+/* exported NRMSE */
+
+/**
+ * The NRMSE (normalized root mean square error) - reference-based image metric.
+ * @namespace NRMSE
+ */
+const NRMSE = {
+	/** The maximum value of a pixel component. 255 for 8 bit depth */
+	pixelMaxValue: 255,
+	/** The allowed size difference when comparing images.
+	 * The leftover extra pixels of the larger image will be ignored. */
+	defaultTolerance: 0.01,
+	/**
+	 * Compares two images.
+	 * @param {*} image1 Preferably the ground truth / reference (convention, shouldnt matter otherwise)
+	 * @param {*} image2 An image to compare
+	 * @param {*} tolerance The allowed size ratio difference, default is {@link NRMSE.defaultTolerance}.
+	 * @returns An object with the calculate metric values of MSE, PSNR, RMSE, NRMSE,
+	 * Inverted NRMSE, NMSE, and Inverted NMSE.
+	 */
+	compare: function(image1, image2, tolerance) {
+		'use strict';
+
+		// size check and tolerance
+		if (image1.data.length != image2.data.length) {
+			let dl1 = image1.data.length, dl2 = image2.data.length;
+			var errmsg = "The given images have different data length ("
+				+image1.width+"x"+image1.height+" vs "+image2.width+"x"+image2.height
+				+") or sizes ("+dl1+" vs "+dl2+").";
+			
+			// get the tolerance or use default if not provided
+			tolerance = (typeof tolerance !== 'undefined') ? tolerance : this.defaultTolerance;
+			let relDiff = Math.abs(dl1 - dl2) / Math.max(dl1, dl2);
+			if (relDiff &lt;= tolerance) {
+				// eslint-disable-next-line no-magic-numbers
+				console.warn(errmsg + " Tolerance = "+tolerance+" relDiff = "+relDiff.toFixed(6));
+			} else {
+				throw errmsg;
+			}
+		}
+
+		const n_channels = 4; // assume grayscale RGBA flat array
+		// max pixel value for the bit depth. At 8 bit-depth, this is 255.
+		const p_max = this.pixelMaxValue;
+		
+		// Do sum of squared difference
+		var sum = 0, len = image1.data.length;
+		for (var i = 0; i &lt; len; i += n_channels) {
+			let diff = image1.data[i] - image2.data[i];
+
+			// check and allow for tolerance of diff image sizes
+			if (isNaN(diff)) {
+				if (i >= image2.data.length) {
+					console.warn("Calculation loop ended early as i = "+i);
+					break;
+				} else {
+					throw "Error: untolerated or invalid calculation!";
+				}
+			}
+
+			sum += Math.pow(diff, 2);
+		}
+
+		// number of pixels, each having multiple "channels",
+		// or color components (e.g., R, G, B, A)...
+		var pc = len / n_channels;
+
+		// final step ("average error over all entries/pixels"),
+		// to obtain MSE (Mean Squared Error)
+		var mse = sum / pc;
+
+		// Maximum possible mse value
+		// var max_mse = (Math.pow(p_max - 0, 2) * pc) / pc;
+		// which can be reduced to:
+		const max_mse = Math.pow(p_max, 2);
+
+		// Normalized MSE (NMSE)
+		var nmse = mse / max_mse;
+
+		// Compute RMSE (Root MSE)
+		var rmse = Math.sqrt(mse);
+		
+		// Normalized RMSE (NRMSE) or RMS-percentage-E (RMSPE)
+		// many ways to normalize:
+		// https://cirpwiki.info/wiki/Statistics#Normalization
+		// https://stats.stackexchange.com/a/413257/37910
+		// We just normalize by the max value possible for our RMSE
+		// which is equal to Math.sqrt(max_mse);
+		// which can be reduce to just: p_max
+		var nrmse = rmse / p_max;
+
+		return {
+			mse: mse,
+			psnr: this.psnr(mse),
+			rmse: rmse,
+			nrmse: nrmse,
+			// "inverted" ("iNRMSE") since we want 1 = good, 0 = bad match
+			inrmse: 1 - nrmse,
+			nmse: nmse,
+			// inverted NMSE ("iNMSE")
+			inmse: 1 - nmse,
+		};
+	},
+	/**
+	 * Calculates PSNR (Peak Signal-to-Noise Ratio).
+	 * @param {*} mse a Mean Squared Error (MSE) value
+	 * @param {*} max the maximum value of a pixel component, default is {@link NRMSE.pixelMaxValue}
+	 * @returns the calculated value
+	 */
+	psnr: function(mse, max) {
+		if (max === void 0) { max = this.pixelMaxValue; }
+		// eslint-disable-next-line no-magic-numbers
+		return 10 * this.log10((max * max) / mse);
+	},
+	/** Utility function that performs a Log base 10 calculation. */
+	log10: function(value) {
+		return Math.log(value) / Math.LN10;
+	}
+};</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="G_MATH_TOFIXED.html">G_MATH_TOFIXED</a></li><li><a href="NRMSE.html">NRMSE</a></li><li><a href="Utils.html">Utils</a></li></ul><h3>Global</h3><ul><li><a href="global.html#G_AUTO_PREVIEW_LIMIT">G_AUTO_PREVIEW_LIMIT</a></li><li><a href="global.html#G_BOX_SIZE">G_BOX_SIZE</a></li><li><a href="global.html#G_INPUT_IMAGE">G_INPUT_IMAGE</a></li><li><a href="global.html#G_MAIN_CONTAINER">G_MAIN_CONTAINER</a></li><li><a href="global.html#G_MAIN_IMAGE_OBJ">G_MAIN_IMAGE_OBJ</a></li><li><a href="global.html#G_UpdateResampled">G_UpdateResampled</a></li><li><a href="global.html#G_UpdateVirtualSEMConfig">G_UpdateVirtualSEMConfig</a></li><li><a href="global.html#GetOptimalBoxWidth">GetOptimalBoxWidth</a></li><li><a href="global.html#OnImageLoaded">OnImageLoaded</a></li><li><a href="global.html#ResampleFullImage">ResampleFullImage</a></li><li><a href="global.html#UpdateBaseImage">UpdateBaseImage</a></li><li><a href="global.html#drawGroundtruthImage">drawGroundtruthImage</a></li><li><a href="global.html#drawProbeLayout">drawProbeLayout</a></li><li><a href="global.html#drawProbeLayoutSampling">drawProbeLayoutSampling</a></li><li><a href="global.html#drawResampled">drawResampled</a></li><li><a href="global.html#drawSpotContent">drawSpotContent</a></li><li><a href="global.html#drawSpotProfileEdit">drawSpotProfileEdit</a></li><li><a href="global.html#drawSpotSignal">drawSpotSignal</a></li><li><a href="global.html#drawSubregionImage">drawSubregionImage</a></li><li><a href="global.html#drawVirtualSEM">drawVirtualSEM</a></li><li><a href="global.html#nStages">nStages</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Tue Apr 25 2023 21:00:10 GMT-0400 (Eastern Daylight Time)
+</footer>
+
+<a id="backtotop" href="#"><div>&uarr; Top</div></a>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

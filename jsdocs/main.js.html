@@ -1,4 +1,75 @@
-/* globals Utils, GetOptimalBoxWidth */
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: main.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+
+    <!-- Some minor style overrides on the default jsdoc template -->
+    <style>
+        /* Style Program main title in included readme.md */
+        article h1:first-child {
+            margin-left: 0;
+            margin-top: 0;
+            border-bottom: 1px solid #ccc;
+            font-weight: bold;
+        }
+        /* fix the v-margin between "returns" and next func/method declaration */
+        article h4.name {
+            padding-top: 1.0em;
+            margin-top: 1.0em;
+            border-top: 1px solid #eee;
+        }
+        article h4.name::before {
+            width: 5px;
+            height: 2em;
+            background: red;
+            display: inline-block;
+            content: '';
+            vertical-align: middle;
+            margin-right: 0.5em;
+        }
+        article dl {
+            margin-bottom: 30px;
+        }
+        /* implement a basic back-to-top feature */
+        #backtotop {
+            position: fixed;
+            bottom: 12px;
+            right: 16px;
+        }
+        #backtotop div {
+            padding: 4px 8px;
+            border: 1px solid #888;
+        }
+        /* Code display: fix line-height of empty/blank new lines */
+        li > code {
+            min-height: 1em;
+        }
+    </style>
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: main.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/* globals Utils, GetOptimalBoxWidth */
 
 // global functions from drawsteps.js
 /* globals
@@ -43,7 +114,7 @@ const nStages = 9;
 
 // first create the stages
 var stages = [];
-for (let i = 0; i < nStages; i++) {
+for (let i = 0; i &lt; nStages; i++) {
 	var stage = Utils.newStageTemplate(G_MAIN_CONTAINER, G_BOX_SIZE, G_BOX_SIZE);
 	stages.push(stage);
 }
@@ -123,11 +194,11 @@ function OnImageLoaded(eImg, stages){
 	var beam = drawSpotProfileEdit(spotProfileStage);
 
 	// Subregion View
-	// draw base image (can pan & zoom)
+	// draw base image (can pan &amp; zoom)
 	$(baseImageStage.getContainer())
 		.addClass('grabCursor')
 		.attr('box_label', 'Subregion/ROI View')
-		.attr('note', 'Pan & Zoom: Drag and Scroll\nPress [R] to reset')
+		.attr('note', 'Pan &amp; Zoom: Drag and Scroll\nPress [R] to reset')
 		.css('border-color', 'blue');
 	var subregionImage = drawSubregionImage(baseImageStage, eImg, G_BOX_SIZE, false, doUpdate);
 
@@ -204,7 +275,7 @@ function OnImageLoaded(eImg, stages){
 		var rows = Utils.getRowsInput();
 		var cols = Utils.getColsInput();
 
-		if (internallyCalled && (rows*cols > G_AUTO_PREVIEW_LIMIT)) {
+		if (internallyCalled &amp;&amp; (rows*cols > G_AUTO_PREVIEW_LIMIT)) {
 			console.warn('automatic preview disable for 64+ grid cells.');
 			return;
 		}
@@ -314,7 +385,7 @@ function ResampleFullImage() {
 		cv = document.createElement('canvas');
 		cv.id = 'finalCanvas';
 		cv.width = cols; cv.height = rows;
-		var cc = $('<div/>').addClass('box final').appendTo(G_MAIN_CONTAINER); cc.append(cv);
+		var cc = $('&lt;div/>').addClass('box final').appendTo(G_MAIN_CONTAINER); cc.append(cv);
 	}
 
 	cv.width = cols;
@@ -332,10 +403,10 @@ function ResampleFullImage() {
 	var count = 0;
 
 	// process and compute each pixel grid cell
-	for (let i = 0; i < rows; i++) {
+	for (let i = 0; i &lt; rows; i++) {
 
 		// compute pixel value and push to matrix
-		for (let j = 0; j < cols; j++) {
+		for (let j = 0; j &lt; cols; j++) {
 			const probe = {
 				centerX: (j * pixelSizeX) + cell_half_W,
 				centerY: (i * pixelSizeY) + cell_half_H,
@@ -382,4 +453,28 @@ function ResampleFullImage() {
 	msg = 'ResampleFullImage End: took '+ Math.floor(Elapsed / second).toString()+" seconds.";
 	console.log(msg);
 	eStatus.innerHTML = msg;
-}
+}</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="G_MATH_TOFIXED.html">G_MATH_TOFIXED</a></li><li><a href="NRMSE.html">NRMSE</a></li><li><a href="Utils.html">Utils</a></li></ul><h3>Global</h3><ul><li><a href="global.html#G_AUTO_PREVIEW_LIMIT">G_AUTO_PREVIEW_LIMIT</a></li><li><a href="global.html#G_BOX_SIZE">G_BOX_SIZE</a></li><li><a href="global.html#G_INPUT_IMAGE">G_INPUT_IMAGE</a></li><li><a href="global.html#G_MAIN_CONTAINER">G_MAIN_CONTAINER</a></li><li><a href="global.html#G_MAIN_IMAGE_OBJ">G_MAIN_IMAGE_OBJ</a></li><li><a href="global.html#G_UpdateResampled">G_UpdateResampled</a></li><li><a href="global.html#G_UpdateVirtualSEMConfig">G_UpdateVirtualSEMConfig</a></li><li><a href="global.html#GetOptimalBoxWidth">GetOptimalBoxWidth</a></li><li><a href="global.html#OnImageLoaded">OnImageLoaded</a></li><li><a href="global.html#ResampleFullImage">ResampleFullImage</a></li><li><a href="global.html#UpdateBaseImage">UpdateBaseImage</a></li><li><a href="global.html#drawGroundtruthImage">drawGroundtruthImage</a></li><li><a href="global.html#drawProbeLayout">drawProbeLayout</a></li><li><a href="global.html#drawProbeLayoutSampling">drawProbeLayoutSampling</a></li><li><a href="global.html#drawResampled">drawResampled</a></li><li><a href="global.html#drawSpotContent">drawSpotContent</a></li><li><a href="global.html#drawSpotProfileEdit">drawSpotProfileEdit</a></li><li><a href="global.html#drawSpotSignal">drawSpotSignal</a></li><li><a href="global.html#drawSubregionImage">drawSubregionImage</a></li><li><a href="global.html#drawVirtualSEM">drawVirtualSEM</a></li><li><a href="global.html#nStages">nStages</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Tue Apr 25 2023 21:00:10 GMT-0400 (Eastern Daylight Time)
+</footer>
+
+<a id="backtotop" href="#"><div>&uarr; Top</div></a>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
