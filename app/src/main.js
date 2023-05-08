@@ -166,7 +166,7 @@ function OnImageLoaded(eImg, stages){
 	// draw Spot Signal
 	$(spotSignalStage.getContainer())
 		.addClass('note_colored')
-		.attr('box_label', 'Spot Signal');
+		.attr('box_label', '(Integrated) Spot Signal');
 	var spotSignalBeam = beam.clone();
 	var updateSpotSignal = drawSpotSignal(spotContentStage, spotSignalStage, spotSignalBeam);
 
