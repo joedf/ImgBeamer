@@ -142,7 +142,7 @@ function OnImageLoaded(eImg, stages){
 
 	// draw Spot Content
 	$(spotContentStage.getContainer())
-		.addClass('advancedMode')
+		.addClass('advancedMode').hide()
 		.addClass('grabCursor')
 		.attr('box_label', 'Spot Content')
 		.attr('note', 'Scroll to adjust spot size\nHold [Shift] for half rate');
@@ -171,7 +171,7 @@ function OnImageLoaded(eImg, stages){
 
 	// draw Spot Signal
 	$(spotSignalStage.getContainer())
-		.addClass('advancedMode')
+		.addClass('advancedMode').hide()
 		.addClass('note_colored')
 		.attr('box_label', '(Integrated) Spot Signal');
 	var spotSignalBeam = beam.clone();
@@ -186,7 +186,7 @@ function OnImageLoaded(eImg, stages){
 	// draw Sampled Subregion
 	// compute resampled image
 	$(layoutSampledStage.getContainer())
-		.addClass('advancedMode')
+		.addClass('advancedMode').hide()
 		.attr('box_label', 'Sampled Subregion');
 	var layoutSampledBeam = beam.clone();
 	var updateProbeLayoutSamplingPreview = drawProbeLayoutSampling(
