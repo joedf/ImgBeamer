@@ -274,7 +274,7 @@ const Utils = {
 
 			// display it
 			element.innerHTML = fmtMag;
-			G_GUI_Controller.mag = fmtMag;
+			G_GUI_Controller.digitalMag = fmtMag;
 		}
 	},
 
