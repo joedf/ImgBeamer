@@ -12,13 +12,14 @@
 		<script src="src/3rd-party/konva/konva.js"></script>
 		<script src="src/3rd-party/jquery-3.6.1.min.js"></script>
 		<script src="src/3rd-party/jquery-ui-1.13.2/jquery-ui.min.js"></script>
+		<script src="src/3rd-party/dat.gui/dat.gui.min.js"></script>
 	</head>
 	<body>
 		<div class="layout" id="main-container"></div>
 
 		<div id="options-anchor">
 			<div id="options">
-				<details open>
+				<details open style="display: none;">
 					<summary>Configuration Panel</summary>
 					<table>
 						<tr>
@@ -130,6 +131,10 @@
 		<script src="src/img_metrics.js"></script>
 		<script src="src/main.js"></script>
 
+		<style>
+			.dg.ac { position:fixed; z-index: 101 !important; }
+		</style>
+
 		<script>
 			if (G_DEBUG) {
 				$('#links2readBox').show();
@@ -137,37 +142,55 @@
 
 			$("#options").draggable();
 
-			var stageFinal = stages[stages.length - 1];
 
-			var doGenerateSubRegion = function(e){
-				$('#loadspinner').show();
-				
-				G_UpdateVirtualSEMConfig();
-				
-				setTimeout(function(){
-					G_UpdateResampled(false);
-					$('#loadspinner').hide();
-				}, 250);
+			const gui = new dat.GUI();
+			var G_GUI_Controller = new function() {
+				this.pixelCountX = 8;
+				this.pixelCountY = 8;
+				this.advancedMode = true;
+				this.updateViews = function(){
+					G_UpdateVirtualSEMConfig();
+					G_UpdateResampled();
+				};
+				this.groundTruthImg = 'grains2tl.png';
+				this.pause_vSEM = G_VSEM_PAUSED;
+				this.exportResultImg = function(){ exportResultImage(); };
+				this.importImage = function(){
+					// getInputImage();
+					$('#_fileImgInput').click();
+				};
 			};
-
-			$('#iRows, #iCols, #iDelaySEM').keypress(function(e){
-				if ( e.which == 13 ) {
-					e.preventDefault();
-					doGenerateSubRegion();
-				}
+			gui.add(G_GUI_Controller, 'pixelCountX').min(1).max(64).step(1).onChange(G_GUI_Controller.updateViews);
+			gui.add(G_GUI_Controller, 'pixelCountY').min(1).max(64).step(1).onChange(G_GUI_Controller.updateViews);
+			gui.add(G_GUI_Controller, 'advancedMode').onChange(function(){
+				$('.advancedMode').toggle(G_GUI_Controller.advancedMode);
 			});
-
-			$('#sb_groundtruthImage').on('change', function(e){
-				G_INPUT_IMAGE = Utils.getGroundtruthImage();
+			gui.add(G_GUI_Controller, 'pause_vSEM').onChange(function(){
+				G_VSEM_PAUSED = G_GUI_Controller.pause_vSEM;
+			});
+			// gui.add(G_GUI_Controller, 'updateViews');
+			gui.add(G_GUI_Controller, 'groundTruthImg', [
+				'grains1.png',
+				'grains1b.png',
+				'grains1c.png',
+				'grains2.png',
+				'grains2c.png',
+				'grains2tl.png',
+				'grains2nc.png',
+			]).onChange(function(){
+				// G_INPUT_IMAGE = Utils.getGroundtruthImage();
+				G_INPUT_IMAGE = 'src/testimages/' + Utils.getGroundtruthImage();
 				console.log("Ground Truth Image changed to: "+G_INPUT_IMAGE);
 				$(document.body).trigger('OnGroundtruthImageChange');
 			});
+			gui.add(G_GUI_Controller, 'importImage');
+			gui.add(G_GUI_Controller, 'exportResultImg');
 
-			$('#btn_updateViews').click(doGenerateSubRegion);
 
 			// used to auto-name the export files with a counter
 			var G_Export_img_count = 0;
-			$('#exportPNG').click(function(e){
+			var stageFinal = stages[stages.length - 1];
+			function exportResultImage(){
 				// Export image as file download
 				// https://konvajs.org/docs/data_and_serialization/High-Quality-Export.html
 
@@ -178,7 +201,7 @@
 				var url = finalImage.toDataURL({pixelRatio:2});
 				var filename = Utils.GetSuggestedFileName("result_image",++G_Export_img_count);
 				Utils.downloadURI(url, filename);
-			});
+			}
 
 			$('#_fileImgInput').change(function(e){
 				// https://stackoverflow.com/a/34840295/883015
@@ -202,28 +225,6 @@
 					console.log('Imported image selection cleared.');
 					// preview.src = "";
 				}
-			});
-
-			// used to auto-name the export files with a counter
-			var G_Export_img_count = 0;
-			$('#exportPNG').click(function(e){
-				// Export image as file download
-				// https://konvajs.org/docs/data_and_serialization/High-Quality-Export.html
-				
-				// hide the indicator if possible
-				if (G_VirtualSEM_indicator != null)
-					G_VirtualSEM_indicator.hide();
-
-				// export the image
-				var url = stageFinal.toDataURL({pixelRatio:2});
-				var datestamp = new Date().toISOString().slice(0, 10).replaceAll('-','.');
-				var counter = String(++G_Export_img_count).padStart(3,'0');
-				var filename = "result_image-"+datestamp+"-"+counter+".png";
-				downloadURI(url, filename);
-				
-				// restore the indicator
-				if (G_VirtualSEM_indicator != null)
-					G_VirtualSEM_indicator.show();
 			});
 
 			$('#generateFull').click(function(e){

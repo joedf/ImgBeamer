@@ -15,11 +15,13 @@ Konva.autoDrawEnabled = true;
 
 /** The number of cells in the raster grid at which auto-preview stops, for responsiveness */
 // eslint-disable-next-line no-magic-numbers
-var G_AUTO_PREVIEW_LIMIT = 16 * 16;
+var G_AUTO_PREVIEW_LIMIT = Infinity;// 16 * 16;
 
+var G_VSEM_PAUSED = false;
 
 /** global variable to set the input ground truth image */
-var G_INPUT_IMAGE = Utils.getGroundtruthImage();
+// var G_INPUT_IMAGE = Utils.getGroundtruthImage();
+var G_INPUT_IMAGE = 'src/testimages/grains2tl.png';
 
 /** global reference to update the resampling steps (spot layout,
  * sampled subregion, resulting subregion) displays,
@@ -94,7 +96,9 @@ function OnImageLoaded(eImg, stages){
 
 	/** called when a change occurs in the spot profile, subregion, or spot content */
 	function doUpdate(){
-		updateSpotSignal();
+		if ($(spotSignalStage.getContainer()).is(':visible')) {
+			updateSpotSignal();
+		}
 		updateProbeLayout();
 		updateResamplingSteps(true);
 		updateGroundtruthMap();
@@ -138,6 +142,7 @@ function OnImageLoaded(eImg, stages){
 
 	// draw Spot Content
 	$(spotContentStage.getContainer())
+		.addClass('advancedMode')
 		.addClass('grabCursor')
 		.attr('box_label', 'Spot Content')
 		.attr('note', 'Scroll to adjust spot size\nHold [Shift] for half rate');
@@ -166,6 +171,7 @@ function OnImageLoaded(eImg, stages){
 
 	// draw Spot Signal
 	$(spotSignalStage.getContainer())
+		.addClass('advancedMode')
 		.addClass('note_colored')
 		.attr('box_label', '(Integrated) Spot Signal');
 	var spotSignalBeam = beam.clone();
@@ -179,7 +185,9 @@ function OnImageLoaded(eImg, stages){
 	
 	// draw Sampled Subregion
 	// compute resampled image
-	$(layoutSampledStage.getContainer()).attr('box_label', 'Sampled Subregion');
+	$(layoutSampledStage.getContainer())
+		.addClass('advancedMode')
+		.attr('box_label', 'Sampled Subregion');
 	var layoutSampledBeam = beam.clone();
 	var updateProbeLayoutSamplingPreview = drawProbeLayoutSampling(
 		layoutSampledStage,
@@ -201,7 +209,7 @@ function OnImageLoaded(eImg, stages){
 		resampledBeam
 	);
 	
-	var updateResamplingSteps = function(internallyCalled){
+	var updateResamplingSteps = function(internallyCalled=false){
 		var rows = Utils.getRowsInput();
 		var cols = Utils.getColsInput();
 
@@ -210,7 +218,10 @@ function OnImageLoaded(eImg, stages){
 			return;
 		}
 
-		updateProbeLayoutSamplingPreview();
+		updateProbeLayout();
+		if ($(layoutSampledStage.getContainer()).is(':visible')) {
+			updateProbeLayoutSamplingPreview();
+		}
 		updateResampled();
 	};
 	G_UpdateResampled = updateResamplingSteps;

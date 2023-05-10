@@ -766,77 +766,79 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 	var irw = (iw / stage.width()), irh = (ih / stage.height());
 
 	var doUpdate = function(){
-		// track time to draw the row
-		var timeRowStart = Date.now();
+		if (!G_VSEM_PAUSED) {
+			// track time to draw the row
+			var timeRowStart = Date.now();
 
-		var row = currentRow++;
-		var ctx = context;
+			var row = currentRow++;
+			var ctx = context;
 
-		if (currentRow >= rows) {
-			currentRow = 0;
-			currentDrawPass += 1;
-		}
-
-		var rowIntensitySum = 0;
-
-		// interate over X
-		for (let i = 0; i < cols; i++) {
-			const cellX = i * cellW;
-			const cellY = row * cellH;
-
-			// TODO: check these values and the Utils.ComputeProbeValue_gs again
-			// since the final image seems to differ...
-
-			// map/transform values to full resolution image coordinates
-			const scaledProbe = {
-				centerX: (cellX + cellW/2) * irw,
-				centerY: (cellY + cellH/2) * irh,
-				rotationRad: Utils.toRadians(beam.rotation()),
-				radiusX: beamRadius.x * irw,
-				radiusY: beamRadius.y * irh,
-			};
-
-			// compute the pixel value, for the given spot/probe profile
-			var gsValue = Utils.ComputeProbeValue_gs(originalImageObj, scaledProbe, superScale);
-			color = 'rgba('+[gsValue,gsValue,gsValue].join(',')+',1)';
-
-			ctx.fillStyle = color;
-
-			rowIntensitySum += gsValue;
-
-			// optionally, draw with overlap to reduce visual artifacts
-			if ((currentDrawPass < G_DRAW_OVERLAP_PASSES)
-			&& (G_DRAW_WITH_OVERLAP && pixelCount >= G_DRAW_OVERLAP_THRESHOLD)) {
-				ctx.fillRect(
-					cellX -G_DRAW_OVERLAP_PIXELS,
-					cellY -G_DRAW_OVERLAP_PIXELS,
-					cellW +G_DRAW_OVERLAP_PIXELS,
-					cellH +G_DRAW_OVERLAP_PIXELS
-				);
-			} else {
-				ctx.fillRect(cellX, cellY, cellW, cellH);
+			if (currentRow >= rows) {
+				currentRow = 0;
+				currentDrawPass += 1;
 			}
+
+			var rowIntensitySum = 0;
+
+			// interate over X
+			for (let i = 0; i < cols; i++) {
+				const cellX = i * cellW;
+				const cellY = row * cellH;
+
+				// TODO: check these values and the Utils.ComputeProbeValue_gs again
+				// since the final image seems to differ...
+
+				// map/transform values to full resolution image coordinates
+				const scaledProbe = {
+					centerX: (cellX + cellW/2) * irw,
+					centerY: (cellY + cellH/2) * irh,
+					rotationRad: Utils.toRadians(beam.rotation()),
+					radiusX: beamRadius.x * irw,
+					radiusY: beamRadius.y * irh,
+				};
+
+				// compute the pixel value, for the given spot/probe profile
+				var gsValue = Utils.ComputeProbeValue_gs(originalImageObj, scaledProbe, superScale);
+				color = 'rgba('+[gsValue,gsValue,gsValue].join(',')+',1)';
+
+				ctx.fillStyle = color;
+
+				rowIntensitySum += gsValue;
+
+				// optionally, draw with overlap to reduce visual artifacts
+				if ((currentDrawPass < G_DRAW_OVERLAP_PASSES)
+				&& (G_DRAW_WITH_OVERLAP && pixelCount >= G_DRAW_OVERLAP_THRESHOLD)) {
+					ctx.fillRect(
+						cellX -G_DRAW_OVERLAP_PIXELS,
+						cellY -G_DRAW_OVERLAP_PIXELS,
+						cellW +G_DRAW_OVERLAP_PIXELS,
+						cellH +G_DRAW_OVERLAP_PIXELS
+					);
+				} else {
+					ctx.fillRect(cellX, cellY, cellW, cellH);
+				}
+			}
+
+			// if the last drawn was essentially completely black
+			// assume the spot size was too small or no signal
+			// for 1-2 overlapped-draw passes...
+			var rowIntensityAvg = rowIntensitySum / cols;
+			if (rowIntensityAvg <= G_MIN_AVG_SIGNAL_VALUE) { // out of 255
+				currentDrawPass = -1;
+			}
+
+			// move/update the indicator
+			indicator.y((row+1) * cellH - indicator.height());
+
+			layer.batchDraw();
+
+			// use this for debugging, less heavy, draw random color rows
+			// color = colors[Utils.getRandomInt(colors.length)];
+			// updateConfigValues();
+
+			var timeDrawTotal = Date.now() - timeRowStart;
+			stage.getContainer().setAttribute('note', timeDrawTotal + " ms/Row");
 		}
-
-		// if the last drawn was essentially completely black
-		// assume the spot size was too small or no signal
-		// for 1-2 overlapped-draw passes...
-		var rowIntensityAvg = rowIntensitySum / cols;
-		if (rowIntensityAvg <= G_MIN_AVG_SIGNAL_VALUE) { // out of 255
-			currentDrawPass = -1;
-		}
-
-		// move/update the indicator
-		indicator.y((row+1) * cellH - indicator.height());
-
-		layer.batchDraw();
-
-		// use this for debugging, less heavy, draw random color rows
-		// color = colors[Utils.getRandomInt(colors.length)];
-		// updateConfigValues();
-
-		var timeDrawTotal = Date.now() - timeRowStart;
-		stage.getContainer().setAttribute('note', timeDrawTotal + " ms/Row");
 		
 		// see comment on using this instead of setInterval below
 		G_VirtualSEM_animationFrameRequestId = requestAnimationFrame(doUpdate);
