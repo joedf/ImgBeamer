@@ -64,7 +64,7 @@ summary {
 
 .box > span.parameterDisplay { cursor: pointer; }
 
-.box > .resultInfoDisplay {
+.box > .extraInfoDisplay {
 	bottom: 0;
 	left: 0;
 }

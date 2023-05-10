@@ -274,6 +274,7 @@ const Utils = {
 
 			// display it
 			element.innerHTML = fmtMag;
+			G_GUI_Controller.mag = fmtMag;
 		}
 	},
 
@@ -311,8 +312,8 @@ const Utils = {
 	 * @param {*} destStage The stage to display info on.
 	 * @param {string} infoText Text to display.
 	 */
-	updateResultImageInfo: function(destStage, infoText) {
-		const infoclass = "resultInfoDisplay";
+	updateExtraInfo: function(destStage, infoText) {
+		const infoclass = "extraInfoDisplay";
 		var element = this.ensureInfoBox(destStage, infoclass);
 		if (element) {
 			// display it

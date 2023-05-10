@@ -621,6 +621,7 @@ function drawGroundtruthImage(stage, imageObj, subregionImage, maxSize=G_BOX_SIZ
 		stroke: "#00FFFF",
 		strokeWidth: 1,
 		listening: false,
+		strokeScaleEnabled: false,
 	});
 
 	layer.add(image);
@@ -640,6 +641,42 @@ function drawGroundtruthImage(stage, imageObj, subregionImage, maxSize=G_BOX_SIZ
 		});
 
 		stage.draw();
+
+		// center of the rect coords
+		var center = {
+			x: rect.x() + rect.width()/2,
+			y: rect.y() + rect.height()/2,
+		};
+
+		// transform so that the coords have the middle of the stage as 0,0
+		var stageCentered = {
+			x: center.x - stage.width()/2,
+			y: center.y - stage.height()/2,
+		};
+
+		// transform to unit square coords
+		var unitCoords = {
+			x: stageCentered.x / stage.width(),
+			y: stageCentered.y / stage.height(),
+		};
+
+		// scale to original image pixel size
+		var pxImgCoords = {
+			x: unitCoords.x * G_MAIN_IMAGE_OBJ.width,
+			y: unitCoords.y * G_MAIN_IMAGE_OBJ.height,
+		};
+
+		// scale real physical units as microns
+		var middle = {
+			x: pxImgCoords.x * G_GUI_Controller.pixelSize_nm/1000,
+			y: pxImgCoords.y * G_GUI_Controller.pixelSize_nm/1000,
+		};
+
+		// display coords
+		Utils.updateExtraInfo(stage, '('
+			+ middle.x.toFixed(G_MATH_TOFIXED.SHORT) + ', '
+			+ middle.y.toFixed(G_MATH_TOFIXED.SHORT) + ')'
+			+ ' μm');
 	};
 
 	update();
@@ -755,7 +792,7 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 		}
 
 		// display image size / pixel counts
-		Utils.updateResultImageInfo(stage, cols + ' x ' + rows);
+		Utils.updateExtraInfo(stage, cols + ' x ' + rows);
 	};
 	updateConfigValues();
 

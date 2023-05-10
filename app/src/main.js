@@ -31,6 +31,8 @@ var G_UpdateResampled = null;
 /** global reference to update the beam values for the Virtual SEM view */
 var G_UpdateVirtualSEMConfig = null;
 
+var G_Update_GroundTruth = null;
+
 
 /** a global reference to the main body container that holds the boxes/stages.
  * @todo do we still need this? Maybe remove... */
@@ -230,6 +232,7 @@ function OnImageLoaded(eImg, stages){
 	$(groundtruthMapStage.getContainer()).attr('box_label', 'Sample Ground Truth');
 	var groundtruthMap = drawGroundtruthImage(groundtruthMapStage, eImg, subregionImage, G_BOX_SIZE);
 	var updateGroundtruthMap = groundtruthMap.updateFunc;
+	G_Update_GroundTruth = updateGroundtruthMap;
 	
 	// draw Resulting Image
 	$(virtualSEMStage.getContainer()).attr('box_label', 'Resulting Image');
