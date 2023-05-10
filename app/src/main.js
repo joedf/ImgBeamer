@@ -200,6 +200,7 @@ function OnImageLoaded(eImg, stages){
 
 	// draw Resulting Subregion
 	$(resampledStage.getContainer())
+		.addClass('advancedMode').hide()
 		.attr('box_label', 'Resulting Subregion')
 		.css('border-color', 'lime');
 	var resampledBeam = beam.clone();
@@ -224,7 +225,9 @@ function OnImageLoaded(eImg, stages){
 		if ($(layoutSampledStage.getContainer()).is(':visible')) {
 			updateProbeLayoutSamplingPreview();
 		}
-		updateResampled();
+		if ($(resampledStage.getContainer()).is(':visible')) {
+			updateResampled();
+		}
 	};
 	G_UpdateResampled = updateResamplingSteps;
 
