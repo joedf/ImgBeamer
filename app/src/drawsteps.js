@@ -753,6 +753,9 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 			currentRow = 0; // restart drawing from the top
 			currentDrawPass = 0;
 		}
+
+		// display image size / pixel counts
+		Utils.updateResultImageInfo(stage, cols + ' x ' + rows);
 	};
 	updateConfigValues();
 

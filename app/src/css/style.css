@@ -53,7 +53,9 @@ summary {
 
 .box.note_colored::after { color: yellow; }
 
-.box > span.infoBox {
+.parameterDisplay,
+.magDisplay,
+.metricsDisplay {
 	top: 0;
 	right: 0;
 	text-align: right;
@@ -61,6 +63,11 @@ summary {
 }
 
 .box > span.parameterDisplay { cursor: pointer; }
+
+.box > .resultInfoDisplay {
+	bottom: 0;
+	left: 0;
+}
 
 .final {
 	background-color: #172542;

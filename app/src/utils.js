@@ -307,6 +307,20 @@ const Utils = {
 	},
 
 	/**
+	 * Displays and updates additional info on the given stage
+	 * @param {*} destStage The stage to display info on.
+	 * @param {string} infoText Text to display.
+	 */
+	updateResultImageInfo: function(destStage, infoText) {
+		const infoclass = "resultInfoDisplay";
+		var element = this.ensureInfoBox(destStage, infoclass);
+		if (element) {
+			// display it
+			element.innerHTML = infoText;
+		}	
+	},
+
+	/**
 	 * Gets or creates an info-box element on the given stage.
 	 * @param {*} stage The stage on which display/have the info-box.
 	 * @param {string} className The class name of the info-box DOM element.
