@@ -666,17 +666,26 @@ function drawGroundtruthImage(stage, imageObj, subregionImage, maxSize=G_BOX_SIZ
 			y: unitCoords.y * G_MAIN_IMAGE_OBJ.height,
 		};
 
+		var pxSizeUm = G_GUI_Controller.pixelSize_nm / 1000;
+
 		// scale real physical units as microns
 		var middle = {
-			x: pxImgCoords.x * G_GUI_Controller.pixelSize_nm/1000,
-			y: pxImgCoords.y * G_GUI_Controller.pixelSize_nm/1000,
+			x: pxImgCoords.x * pxSizeUm,
+			y: pxImgCoords.y * pxSizeUm,
 		};
 
-		// display coords
+		var sizeFOV = {
+			w: (rect.width() / stage.width()) * G_MAIN_IMAGE_OBJ.width * pxSizeUm,
+		};
+
+		// display coords & FOV size
 		Utils.updateExtraInfo(stage, '('
 			+ middle.x.toFixed(G_MATH_TOFIXED.SHORT) + ', '
 			+ middle.y.toFixed(G_MATH_TOFIXED.SHORT) + ')'
-			+ ' μm');
+			+ ' μm'
+			+ '<br>FOV width: ' + sizeFOV.w.toFixed(G_MATH_TOFIXED.SHORT)
+			+ ' μm'
+		);
 	};
 
 	update();

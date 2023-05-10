@@ -134,7 +134,7 @@ function OnImageLoaded(eImg, stages){
 	// draw base image (can pan & zoom)
 	$(baseImageStage.getContainer())
 		.addClass('grabCursor')
-		.attr('box_label', 'Subregion/ROI View')
+		.attr('box_label', 'Subregion View / FOV')
 		.attr('note', 'Pan & Zoom: Drag and Scroll\nPress [R] to reset')
 		.css('border-color', 'blue');
 	var subregionImage = drawSubregionImage(baseImageStage, eImg, G_BOX_SIZE, false, doUpdate);
