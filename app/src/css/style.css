@@ -87,7 +87,10 @@ summary {
 	float: right;
 }
 
-#options { width: fit-content; }
+#options {
+	opacity: .9;
+	width: fit-content;
+}
 
 #options-handle {
 	text-align: center;
@@ -96,8 +99,10 @@ summary {
 
 #options-anchor {
 	display: inline-block;
-	position: absolute;
+	position: fixed;
 	right: 0.25em;
+	bottom: 5em;
+	z-index: 101;
 	user-select: none;
 	cursor: move;
 }
