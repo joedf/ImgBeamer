@@ -96,8 +96,6 @@ const Utils = {
 		return rawValue;
 	},
 
-	// getRowsInput: function(){ return this.getInputValueInt($('#iRows')); },
-	// getColsInput: function(){ return this.getInputValueInt($('#iCols')); },
 	getRowsInput: function(){ return G_GUI_Controller.pixelCountY; },
 	getColsInput: function(){ return G_GUI_Controller.pixelCountX; },
 	getCellWInput: function(){ return this.getInputValueInt($('#iCellW')); },
@@ -105,7 +103,6 @@ const Utils = {
 	getSpotXInput: function(){ return this.getInputValueInt($('#iSpotX')); },
 	getSpotYInput: function(){ return this.getInputValueInt($('#iSpotY')); },
 	getSpotAngleInput: function(){ return this.getInputValueInt($('#iSpotAngle')); },
-	// getGroundtruthImage: function(){ return $('#sb_groundtruthImage').val(); },
 	getGroundtruthImage: function(){ return G_GUI_Controller.groundTruthImg; },
 
 	/**
