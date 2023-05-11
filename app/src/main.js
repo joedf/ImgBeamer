@@ -200,7 +200,6 @@ function OnImageLoaded(eImg, stages){
 
 	// draw Resulting Subregion
 	$(resampledStage.getContainer())
-		.addClass('advancedMode').hide()
 		.attr('box_label', 'Resulting Subregion')
 		.css('border-color', 'lime');
 	var resampledBeam = beam.clone();
