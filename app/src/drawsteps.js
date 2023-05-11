@@ -433,6 +433,17 @@ function drawProbeLayout(drawStage, baseImage, spotScale, beam) {
 	baseLayer.add(imageCopy);
 	baseLayer.draw();
 
+	// setup "last" values to help optimize for draw performance
+	// no need to redraw the grid lines and spot outlines if the
+	// no. rows, columns, spot radii, or rotation didn't change...
+	var _last = {
+		rows: -1,
+		cols: -1,
+		radiusX: -1,
+		radiusY: -1,
+		rotation: 0,
+	};
+
 	var updateProbeLayout = function(){
 		// get the over-layer, create if not already added
 		var gridLayer = null;
@@ -466,29 +477,40 @@ function drawProbeLayout(drawStage, baseImage, spotScale, beam) {
 
 		var tRows = Utils.getRowsInput();
 		var tCols = Utils.getColsInput();
-		
-		// uncomment to draw grid only once
-		gridDrawn = false; gridLayer.destroyChildren();
 
-		// draw grid, based on rect
-		if (!gridDrawn)
-		Utils.drawGrid(gridLayer, baseGridRect, tRows, tCols);
+		var radiusX = (beam.width() / spotScale.scaleX()) / 2; //(cell.width/2) * .8
+		var radiusY = (beam.height() / spotScale.scaleY()) / 2; //(cell.height/2) * .8
 		
-		// clear the probe layer
-		probesLayer.destroyChildren();
+		// only redraw grid lines and spot outlines if they would change
+		if (_last.rows != tRows || _last.cols != tCols
+		|| _last.radiusX != radiusX || _last.radiusY != radiusY) {
+			// record for next change detect
+			_last.rows = tRows, _last.cols = tCols;
+			_last.radiusX = radiusX, _last.radiusY = radiusY;
 
-		var probe = new Konva.Ellipse({
-			radius : {
-				x : (beam.width() / spotScale.scaleX()) / 2, //(cell.width/2) * .8,
-				y : (beam.height() / spotScale.scaleY()) / 2 //(cell.height/2) * .8
-			},
-			rotation: beam.rotation(),
-			fill: 'rgba(255,0,0,.4)',
-			strokeWidth: 1,
-			stroke: 'red'
-		});
-		
-		Utils.repeatDrawOnGrid(probesLayer, baseGridRect, probe, tRows, tCols);
+			// comment to draw grid only once
+			gridDrawn = false; gridLayer.destroyChildren();
+
+			// draw grid, based on rect
+			if (!gridDrawn)
+			Utils.drawGrid(gridLayer, baseGridRect, tRows, tCols);
+			
+			// clear the probe layer
+			probesLayer.destroyChildren();
+
+			var probe = new Konva.Ellipse({
+				radius : {
+					x : radiusX, 
+					y : radiusY,
+				},
+				rotation: beam.rotation(),
+				fill: 'rgba(255,0,0,.4)',
+				strokeWidth: 1,
+				stroke: 'red'
+			});
+			
+			Utils.repeatDrawOnGrid(probesLayer, baseGridRect, probe, tRows, tCols);
+		}
 	};
 
 	// run once immediately
