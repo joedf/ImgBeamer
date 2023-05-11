@@ -90,6 +90,7 @@ summary {
 #options {
 	opacity: .9;
 	width: fit-content;
+	float: right;
 }
 
 #options-handle {
@@ -100,11 +101,13 @@ summary {
 #options-anchor {
 	display: inline-block;
 	position: fixed;
+	top: 35vh;
 	right: 0.25em;
-	bottom: 5em;
 	z-index: 101;
 	user-select: none;
 	cursor: move;
+	width: 0;
+	height: 0;
 }
 
 #options-full-resample {
