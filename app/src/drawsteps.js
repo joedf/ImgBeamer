@@ -473,7 +473,6 @@ function drawProbeLayout(drawStage, baseImage, spotScale, beam) {
 		imageCopy.y(baseImage.y());
 		imageCopy.scaleX(baseImage.scaleX());
 		imageCopy.scaleY(baseImage.scaleY());
-		imageCopy.draw();
 
 		var tRows = Utils.getRowsInput();
 		var tCols = Utils.getColsInput();
