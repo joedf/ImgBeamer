@@ -1,7 +1,8 @@
 /* globals
  * Utils,
- * G_BOX_SIZE, G_DEBUG, G_AUTO_PREVIEW_LIMIT
- * G_VSEM_PAUSED
+ * G_BOX_SIZE, G_DEBUG, G_AUTO_PREVIEW_LIMIT,
+ * G_VSEM_PAUSED, G_MATH_TOFIXED,
+ * G_GUI_Controller
  */
 
 /* exported
@@ -741,6 +742,7 @@ function drawGroundtruthImage(stage, imageObj, subregionImage, maxSize=G_BOX_SIZ
 			y: unitCoords.y * imageObj.height,
 		};
 
+		// eslint-disable-next-line no-magic-numbers
 		var pxSizeUm = G_GUI_Controller.pixelSize_nm / 1000;
 
 		// scale real physical units as microns

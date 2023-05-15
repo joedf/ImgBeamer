@@ -1,4 +1,4 @@
-/* globals G_DEBUG, NRMSE */
+/* globals G_DEBUG, NRMSE, G_GUI_Controller */
 /* exported GetOptimalBoxWidth */
 
 /**
