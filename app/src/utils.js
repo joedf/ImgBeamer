@@ -709,16 +709,25 @@ const Utils = {
 	 * @param {number} rows The number of rows for the sampling grid
 	 * @param {number} cols The number of columns for the sampling grid
 	 * @param {number} rect The bounds of the sampling grid
+	 * @param {number} rowStart The row to start iterating over.
+	 * @param {number} rowEnd The row at which to stop iterating over.
+	 * @param {number} colStart The column to start iterating over.
+	 * @param {number} colEnd The column at which to stop iterating over.
+	 * @param {boolean} doClear Whether the layer should be cleared before drawing.
+	 * @param {boolean} useLastLayer Whether to use the last (true) or first (false) layer to draw on.
 	 */
-	computeResampledSlow: function(sourceStage, destStage, oImage, probe, rows, cols, rect){
-		var destLayer = destStage.getLayers()[0];
-		destLayer.destroyChildren(); 
+	computeResampledSlow: function(sourceStage, destStage, oImage, probe, rows, cols, rect,
+		rowStart = 0, rowEnd = -1, colStart = 0, colEnd = -1, doClear = true, useLastLayer = false){
+		
+		var layers = destStage.getLayers();
+		var destLayer = layers[0];
+		if (useLastLayer) { destLayer = layers[layers.length-1]; }
+		if (doClear) { destLayer.destroyChildren(); }
 
 		var pImage = oImage.image(),
 		canvas = document.createElement('canvas'),
 		// canvas = document.getElementById('testdemo'),
 		ctx = canvas.getContext('2d');
-
 
 		// get and transform cropped region based on user-sized konva-image for resampling
 		var sx = (sourceStage.x() - oImage.x()) / oImage.scaleX();
@@ -767,10 +776,13 @@ const Utils = {
 		var startX_stage = rect.x(), startY_stage = rect.y();
 		var stepSizeX_stage = rect.width() / cols, stepSizeY_stage = rect.height() / rows;
 
+		if (colEnd < 0) { colEnd = cols; }
+		if (rowEnd < 0) { rowEnd = rows; }
+
 		// interate over X
-		for (let i = 0; i < cols; i++) {
+		for (let i = colStart; i < colEnd; i++) {
 			// interate over Y
-			for (let j = 0; j < rows; j++) {
+			for (let j = rowStart; j < rowEnd; j++) {
 				var cellX = startX + (i * stepSizeX);
 				var cellY = startY + (j * stepSizeY);
 				var cellW = stepSizeX;

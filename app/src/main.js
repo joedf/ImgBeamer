@@ -7,7 +7,13 @@
  drawVirtualSEM
  */
 
-/* exported G_UpdateResampled, G_UpdateVirtualSEMConfig, ResampleFullImage */
+/* exported
+ * G_UpdateResampled,
+ * G_UpdateVirtualSEMConfig,
+ * ResampleFullImage,
+ * G_Update_GroundTruth
+ * G_VSEM_PAUSED
+ */
 
 var G_DEBUG = false;
 
@@ -15,8 +21,9 @@ Konva.autoDrawEnabled = true;
 
 /** The number of cells in the raster grid at which auto-preview stops, for responsiveness */
 // eslint-disable-next-line no-magic-numbers
-var G_AUTO_PREVIEW_LIMIT = Infinity;// 16 * 16;
+var G_AUTO_PREVIEW_LIMIT = 16 * 16;
 
+/** Toggle value to pause the continously draw the Resulting Image / Virtual SEM view */
 var G_VSEM_PAUSED = false;
 
 /** global variable to set the input ground truth image */
@@ -30,7 +37,7 @@ var G_UpdateResampled = null;
 
 /** global reference to update the beam values for the Virtual SEM view */
 var G_UpdateVirtualSEMConfig = null;
-
+/** global reference to update the Groundtruth view */
 var G_Update_GroundTruth = null;
 
 

@@ -1,4 +1,8 @@
-/* globals Utils, G_BOX_SIZE, G_DEBUG */
+/* globals
+ * Utils,
+ * G_BOX_SIZE, G_DEBUG, G_AUTO_PREVIEW_LIMIT
+ * G_VSEM_PAUSED
+ */
 
 /* exported
  * drawSpotProfileEdit, drawSubregionImage, drawSpotContent, drawSpotSignal,
@@ -34,6 +38,7 @@ const KEYCODE_ESC = 27;
 const G_ZOOM_FACTOR_PER_TICK = 1.2;
 
 var G_VirtualSEM_animationFrameRequestId = null;
+var G_SubResampled_animationFrameRequestId = null;
 
 /**
  * Draws an node-editable ellipse shape on the given drawing stage.
@@ -576,11 +581,14 @@ function drawResampled(sourceStage, destStage, originalImage, spotScale, sBeam) 
 
 	var baseGridRect = new Konva.Rect(baseImage.getSelfRect());
 
-	var updateResampledDraw = function(){
-		var rows = Utils.getRowsInput();
-		var cols = Utils.getColsInput();
+	var rows = 0, cols = 0;
+	var probe = null;
 
-		var probe = new Konva.Ellipse({
+	var updateConfigValues = function(){
+		rows = Utils.getRowsInput();
+		cols = Utils.getColsInput();
+
+		probe = new Konva.Ellipse({
 			radius : {
 				x : (beam.width() / spotScale.scaleX()) / 2,
 				y : (beam.height() / spotScale.scaleY()) / 2
@@ -593,16 +601,62 @@ function drawResampled(sourceStage, destStage, originalImage, spotScale, sBeam) 
 		// update it globally, so we can limit zoom in Spot Content, based on this
 		G_BEAMRADIUS_SUBREGION_PX = {x:probe.radiusX()*2, y:probe.radiusY()*2};
 
-		// Utils.computeResampledFast(sourceStage, destStage, baseImage, probe, rows, cols);
-		Utils.computeResampledSlow(sourceStage, destStage, baseImage, probe, rows, cols, baseGridRect);
-
-		destStage.draw();
+		// manage layers to allow for multilayer draw as needed for row-by-row drawing
+		// guarantee at least one layer
+		var layers = destStage.getLayers();
+		if (layers.length < 1) { destStage.add(new Konva.Layer({ listening: false })); }
 	};
+	
+	var currentRow = 0;
+
+	function doUpdate(){
+		var layers = destStage.getLayers();
+
+		if (rows*cols > G_AUTO_PREVIEW_LIMIT) {
+			// do row-by-row draw
+			// otherwise, the app gets unresponsive since a frame may take too long to draw.
+
+			var row = currentRow++;
+
+			if (currentRow >= rows) {
+				currentRow = 0;
+				var layer = new Konva.Layer({ listening: false });
+				destStage.add(layer);
+			}
+	
+			if (layers.length > 2) { layers[0].destroy(); }
+			
+			Utils.computeResampledSlow(sourceStage, destStage, baseImage, probe, rows, cols, baseGridRect
+				,row,row+1,0,-1,false,true);
+		} else {
+			// do frame-by-frame draw
+
+			// ensure we only use one layer
+			// prevents any left over partially draw layers on top coming from the row-by-row draw
+			if (layers.length > 1) {
+				destStage.destroyChildren();
+				destStage.add(new Konva.Layer({ listening: false }));
+			}
+
+			// Utils.computeResampledFast(sourceStage, destStage, baseImage, probe, rows, cols);
+			// Utils.computeResampledSlow(sourceStage, destStage, baseImage, probe, rows, cols, baseGridRect);
+			Utils.computeResampledSlow(sourceStage, destStage, baseImage, probe, rows, cols, baseGridRect
+				,0,-1,0,-1,true,false);
+		}
+
+		// not needed
+		// destStage.draw()
+		
+		G_SubResampled_animationFrameRequestId = requestAnimationFrame(doUpdate);
+	}
 
 	// run once immediately
-	updateResampledDraw();
+	updateConfigValues();
 
-	return updateResampledDraw;
+	cancelAnimationFrame(G_SubResampled_animationFrameRequestId);
+	G_SubResampled_animationFrameRequestId = requestAnimationFrame(doUpdate);
+
+	return updateConfigValues;
 }
 
 /**
@@ -683,8 +737,8 @@ function drawGroundtruthImage(stage, imageObj, subregionImage, maxSize=G_BOX_SIZ
 
 		// scale to original image pixel size
 		var pxImgCoords = {
-			x: unitCoords.x * G_MAIN_IMAGE_OBJ.width,
-			y: unitCoords.y * G_MAIN_IMAGE_OBJ.height,
+			x: unitCoords.x * imageObj.width,
+			y: unitCoords.y * imageObj.height,
 		};
 
 		var pxSizeUm = G_GUI_Controller.pixelSize_nm / 1000;
@@ -696,7 +750,7 @@ function drawGroundtruthImage(stage, imageObj, subregionImage, maxSize=G_BOX_SIZ
 		};
 
 		var sizeFOV = {
-			w: (rect.width() / stage.width()) * G_MAIN_IMAGE_OBJ.width * pxSizeUm,
+			w: (rect.width() / stage.width()) * imageObj.width * pxSizeUm,
 		};
 
 		// display coords & FOV size
@@ -771,9 +825,6 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 		fill: 'red',
 	});
 	layer.add(indicator);
-
-	// global reference, so we can show/hide the indicator
-	G_VirtualSEM_indicator = indicator;
 
 	var context = canvas.getContext('2d');
 	context.imageSmoothingEnabled = false;
