@@ -606,6 +606,8 @@ function drawResampled(sourceStage, destStage, originalImage, spotScale, sBeam) 
 		// guarantee at least one layer
 		var layers = destStage.getLayers();
 		if (layers.length < 1) { destStage.add(new Konva.Layer({ listening: false })); }
+
+		// TODO: display pixel size in physical units and use Utils.formatUnitNm()
 	};
 	
 	var currentRow = 0;
@@ -742,26 +744,28 @@ function drawGroundtruthImage(stage, imageObj, subregionImage, maxSize=G_BOX_SIZ
 			y: unitCoords.y * imageObj.height,
 		};
 
-		// eslint-disable-next-line no-magic-numbers
-		var pxSizeUm = G_GUI_Controller.pixelSize_nm / 1000;
+		var pxSizeNm = G_GUI_Controller.pixelSize_nm;
 
-		// scale real physical units as microns
+		// scale as real physical units
 		var middle = {
-			x: pxImgCoords.x * pxSizeUm,
-			y: pxImgCoords.y * pxSizeUm,
+			x: pxImgCoords.x * pxSizeNm,
+			y: pxImgCoords.y * pxSizeNm,
 		};
+		// get as optimal displayUnit
+		var fmtMiddle = Utils.formatUnitNm(middle.x, middle.y);
 
 		var sizeFOV = {
-			w: (rect.width() / stage.width()) * imageObj.width * pxSizeUm,
+			w: (rect.width() / stage.width()) * imageObj.width * pxSizeNm,
 		};
+		var fmtSizeFOV = Utils.formatUnitNm(sizeFOV.w);
 
 		// display coords & FOV size
 		Utils.updateExtraInfo(stage, '('
-			+ middle.x.toFixed(G_MATH_TOFIXED.SHORT) + ', '
-			+ middle.y.toFixed(G_MATH_TOFIXED.SHORT) + ')'
-			+ ' μm'
-			+ '<br>FOV width: ' + sizeFOV.w.toFixed(G_MATH_TOFIXED.SHORT)
-			+ ' μm'
+			+ fmtMiddle.value.toFixed(G_MATH_TOFIXED.SHORT) + ', '
+			+ fmtMiddle.value2.toFixed(G_MATH_TOFIXED.SHORT) + ')'
+			+ ' ' + fmtMiddle.unit
+			+ '<br>FOV width: ' + fmtSizeFOV.value.toFixed(G_MATH_TOFIXED.SHORT)
+			+ ' ' + fmtSizeFOV.unit
 		);
 	};
 
@@ -835,6 +839,11 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 
 	var superScale = 1;
 
+	// original image size
+	var iw = originalImageObj.naturalWidth, ih = originalImageObj.naturalHeight;
+	// get scale factor for full image size
+	var irw = (iw / stage.width()), irh = (ih / stage.height());
+
 	var updateConfigValues = function(){
 		var ratioX = subregionRectStage.width() / subregionRect.width();
 		var ratioY = subregionRectStage.height() / subregionRect.height();
@@ -874,19 +883,23 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 			currentDrawPass = 0;
 		}
 
-		// display image size / pixel counts
-		Utils.updateExtraInfo(stage, cols + ' x ' + rows);
+		// display image size / pixel counts and the pixel size
+		var fullImgWidthNm = (iw * G_GUI_Controller.pixelSize_nm);
+		var fmtPxSize = Utils.formatUnitNm(
+			fullImgWidthNm / cols,
+			fullImgWidthNm / rows,
+		);
+		var displayUnit = fmtPxSize.unit + "/px";
+		Utils.updateExtraInfo(stage, cols + ' x ' + rows
+			+ ' px<br>' + fmtPxSize.value.toFixed(G_MATH_TOFIXED.SHORT)
+			+ " x " + fmtPxSize.value2.toFixed(G_MATH_TOFIXED.SHORT)
+			+ " " + displayUnit);
 	};
 	updateConfigValues();
 
 	// var colors = ['blue', 'yellow', 'red', 'green', 'cyan', 'pink'];
 	var colors = ['#DDDDDD','#EEEEEE','#CCCCCC','#999999','#666666','#333333','#B6B6B6','#1A1A1A'];
 	var color = colors[Utils.getRandomInt(colors.length)];
-
-	// original image size
-	var iw = originalImageObj.naturalWidth, ih = originalImageObj.naturalHeight;
-	// get scale factor for full image size
-	var irw = (iw / stage.width()), irh = (ih / stage.height());
 
 	var doUpdate = function(){
 		if (!G_VSEM_PAUSED) {

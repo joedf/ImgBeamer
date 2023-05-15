@@ -829,6 +829,30 @@ const Utils = {
 	toRadians: function(angle) { return angle * (Math.PI / 180); },
 
 	/**
+	 * Formats the values given to the appropriate display unit (nm or μm).
+	 * @param {*} value_in_nm a value in nm.
+	 * @param {*} value2_in_nm (optional) a value in nm.
+	 * @returns an object containing the adjusted values and selected unit.
+	 */
+	formatUnitNm: function(value_in_nm, value2_in_nm = 0){
+		/* eslint-disable no-magic-numbers */
+		var out = {
+			value: value_in_nm,
+			value2: value2_in_nm,
+			unit: "nm",
+		};
+
+		if (Math.abs(out.value) > 1000 || Math.abs(out.value2) > 1000) {
+			out.value /= 1000;
+			out.value2 /= 1000;
+			out.unit = "μm";
+		}
+		/* eslint-enable no-magic-numbers */
+
+		return out;
+	},
+
+	/**
 	 * Generate a filename with a timestamp and the given prefix and counter.
 	 * @param {string} prefix the filename prefix
 	 * @param {number} counter a counter that has been incremented elsewhere
