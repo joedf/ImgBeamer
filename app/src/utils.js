@@ -104,6 +104,12 @@ const Utils = {
 	getSpotYInput: function(){ return this.getInputValueInt($('#iSpotY')); },
 	getSpotAngleInput: function(){ return this.getInputValueInt($('#iSpotAngle')); },
 	getGroundtruthImage: function(){ return G_GUI_Controller.groundTruthImg; },
+	getAdvancedMode: function(){
+		if (typeof G_GUI_Controller !== 'undefined' || G_GUI_Controller !== null){
+			return G_GUI_Controller.advancedMode;
+		}
+		return false;
+	},
 
 	/**
 	 * Creates a Zoom event handler to be used on a stage.
