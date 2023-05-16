@@ -37,6 +37,7 @@ summary {
 	font-family: monospace;
 	background: rgba(0,0,0,0.5);
 	padding: 2px 4px;
+	user-select: none;
 }
 
 .box:before { content: attr(box_label); }
@@ -53,14 +54,16 @@ summary {
 
 .box.note_colored::after { color: yellow; }
 
+.vsem_mode,
 .parameterDisplay,
 .magDisplay,
 .metricsDisplay {
 	top: 0;
 	right: 0;
 	text-align: right;
-	user-select: none;
 }
+
+.box > .vsem_mode { cursor: pointer; }
 
 .box > span.parameterDisplay { cursor: pointer; }
 
