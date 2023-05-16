@@ -390,9 +390,6 @@ const Utils = {
 			// not found, so create it
 			eStage.prepend('<span class="infoBox '+className+'"></span>');
 			e = eStage.children('.'+className+':first');
-
-			if (typeof onDblClick == 'function')
-				e.dblclick(onDblClick);
 		}
 
 		// return the non-jquery-wrapped DOM element
@@ -401,6 +398,15 @@ const Utils = {
 		// but return false if not found or unsuccessful
 		if (typeof element == 'undefined')
 			return false;
+
+		// attach the dbclick event handler if one was given
+		// we bind everytime instead of only on-creation to prevent
+		// any issues with stale references in the given handler function.
+		if (typeof onDblClick == 'function') {
+			// ensure we remove all previous dblclick handlers so dont end up
+			// with multiple instances of the handler being triggered...
+			e.unbind('dblclick').on('dblclick', onDblClick);
+		}
 
 		return element;
 	},
