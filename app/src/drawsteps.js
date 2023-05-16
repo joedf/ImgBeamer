@@ -537,28 +537,73 @@ function drawProbeLayout(drawStage, baseImage, spotScale, beam) {
  * @returns an update function to call when a redraw is needed.
  */
 function drawProbeLayoutSampling(drawStage, originalImage, spotScale, sBeam) {
-	var baseImage = originalImage; //.clone();
+	var imageCopy = originalImage.clone();
 	var beam = sBeam; //.clone();
 
-	var baseGridRect = new Konva.Rect(baseImage.getSelfRect());
+	var drawLayer = drawStage.getLayers()[0];
+	drawLayer.destroyChildren(); // avoid memory leaks
+
+	var baseGridRect = new Konva.Rect(imageCopy.getSelfRect());
+
+	// setup "last" values to help optimize for draw performance
+	// similar reason as for drawProbeLayout()
+	var _last = {
+		rows: -1,
+		cols: -1,
+		radiusX: -1,
+		radiusY: -1,
+		rotation: 0,
+	};
 
 	var updateProbeLayoutSampling = function(){
 		var rows = Utils.getRowsInput();
 		var cols = Utils.getColsInput();
 
-		var probe = new Konva.Ellipse({
-			radius : {
-				x : (beam.width() / spotScale.scaleX()) / 2,
-				y : (beam.height() / spotScale.scaleY()) / 2
-			},
-			rotation: beam.rotation(),
-			fill: 'white',
-			listening: false,
-		});
+		var radiusX = (beam.width() / spotScale.scaleX()) / 2;
+		var radiusY = (beam.height() / spotScale.scaleY()) / 2;
 
-		Utils.computeResampledPreview(drawStage, baseImage, probe, rows, cols, baseGridRect);
+		var beamRotation = beam.rotation();
 
-		drawStage.draw();
+		// only redraw as necessary: if the spots would change...
+		if (_last.rows != rows || _last.cols != cols
+		|| _last.radiusX != radiusX || _last.radiusY != radiusY
+		|| _last.rotation != beamRotation)
+		{
+			// record for next change detect
+			_last.rows = rows, _last.cols = cols;
+			_last.radiusX = radiusX, _last.radiusY = radiusY,
+			_last.rotation = beamRotation;
+
+			// clear the layer before we draw
+			drawLayer.destroyChildren();
+
+			var probe = new Konva.Ellipse({
+				radius : {
+					x : radiusX,
+					y : radiusY,
+				},
+				rotation: beamRotation,
+				fill: 'white',
+				listening: false,
+			});
+			
+			//Utils.computeResampledPreview(drawStage, imageCopy, probe, rows, cols, baseGridRect);
+			
+			Utils.repeatDrawOnGrid(drawLayer, baseGridRect, probe, rows, cols);
+			imageCopy.globalCompositeOperation('source-in');
+			drawLayer.add(imageCopy);
+
+			// Not needed
+			// drawStage.draw();
+		}
+		else 
+		{
+			// otherwise only the image needs to updated by size & position
+			imageCopy.x(originalImage.x());
+			imageCopy.y(originalImage.y());
+			imageCopy.scaleX(originalImage.scaleX());
+			imageCopy.scaleY(originalImage.scaleY());
+		}
 	};
 
 	// run once immediately

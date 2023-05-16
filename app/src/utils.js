@@ -613,6 +613,7 @@ const Utils = {
 	 * @param {number} rows The number of rows for the grid
 	 * @param {number} cols The number of columns for the grid
 	 * @param {*} rect The bounds for the grid
+	 * @todo Likely remove it, deprecated and no longer used by anything...
 	 */
 	computeResampledPreview: function(previewStage, image, probe, rows, cols, rect){
 		var previewLayer = previewStage.getLayers()[0];

@@ -109,7 +109,7 @@ function OnImageLoaded(eImg, stages){
 			updateSpotSignal();
 		}
 		updateProbeLayout();
-		updateResamplingSteps(true);
+		updateResamplingSteps();
 		updateGroundtruthMap();
 		updateVirtualSEM_Config();
 
@@ -218,15 +218,7 @@ function OnImageLoaded(eImg, stages){
 		resampledBeam
 	);
 	
-	var updateResamplingSteps = function(internallyCalled=false){
-		var rows = Utils.getRowsInput();
-		var cols = Utils.getColsInput();
-
-		if (internallyCalled && (rows*cols > G_AUTO_PREVIEW_LIMIT)) {
-			console.warn('automatic preview disable for 64+ grid cells.');
-			return;
-		}
-
+	var updateResamplingSteps = function(){
 		updateProbeLayout();
 		if ($(layoutSampledStage.getContainer()).is(':visible')) {
 			updateProbeLayoutSamplingPreview();
