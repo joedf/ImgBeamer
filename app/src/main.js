@@ -12,6 +12,7 @@
  * G_UpdateVirtualSEMConfig,
  * ResampleFullImage,
  * G_Update_GroundTruth
+ * G_AUTO_PREVIEW_LIMIT
  * G_VSEM_PAUSED
  */
 
