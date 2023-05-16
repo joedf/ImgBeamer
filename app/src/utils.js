@@ -104,12 +104,6 @@ const Utils = {
 	getSpotYInput: function(){ return this.getInputValueInt($('#iSpotY')); },
 	getSpotAngleInput: function(){ return this.getInputValueInt($('#iSpotAngle')); },
 	getGroundtruthImage: function(){ return G_GUI_Controller.groundTruthImg; },
-	getAdvancedMode: function(){
-		if (typeof G_GUI_Controller !== 'undefined' || G_GUI_Controller !== null){
-			return G_GUI_Controller.advancedMode;
-		}
-		return false;
-	},
 
 	/**
 	 * Creates a Zoom event handler to be used on a stage.
@@ -322,6 +316,20 @@ const Utils = {
 			// display it
 			element.innerHTML = infoText;
 		}	
+	},
+
+	/** 
+	 * Updates the displayed element to be shown/hidden according
+	 * to the advanced mode setting. Affects all HTML elements with
+	 * the class "advancedMode".
+	 */
+	updateAdvancedMode: function(){
+		var isAdvModeON = false;
+		if (typeof G_GUI_Controller !== 'undefined' || G_GUI_Controller !== null){
+			isAdvModeON = G_GUI_Controller.advancedMode;
+		}
+		
+		$('.advancedMode').toggle(isAdvModeON);
 	},
 
 	/**

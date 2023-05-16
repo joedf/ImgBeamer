@@ -109,7 +109,7 @@
 
 			var gui_do = gui.addFolder('Display Options');
 			gui_do.add(G_GUI_Controller, 'advancedMode').onChange(function(){
-				$('.advancedMode').toggle(G_GUI_Controller.advancedMode);
+				Utils.updateAdvancedMode();
 			});
 			gui_do.add(G_GUI_Controller, 'pause_vSEM').onChange(function(){
 				G_VSEM_PAUSED = G_GUI_Controller.pause_vSEM;

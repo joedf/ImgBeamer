@@ -151,7 +151,7 @@ function OnImageLoaded(eImg, stages){
 
 	// draw Spot Content
 	$(spotContentStage.getContainer())
-		.addClass('advancedMode').toggle(Utils.getAdvancedMode())
+		.addClass('advancedMode')
 		.addClass('grabCursor')
 		.attr('box_label', 'Spot Content')
 		.attr('note', 'Scroll to adjust spot size\nHold [Shift] for half rate');
@@ -180,7 +180,7 @@ function OnImageLoaded(eImg, stages){
 
 	// draw Spot Signal
 	$(spotSignalStage.getContainer())
-		.addClass('advancedMode').toggle(Utils.getAdvancedMode())
+		.addClass('advancedMode')
 		.addClass('note_colored')
 		.attr('box_label', '(Integrated) Spot Signal');
 	var spotSignalBeam = beam.clone();
@@ -195,7 +195,7 @@ function OnImageLoaded(eImg, stages){
 	// draw Sampled Subregion
 	// compute resampled image
 	$(layoutSampledStage.getContainer())
-		.addClass('advancedMode').toggle(Utils.getAdvancedMode())
+		.addClass('advancedMode')
 		.attr('box_label', 'Sampled Subregion');
 	var layoutSampledBeam = beam.clone();
 	var updateProbeLayoutSamplingPreview = drawProbeLayoutSampling(
@@ -289,6 +289,8 @@ function OnImageLoaded(eImg, stages){
 	});
 
 	doUpdate();
+
+	Utils.updateAdvancedMode();
 }
 
 /** Draws the full resample image given the parameters in the GUI and logs
