@@ -115,7 +115,7 @@ function OnImageLoaded(eImg, stages){
 		updateVirtualSEM_Config();
 
 		// update spot/beam info: size, rotation, shape
-		var cellSize = Utils.computeCellSize(probeLayout.image, Utils.getRowsInput(), Utils.getColsInput());
+		var cellSize = Utils.computeCellSize(probeLayout.image);
 		Utils.updateDisplayBeamParams(spotProfileStage, layoutBeam, cellSize, spotScaling, promptForSpotWidth);
 		Utils.updateMagInfo(baseImageStage, subregionImage);
 		Utils.updateImageMetricsInfo(groundtruthMapStage, virtualSEMStage);
@@ -167,7 +167,7 @@ function OnImageLoaded(eImg, stages){
 		var spotScaler = spotScaling;
 		
 		// calculate the new scale for spot-content image, based on the given spot width
-		var cellSize = Utils.computeCellSize(spotScaler, Utils.getRowsInput(), Utils.getColsInput());
+		var cellSize = Utils.computeCellSize(spotScaler);
 		var maxScale = Math.max(beam.scaleX(), beam.scaleY());
 		var eccScaled = beam.scaleX() / maxScale;
 		var newScale = ((beam.width() * eccScaled) / (spotWidth/100)) / cellSize.w;

@@ -273,12 +273,18 @@ const Utils = {
 	/**
 	 * Calculates cell size based on imageRect, rows and cols
 	 * @param {*} image the subregion image object.
-	 * @param {number} rows the number of rows to split the subregion into.
-	 * @param {number} cols the number of columns to split the subregion into.
+	 * @param {number} rows (optional) the number of rows to split the subregion into.
+	 * If not is provided, attempts to get it from gui/input.
+	 * @param {number} cols (optional) the number of columns to split the subregion into.
+	 * If not is provided, attempts to get it from gui/input.
 	 * @returns the size (w,h) of a cell in the raster grid.
 	 */
-	computeCellSize: function(image, rows, cols){
+	computeCellSize: function(image, rows = -1, cols = -1){
 		var subregionRect = image.getSelfRect();
+
+		if (rows <= 0) { rows = this.getRowsInput(); }
+		if (cols <= 0) { cols = this.getColsInput(); }
+
 		var cellSize = {
 			w: subregionRect.width / cols,
 			h: subregionRect.height / rows
