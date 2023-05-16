@@ -13,6 +13,7 @@
 		<script src="src/3rd-party/jquery-3.6.1.min.js"></script>
 		<script src="src/3rd-party/jquery-ui-1.13.2/jquery-ui.min.js"></script>
 		<script src="src/3rd-party/dat.gui/dat.gui.min.js"></script>
+		<script src="src/3rd-party/UTIF.js"></script>
 	</head>
 	<body>
 		<div class="layout" id="main-container"></div>
@@ -169,8 +170,8 @@
 					// clear selection in the combobox for included images
 					G_GUI_Controller.groundTruthImg = '';
 
-					// returns a data base64 url
-					G_INPUT_IMAGE = reader.result;
+					G_INPUT_IMAGE = reader.result; // returns a data base64 url
+					// G_INPUT_IMAGE = URL.createObjectURL(file); // makes a blob:// url
 					$(document.body).trigger('OnGroundtruthImageChange');
 				}
 

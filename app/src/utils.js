@@ -1,4 +1,10 @@
-/* globals G_DEBUG, NRMSE, G_GUI_Controller */
+/* globals
+ G_DEBUG
+ NRMSE
+ G_GUI_Controller
+ UTIF
+ */
+
 /* exported GetOptimalBoxWidth */
 
 /**
@@ -77,11 +83,46 @@ const Utils = {
 	 * Initiates the image resource load with a callback once the image is loaded.
 	 * @param {string} url The url pointing to the image to load.
 	 * @param {function} callback The callback function to call/run once the image is loaded.
+	 * @param {boolean} _allowRetryAsUTIF Used internally to prevent a recursive retry loop with the UTIF decoder.
 	 */
-	loadImage: function(url, callback) {
+	loadImage: function(url, callback, _allowRetryAsUTIF = true) {
 		var imageObj = new Image();
 		imageObj.onload = callback;
+
+		imageObj.onerror = function(e){
+			// eslint-disable-next-line no-magic-numbers
+			if (_allowRetryAsUTIF && e.target.src.substring(0,22) == "data:image/tiff;base64") {
+				console.warn("ERROR: could not load the given TIFF image. Retrying with UTIF decoder.", e);
+				Utils._loadImageUTIF(url, callback);
+			} else {
+				console.error("ERROR: could not load the given image.", e);
+			}
+		};
+		
 		imageObj.src = url;
+	},
+
+	/**
+	 * Used internally by @see {@link Utils.loadImage} to retry loading TIFFs with the
+	 * UTIF.js decoder that otherwise failed with the built-in decoder.
+	 * @param {*} url The image base64 URL/URI.
+	 * @param {*} callback a function to call when image.onload happens.
+	 */
+	_loadImageUTIF: async function(url, callback) {
+		// useful links
+		// https://github.com/photopea/UTIF.js/
+		// https://observablehq.com/@ehouais/decoding-tiff-image-data
+		// https://stackoverflow.com/a/52410044/883015
+
+		// 
+		// let blob = await fetch(url).then(r => r.blob());
+		await fetch(url).then(response => response.blob()) // get the url as a blob
+			.then(blob => blob.arrayBuffer()) // get the data as a array/buffer
+			.then(UTIF.bufferToURI) // decode the data as an RGBA8 image data URI
+			.then(function(decoded_as_rgba8_url){
+				// load the image once again as usual...
+				Utils.loadImage(decoded_as_rgba8_url, callback, false);
+			}); 
 	},
 
 	/**
