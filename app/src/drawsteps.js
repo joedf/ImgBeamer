@@ -633,6 +633,8 @@ function drawResampled(sourceStage, destStage, originalImage, spotScale, sBeam) 
 	var rows = 0, cols = 0;
 	var probe = null;
 
+	var changeCount = 0, lastChange = 0;
+
 	var updateConfigValues = function(){
 		rows = Utils.getRowsInput();
 		cols = Utils.getColsInput();
@@ -656,6 +658,8 @@ function drawResampled(sourceStage, destStage, originalImage, spotScale, sBeam) 
 		if (layers.length < 1) { destStage.add(new Konva.Layer({ listening: false })); }
 
 		// TODO: display pixel size in physical units and use Utils.formatUnitNm()
+
+		changeCount++;
 	};
 	
 	var currentRow = 0;
@@ -667,32 +671,39 @@ function drawResampled(sourceStage, destStage, originalImage, spotScale, sBeam) 
 			// do row-by-row draw
 			// otherwise, the app gets unresponsive since a frame may take too long to draw.
 
-			var row = currentRow++;
+			if (!G_VSEM_PAUSED) {
+				var row = currentRow++;
 
-			if (currentRow >= rows) {
-				currentRow = 0;
-				var layer = new Konva.Layer({ listening: false });
-				destStage.add(layer);
+				if (currentRow >= rows) {
+					currentRow = 0;
+					var layer = new Konva.Layer({ listening: false });
+					destStage.add(layer);
+				}
+		
+				if (layers.length > 2) { layers[0].destroy(); }
+				
+				Utils.computeResampledSlow(sourceStage, destStage, baseImage, probe, rows, cols, baseGridRect
+					,row,row+1,0,-1,false,true);
 			}
-	
-			if (layers.length > 2) { layers[0].destroy(); }
-			
-			Utils.computeResampledSlow(sourceStage, destStage, baseImage, probe, rows, cols, baseGridRect
-				,row,row+1,0,-1,false,true);
 		} else {
 			// do frame-by-frame draw
+			if (changeCount > lastChange) {
+				// reset change counts instead of recording it,
+				// a trick to avoid an integer rollover, yet still functional.
+				lastChange = changeCount = 0;
 
-			// ensure we only use one layer
-			// prevents any left over partially draw layers on top coming from the row-by-row draw
-			if (layers.length > 1) {
-				destStage.destroyChildren();
-				destStage.add(new Konva.Layer({ listening: false }));
+				// ensure we only use one layer
+				// prevents any left over partially draw layers on top coming from the row-by-row draw
+				if (layers.length > 1) {
+					destStage.destroyChildren();
+					destStage.add(new Konva.Layer({ listening: false }));
+				}
+
+				// Utils.computeResampledFast(sourceStage, destStage, baseImage, probe, rows, cols);
+				// Utils.computeResampledSlow(sourceStage, destStage, baseImage, probe, rows, cols, baseGridRect);
+				Utils.computeResampledSlow(sourceStage, destStage, baseImage, probe, rows, cols, baseGridRect
+					,0,-1,0,-1,true,false);
 			}
-
-			// Utils.computeResampledFast(sourceStage, destStage, baseImage, probe, rows, cols);
-			// Utils.computeResampledSlow(sourceStage, destStage, baseImage, probe, rows, cols, baseGridRect);
-			Utils.computeResampledSlow(sourceStage, destStage, baseImage, probe, rows, cols, baseGridRect
-				,0,-1,0,-1,true,false);
 		}
 
 		// not needed
