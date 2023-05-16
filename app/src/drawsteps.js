@@ -485,13 +485,17 @@ function drawProbeLayout(drawStage, baseImage, spotScale, beam) {
 
 		var radiusX = (beam.width() / spotScale.scaleX()) / 2; //(cell.width/2) * .8
 		var radiusY = (beam.height() / spotScale.scaleY()) / 2; //(cell.height/2) * .8
+
+		var beamRotation = beam.rotation();
 		
 		// only redraw grid lines and spot outlines if they would change
 		if (_last.rows != tRows || _last.cols != tCols
-		|| _last.radiusX != radiusX || _last.radiusY != radiusY) {
+		|| _last.radiusX != radiusX || _last.radiusY != radiusY
+		|| _last.rotation != beamRotation){
 			// record for next change detect
 			_last.rows = tRows, _last.cols = tCols;
-			_last.radiusX = radiusX, _last.radiusY = radiusY;
+			_last.radiusX = radiusX, _last.radiusY = radiusY,
+			_last.rotation = beamRotation;
 
 			// comment to draw grid only once
 			gridDrawn = false; gridLayer.destroyChildren();
@@ -508,7 +512,7 @@ function drawProbeLayout(drawStage, baseImage, spotScale, beam) {
 					x : radiusX, 
 					y : radiusY,
 				},
-				rotation: beam.rotation(),
+				rotation: beamRotation,
 				fill: 'rgba(255,0,0,.4)',
 				strokeWidth: 1,
 				stroke: 'red'
@@ -567,8 +571,7 @@ function drawProbeLayoutSampling(drawStage, originalImage, spotScale, sBeam) {
 		// only redraw as necessary: if the spots would change...
 		if (_last.rows != rows || _last.cols != cols
 		|| _last.radiusX != radiusX || _last.radiusY != radiusY
-		|| _last.rotation != beamRotation)
-		{
+		|| _last.rotation != beamRotation){
 			// record for next change detect
 			_last.rows = rows, _last.cols = cols;
 			_last.radiusX = radiusX, _last.radiusY = radiusY,
