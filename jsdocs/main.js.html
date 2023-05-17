@@ -78,7 +78,14 @@
  drawVirtualSEM
  */
 
-/* exported G_UpdateResampled, G_UpdateVirtualSEMConfig, ResampleFullImage */
+/* exported
+ * G_UpdateResampled,
+ * G_UpdateVirtualSEMConfig,
+ * ResampleFullImage,
+ * G_Update_GroundTruth
+ * G_AUTO_PREVIEW_LIMIT
+ * G_VSEM_PAUSED
+ */
 
 var G_DEBUG = false;
 
@@ -88,9 +95,12 @@ Konva.autoDrawEnabled = true;
 // eslint-disable-next-line no-magic-numbers
 var G_AUTO_PREVIEW_LIMIT = 16 * 16;
 
+/** Toggle value to pause the continously draw the Resulting Image / Virtual SEM view */
+var G_VSEM_PAUSED = false;
 
 /** global variable to set the input ground truth image */
-var G_INPUT_IMAGE = Utils.getGroundtruthImage();
+// var G_INPUT_IMAGE = Utils.getGroundtruthImage();
+var G_INPUT_IMAGE = 'src/testimages/grains2tl.png';
 
 /** global reference to update the resampling steps (spot layout,
  * sampled subregion, resulting subregion) displays,
@@ -99,6 +109,8 @@ var G_UpdateResampled = null;
 
 /** global reference to update the beam values for the Virtual SEM view */
 var G_UpdateVirtualSEMConfig = null;
+/** global reference to update the Groundtruth view */
+var G_Update_GroundTruth = null;
 
 
 /** a global reference to the main body container that holds the boxes/stages.
@@ -165,17 +177,20 @@ function OnImageLoaded(eImg, stages){
 
 	/** called when a change occurs in the spot profile, subregion, or spot content */
 	function doUpdate(){
-		updateSpotSignal();
+		if ($(spotSignalStage.getContainer()).is(':visible')) {
+			updateSpotSignal();
+		}
 		updateProbeLayout();
-		updateResamplingSteps(true);
+		updateResamplingSteps();
 		updateGroundtruthMap();
 		updateVirtualSEM_Config();
 
 		// update spot/beam info: size, rotation, shape
-		var cellSize = Utils.computeCellSize(probeLayout.image, Utils.getRowsInput(), Utils.getColsInput());
-		Utils.updateDisplayBeamParams(spotProfileStage, layoutBeam, cellSize, userScaledImage, promptForSpotWidth);
+		var cellSize = Utils.computeCellSize(subregionImage);
+		Utils.updateDisplayBeamParams(spotProfileStage, layoutBeam, cellSize, spotScaling, promptForSpotWidth);
 		Utils.updateMagInfo(baseImageStage, subregionImage);
 		Utils.updateImageMetricsInfo(groundtruthMapStage, virtualSEMStage);
+		Utils.updateSubregionPixelSize(resampledStage, subregionImage, eImg);
 	}
 
 	/** prompts the user for the spot width % */
@@ -191,13 +206,15 @@ function OnImageLoaded(eImg, stages){
 		.attr('box_label', 'Spot Profile')
 		.attr('note', 'Press [R] to reset shape')
 		.css('border-color', 'red');
-	var beam = drawSpotProfileEdit(spotProfileStage);
+	var _spotProfileInfo = drawSpotProfileEdit(spotProfileStage, doUpdate);
+	var beam = _spotProfileInfo.beam;
+	var spotScaling = _spotProfileInfo.spotSize;
 
 	// Subregion View
 	// draw base image (can pan &amp; zoom)
 	$(baseImageStage.getContainer())
 		.addClass('grabCursor')
-		.attr('box_label', 'Subregion/ROI View')
+		.attr('box_label', 'Subregion View / FOV')
 		.attr('note', 'Pan &amp; Zoom: Drag and Scroll\nPress [R] to reset')
 		.css('border-color', 'blue');
 	var subregionImage = drawSubregionImage(baseImageStage, eImg, G_BOX_SIZE, false, doUpdate);
@@ -207,27 +224,27 @@ function OnImageLoaded(eImg, stages){
 
 	// draw Spot Content
 	$(spotContentStage.getContainer())
+		.addClass('advancedMode')
 		.addClass('grabCursor')
 		.attr('box_label', 'Spot Content')
 		.attr('note', 'Scroll to adjust spot size\nHold [Shift] for half rate');
 	var spotContentBeam = beam.clone();
-	var userScaledImage = drawSpotContent(spotContentStage, image, spotContentBeam, doUpdate);
+	drawSpotContent(spotContentStage, image, spotContentBeam, doUpdate);
 
 	/**(temporary) publicly exposed function to set the spot width
 	 * @param {number} spotWidth the spot width in percent (%), ex. use 130 for 130%.
 	 * @todo move into separate file if possible */
 	function Utils_SetSpotWidth(spotWidth=100){
 		var beam = spotContentBeam;
-		var userImage = userScaledImage;
+		var spotScaler = spotScaling;
 		
 		// calculate the new scale for spot-content image, based on the given spot width
-		var cellSize = Utils.computeCellSize(userImage, Utils.getRowsInput(), Utils.getColsInput());
+		var cellSize = Utils.computeCellSize(spotScaler);
 		var maxScale = Math.max(beam.scaleX(), beam.scaleY());
 		var eccScaled = beam.scaleX() / maxScale;
 		var newScale = ((beam.width() * eccScaled) / (spotWidth/100)) / cellSize.w;
 
-		// userImage.scale({x: newScale, y: newScale});
-		Utils.centeredScale(userImage, newScale);
+		Utils.centeredScale(spotScaler, newScale);
 
 		// propagate changes and update stages
 		updateBeams();
@@ -236,25 +253,27 @@ function OnImageLoaded(eImg, stages){
 
 	// draw Spot Signal
 	$(spotSignalStage.getContainer())
+		.addClass('advancedMode')
 		.addClass('note_colored')
-		.attr('box_label', 'Spot Signal');
+		.attr('box_label', '(Integrated) Spot Signal');
 	var spotSignalBeam = beam.clone();
 	var updateSpotSignal = drawSpotSignal(spotContentStage, spotSignalStage, spotSignalBeam);
 
 	// draw Spot Layout
 	$(probeLayoutStage.getContainer()).attr('box_label', 'Spot Layout');
 	var layoutBeam = beam.clone();
-	var probeLayout = drawProbeLayout(probeLayoutStage, subregionImage, userScaledImage, layoutBeam);
-	var updateProbeLayout = probeLayout.updateCallback;
+	var updateProbeLayout = drawProbeLayout(probeLayoutStage, subregionImage, spotScaling, layoutBeam);
 	
 	// draw Sampled Subregion
 	// compute resampled image
-	$(layoutSampledStage.getContainer()).attr('box_label', 'Sampled Subregion');
+	$(layoutSampledStage.getContainer())
+		.addClass('advancedMode')
+		.attr('box_label', 'Sampled Subregion');
 	var layoutSampledBeam = beam.clone();
 	var updateProbeLayoutSamplingPreview = drawProbeLayoutSampling(
 		layoutSampledStage,
-		probeLayout.image,
-		userScaledImage,
+		subregionImage,
+		spotScaling,
 		layoutSampledBeam
 	);
 
@@ -266,22 +285,21 @@ function OnImageLoaded(eImg, stages){
 	var updateResampled = drawResampled(
 		layoutSampledStage,
 		resampledStage,
-		probeLayout.image,
-		userScaledImage,
+		subregionImage,
+		spotScaling,
 		resampledBeam
 	);
-	
-	var updateResamplingSteps = function(internallyCalled){
-		var rows = Utils.getRowsInput();
-		var cols = Utils.getColsInput();
 
-		if (internallyCalled &amp;&amp; (rows*cols > G_AUTO_PREVIEW_LIMIT)) {
-			console.warn('automatic preview disable for 64+ grid cells.');
-			return;
+	var updateResamplingSteps = function(){
+		updateProbeLayout();
+		if ($(layoutSampledStage.getContainer()).is(':visible')) {
+			updateProbeLayoutSamplingPreview();
+		}
+		if ($(resampledStage.getContainer()).is(':visible')) {
+			updateResampled();
 		}
 
-		updateProbeLayoutSamplingPreview();
-		updateResampled();
+		Utils.updateVSEM_ModeWarning(resampledStage);
 	};
 	G_UpdateResampled = updateResamplingSteps;
 
@@ -289,6 +307,7 @@ function OnImageLoaded(eImg, stages){
 	$(groundtruthMapStage.getContainer()).attr('box_label', 'Sample Ground Truth');
 	var groundtruthMap = drawGroundtruthImage(groundtruthMapStage, eImg, subregionImage, G_BOX_SIZE);
 	var updateGroundtruthMap = groundtruthMap.updateFunc;
+	G_Update_GroundTruth = updateGroundtruthMap;
 	
 	// draw Resulting Image
 	$(virtualSEMStage.getContainer()).attr('box_label', 'Resulting Image');
@@ -299,7 +318,7 @@ function OnImageLoaded(eImg, stages){
 		groundtruthMap.subregionRect,
 		groundtruthMapStage,
 		eImg,
-		userScaledImage
+		spotScaling
 	);
 	G_UpdateVirtualSEMConfig = updateVirtualSEM_Config;
 
@@ -336,6 +355,8 @@ function OnImageLoaded(eImg, stages){
 	});
 
 	doUpdate();
+
+	Utils.updateAdvancedMode();
 }
 
 /** Draws the full resample image given the parameters in the GUI and logs
@@ -463,13 +484,13 @@ function ResampleFullImage() {
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="G_MATH_TOFIXED.html">G_MATH_TOFIXED</a></li><li><a href="NRMSE.html">NRMSE</a></li><li><a href="Utils.html">Utils</a></li></ul><h3>Global</h3><ul><li><a href="global.html#G_AUTO_PREVIEW_LIMIT">G_AUTO_PREVIEW_LIMIT</a></li><li><a href="global.html#G_BOX_SIZE">G_BOX_SIZE</a></li><li><a href="global.html#G_INPUT_IMAGE">G_INPUT_IMAGE</a></li><li><a href="global.html#G_MAIN_CONTAINER">G_MAIN_CONTAINER</a></li><li><a href="global.html#G_MAIN_IMAGE_OBJ">G_MAIN_IMAGE_OBJ</a></li><li><a href="global.html#G_UpdateResampled">G_UpdateResampled</a></li><li><a href="global.html#G_UpdateVirtualSEMConfig">G_UpdateVirtualSEMConfig</a></li><li><a href="global.html#GetOptimalBoxWidth">GetOptimalBoxWidth</a></li><li><a href="global.html#OnImageLoaded">OnImageLoaded</a></li><li><a href="global.html#ResampleFullImage">ResampleFullImage</a></li><li><a href="global.html#UpdateBaseImage">UpdateBaseImage</a></li><li><a href="global.html#drawGroundtruthImage">drawGroundtruthImage</a></li><li><a href="global.html#drawProbeLayout">drawProbeLayout</a></li><li><a href="global.html#drawProbeLayoutSampling">drawProbeLayoutSampling</a></li><li><a href="global.html#drawResampled">drawResampled</a></li><li><a href="global.html#drawSpotContent">drawSpotContent</a></li><li><a href="global.html#drawSpotProfileEdit">drawSpotProfileEdit</a></li><li><a href="global.html#drawSpotSignal">drawSpotSignal</a></li><li><a href="global.html#drawSubregionImage">drawSubregionImage</a></li><li><a href="global.html#drawVirtualSEM">drawVirtualSEM</a></li><li><a href="global.html#nStages">nStages</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="G_MATH_TOFIXED.html">G_MATH_TOFIXED</a></li><li><a href="NRMSE.html">NRMSE</a></li><li><a href="Utils.html">Utils</a></li></ul><h3>Global</h3><ul><li><a href="global.html#G_AUTO_PREVIEW_LIMIT">G_AUTO_PREVIEW_LIMIT</a></li><li><a href="global.html#G_BOX_SIZE">G_BOX_SIZE</a></li><li><a href="global.html#G_INPUT_IMAGE">G_INPUT_IMAGE</a></li><li><a href="global.html#G_MAIN_CONTAINER">G_MAIN_CONTAINER</a></li><li><a href="global.html#G_MAIN_IMAGE_OBJ">G_MAIN_IMAGE_OBJ</a></li><li><a href="global.html#G_UpdateResampled">G_UpdateResampled</a></li><li><a href="global.html#G_UpdateVirtualSEMConfig">G_UpdateVirtualSEMConfig</a></li><li><a href="global.html#G_Update_GroundTruth">G_Update_GroundTruth</a></li><li><a href="global.html#G_VSEM_PAUSED">G_VSEM_PAUSED</a></li><li><a href="global.html#GetOptimalBoxWidth">GetOptimalBoxWidth</a></li><li><a href="global.html#OnImageLoaded">OnImageLoaded</a></li><li><a href="global.html#ResampleFullImage">ResampleFullImage</a></li><li><a href="global.html#UpdateBaseImage">UpdateBaseImage</a></li><li><a href="global.html#drawGroundtruthImage">drawGroundtruthImage</a></li><li><a href="global.html#drawProbeLayout">drawProbeLayout</a></li><li><a href="global.html#drawProbeLayoutSampling">drawProbeLayoutSampling</a></li><li><a href="global.html#drawResampled">drawResampled</a></li><li><a href="global.html#drawSpotContent">drawSpotContent</a></li><li><a href="global.html#drawSpotProfileEdit">drawSpotProfileEdit</a></li><li><a href="global.html#drawSpotSignal">drawSpotSignal</a></li><li><a href="global.html#drawSubregionImage">drawSubregionImage</a></li><li><a href="global.html#drawVirtualSEM">drawVirtualSEM</a></li><li><a href="global.html#nStages">nStages</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Tue Apr 25 2023 21:00:10 GMT-0400 (Eastern Daylight Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Wed May 17 2023 11:26:39 GMT-0400 (Eastern Daylight Time)
 </footer>
 
 <a id="backtotop" href="#"><div>&uarr; Top</div></a>

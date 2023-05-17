@@ -18,7 +18,7 @@ Simple demo tool of the image formation[<sup>1</sup>](#references) process used 
 9. Resulting Image (full, "virtual SEM")
  
 ### Screenshot
-![screenshot](misc/screenshot3.png)
+![screenshot](misc/screenshot4.png)
 
 ### Notes
 - Minor pixel value differences in virtualSEM; improved, but could be due to sampling from downsized sampling of the larger full image
