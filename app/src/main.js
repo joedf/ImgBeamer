@@ -115,10 +115,11 @@ function OnImageLoaded(eImg, stages){
 		updateVirtualSEM_Config();
 
 		// update spot/beam info: size, rotation, shape
-		var cellSize = Utils.computeCellSize(probeLayout.image);
+		var cellSize = Utils.computeCellSize(subregionImage);
 		Utils.updateDisplayBeamParams(spotProfileStage, layoutBeam, cellSize, spotScaling, promptForSpotWidth);
 		Utils.updateMagInfo(baseImageStage, subregionImage);
 		Utils.updateImageMetricsInfo(groundtruthMapStage, virtualSEMStage);
+		Utils.updateSubregionPixelSize(resampledStage, subregionImage, eImg);
 	}
 
 	/** prompts the user for the spot width % */
@@ -190,8 +191,7 @@ function OnImageLoaded(eImg, stages){
 	// draw Spot Layout
 	$(probeLayoutStage.getContainer()).attr('box_label', 'Spot Layout');
 	var layoutBeam = beam.clone();
-	var probeLayout = drawProbeLayout(probeLayoutStage, subregionImage, spotScaling, layoutBeam);
-	var updateProbeLayout = probeLayout.updateCallback;
+	var updateProbeLayout = drawProbeLayout(probeLayoutStage, subregionImage, spotScaling, layoutBeam);
 	
 	// draw Sampled Subregion
 	// compute resampled image
@@ -201,7 +201,7 @@ function OnImageLoaded(eImg, stages){
 	var layoutSampledBeam = beam.clone();
 	var updateProbeLayoutSamplingPreview = drawProbeLayoutSampling(
 		layoutSampledStage,
-		probeLayout.image,
+		subregionImage,
 		spotScaling,
 		layoutSampledBeam
 	);
@@ -214,7 +214,7 @@ function OnImageLoaded(eImg, stages){
 	var updateResampled = drawResampled(
 		layoutSampledStage,
 		resampledStage,
-		probeLayout.image,
+		subregionImage,
 		spotScaling,
 		resampledBeam
 	);

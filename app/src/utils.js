@@ -353,6 +353,36 @@ const Utils = {
 		}
 	},
 
+	updateSubregionPixelSize: function(destStage, subregionImage, imageObj){
+		var rows = Utils.getRowsInput(), cols = Utils.getColsInput();
+
+		var rect = {
+			w: subregionImage.width() / subregionImage.scaleX(),
+			h: subregionImage.height() / subregionImage.scaleY(),
+		};
+
+		// TODO: maybe get the ground truth image stage for the size info instead,
+		// we are likely "cheating" here because all stages share the same size
+		// in the current design...
+		var gt_stage_size = destStage.size();
+
+		var pxSizeNm = Utils.getPixelSizeNmInput();
+		var pxSize = {
+			w: ((rect.w / gt_stage_size.width) * (imageObj.width * pxSizeNm)) / cols,
+			h: ((rect.h / gt_stage_size.height) * (imageObj.height * pxSizeNm)) / rows,
+		};
+
+		// get optimal / formated unit
+		var fmtPxSize = Utils.formatUnitNm(pxSize.w, pxSize.h);
+
+		// display coords & FOV size
+		Utils.updateExtraInfo(destStage,
+			fmtPxSize.value.toFixed(G_MATH_TOFIXED.SHORT) + ' x '
+			+ fmtPxSize.value2.toFixed(G_MATH_TOFIXED.SHORT)
+			+ ' ' + fmtPxSize.unit + '/px'
+		);
+	},
+
 	/**
 	 * Displays and updates additional info on the given stage
 	 * @param {*} destStage The stage to display info on.

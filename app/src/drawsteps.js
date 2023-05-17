@@ -422,8 +422,7 @@ function drawSpotSignal(sourceStage, destStage, sBeam) {
  * @param {*} baseImage The subregion image to draw with (cloned).
  * @param {*} spotScale an object to query for the spot scale X/Y.
  * @param {*} beam the beam/spot shape to draw with (cloned and scaled).
- * @returns an object with an update function to call when a redraw is needed,
- * 	and a reference to the subregion image drawn.
+ * @returns an update function to call when a redraw is needed.
  */
 function drawProbeLayout(drawStage, baseImage, spotScale, beam) {
 	// draws probe layout
@@ -524,11 +523,7 @@ function drawProbeLayout(drawStage, baseImage, spotScale, beam) {
 	// run once immediately
 	updateProbeLayout();
 
-	// TODO: do we really to forward the image here???
-	return {
-		updateCallback: updateProbeLayout,
-		image: imageCopy
-	};
+	return updateProbeLayout;
 }
 
 /**
