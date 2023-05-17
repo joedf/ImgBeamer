@@ -1,8 +1,7 @@
 /* globals
  * Utils,
  * G_BOX_SIZE, G_DEBUG, G_AUTO_PREVIEW_LIMIT,
- * G_VSEM_PAUSED, G_MATH_TOFIXED,
- * G_GUI_Controller
+ * G_VSEM_PAUSED, G_MATH_TOFIXED
  */
 
 /* exported
@@ -803,7 +802,7 @@ function drawGroundtruthImage(stage, imageObj, subregionImage, maxSize=G_BOX_SIZ
 			y: unitCoords.y * imageObj.height,
 		};
 
-		var pxSizeNm = G_GUI_Controller.pixelSize_nm;
+		var pxSizeNm = Utils.getPixelSizeNmInput();
 
 		// scale as real physical units
 		var middle = {
@@ -943,7 +942,7 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 		}
 
 		// display image size / pixel counts and the pixel size
-		var fullImgWidthNm = (iw * G_GUI_Controller.pixelSize_nm);
+		var fullImgWidthNm = iw * Utils.getPixelSizeNmInput();
 		var fmtPxSize = Utils.formatUnitNm(
 			fullImgWidthNm / cols,
 			fullImgWidthNm / rows,
