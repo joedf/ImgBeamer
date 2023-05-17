@@ -3,6 +3,7 @@
  NRMSE
  G_GUI_Controller
  UTIF
+ G_AUTO_PREVIEW_LIMIT
  */
 
 /* exported GetOptimalBoxWidth */
@@ -364,6 +365,44 @@ const Utils = {
 			// display it
 			element.innerHTML = infoText;
 		}	
+	},
+
+	/**
+	 * Conditionally displays a small warning icon if it meets the G_AUTO_PREVIEW_LIMIT.
+	 * This icon can be hovered or double-clicked to obtain
+	 * a message explaining the drawing is done row-by-row instead of frame-by-frame
+	 * for performance / responsiveness.
+	 * @param {*} stage The stage to display it on.
+	 * @todo Currently, only used for the Subregion resampled stage, could be used elsewhere?
+	 */
+	updateVSEM_ModeWarning: function(stage) {
+		// add Row-by-row / vSEM mode warning
+		var vSEM_note = $(stage.getContainer()).find('.vsem_mode').first();
+		var alreadyAdded = vSEM_note.length > 0;
+
+		// check if we should create it and add the UI element
+		if (!alreadyAdded) {
+			vSEM_note = Utils.ensureInfoBox(stage, 'vsem_mode',
+				function(){
+					alert($(this).attr('title'));
+				}
+			);
+			if (vSEM_note) {
+				// warn icon from GitHub's octicons (https://github.com/primer/octicons)
+				// eslint-disable-next-line max-len
+				const warnIcon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16"><path fill="#FFFF00" d="M6.457 1.047c.659-1.234 2.427-1.234 3.086 0l6.082 11.378A1.75 1.75 0 0 1 14.082 15H1.918a1.75 1.75 0 0 1-1.543-2.575Zm1.763.707a.25.25 0 0 0-.44 0L1.698 13.132a.25.25 0 0 0 .22.368h12.164a.25.25 0 0 0 .22-.368Zm.53 3.996v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 11a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"></path></svg>';
+				vSEM_note.innerHTML = warnIcon;
+				vSEM_note.title = "For higher pixel counts, the drawing is done "
+					+ "row-by-row instead of frame-by-frame "
+					+ "for improved performance / responsiveness.";
+				$(vSEM_note).hide();
+			}
+		}
+
+		// check if we should show/hide it
+		var rows = Utils.getRowsInput(), cols = Utils.getColsInput();
+		var showWarnVSEM = (rows*cols > G_AUTO_PREVIEW_LIMIT);
+		$(vSEM_note).toggle(showWarnVSEM);
 	},
 
 	/** 
