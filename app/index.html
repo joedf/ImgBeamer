@@ -12,60 +12,21 @@
 		<script src="src/3rd-party/konva/konva.js"></script>
 		<script src="src/3rd-party/jquery-3.6.1.min.js"></script>
 		<script src="src/3rd-party/jquery-ui-1.13.2/jquery-ui.min.js"></script>
+		<script src="src/3rd-party/dat.gui/dat.gui.min.js"></script>
+		<script src="src/3rd-party/UTIF.js"></script>
 	</head>
 	<body>
 		<div class="layout" id="main-container"></div>
 
 		<div id="options-anchor">
 			<div id="options">
-				<details open>
-					<summary>Configuration Panel</summary>
-					<table>
-						<tr>
-							<td>Rows</td>
-							<td><input type="number" id="iRows" placeholder="8"></td>
-						</tr>
-						<tr>
-							<td>Columns</td>
-							<td><input type="number" id="iCols" placeholder="8"></td>
-						</tr>
-						<tr>
-							<td></td>
-							<td>
-								<button id="btn_updateViews">Update views</button>
-								<svg id="loadspinner" class="load_spinner_svg"
-									style="display:none"
-									xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid" viewBox="0 0 16 16">
-									<circle fill="none" stroke="#00d8ff" stroke-dasharray="28.274333882308138 11.42477796076938" cx="8" cy="8" r="6" stroke-width="2">
-									<animateTransform attributeName="transform" type="rotate" repeatCount="indefinite" keyTimes="0;1" values="0 8 8;360 8 8" dur="1s"></animateTransform>
-									</circle>
-								</svg>
-							</td>
-						</tr>
-						<tr>
-							<td>Ground Truth Image</td>
-							<td>
-								<select id="sb_groundtruthImage" name="sb_groundtruthImage" title="Ground Truth Image">
-									<option value="src/testimages/grains1.png">grains1.png</option>
-									<option value="src/testimages/grains1b.png">grains1b.png</option>
-									<option value="src/testimages/grains1c.png">grains1c.png</option>
-									<option value="src/testimages/grains2.png">grains2.png</option>
-									<option value="src/testimages/grains2c.png">grains2c.png</option>
-									<option value="src/testimages/grains2tl.png" selected>grains2tl.png</option>
-									<option value="src/testimages/grains2nc.png">grains2nc.png</option>
-								</select>
-							</td>
-						</tr>
-						<tr>
-							<td></td>
-							<td><input type="file" id="_fileImgInput" accept="image/*" /></td>
-						</tr>
-						<tr>
-							<td><button id="exportPNG">Export ...</button></td>
-						</tr>
-					</table>
-				</details>
+				<div id="options-handle">&#9776;</div>
+				<input type="file" id="_fileImgInput" accept="image/*" style="display: none;" />
+			</div>
+		</div>
 
+		<div id="options-full-resample-anchor">
+			<div id="options-full-resample">
 				<details>
 					<summary>Full Resample Panel</summary>
 					<table>
@@ -110,18 +71,6 @@
 						</tr>
 					</table>
 				</details>
-				
-				<details id="links2readBox" style="display:none">
-					<summary style="cursor: pointer; user-select: none;">References or people to look at...</summary>
-					<ul>
-						<li><a href="https://www.physik.hu-berlin.de/en/sem/software/software_qstem">sem/software/software_qstem</a></li>
-						<li><a href="https://scialli.utk.edu/david-joy-retires/">david-joy-retires</a></li>
-						<li><a href="https://sunypoly.edu/faculty-and-staff/eric-lifshin.html">eric-lifshin.html</a></li>
-						<li><a href="https://www.nist.gov/people/andras-e-vladar">andras-e-vladar</a></li>
-						<li><a href="https://www.nist.gov/publications/assessing-scanning-electron-microscopy-stereophotogrammetry-algorithms-virtual-test">algorithms-virtual-test</a></li>
-						<li><a href="https://codepen.io/joedf/pen/VwxmXOx?editors=1010">PixiJS.Composite.Operation.Test.01</a></li>
-					</ul>
-				</details>
 			</div>
 		</div>
 
@@ -131,43 +80,73 @@
 		<script src="src/main.js"></script>
 
 		<script>
-			if (G_DEBUG) {
-				$('#links2readBox').show();
-			}
-
-			$("#options").draggable();
-
-			var stageFinal = stages[stages.length - 1];
-
-			var doGenerateSubRegion = function(e){
-				$('#loadspinner').show();
-				
-				G_UpdateVirtualSEMConfig();
-				
-				setTimeout(function(){
-					G_UpdateResampled(false);
-					$('#loadspinner').hide();
-				}, 250);
+			const gui = new dat.GUI({autoPlace: false});
+			var G_GUI_Controller = new function() {
+				this.pixelCountX = 8;
+				this.pixelCountY = 8;
+				this.digitalMag = "1.00x";
+				this.advancedMode = false;
+				this.updateViews = function(){
+					G_UpdateVirtualSEMConfig();
+					G_UpdateResampled();
+					G_Update_GroundTruth();
+				};
+				this.groundTruthImg = 'grains2tl.png';
+				this.pause_vSEM = G_VSEM_PAUSED;
+				this.exportResultImg = function(){ exportResultImage(); };
+				this.importImage = function(){
+					// getInputImage();
+					$('#_fileImgInput').click();
+				};
+				this.pixelSize_nm = 500; // nm/px default;
 			};
+			
+			var gui_ip = gui.addFolder('Imaging Parameters');
+			gui_ip.add(G_GUI_Controller, 'pixelCountX', 1, 64, 1).onChange(G_GUI_Controller.updateViews);
+			gui_ip.add(G_GUI_Controller, 'pixelCountY', 1, 64, 1).onChange(G_GUI_Controller.updateViews);
+			gui_ip.add(G_GUI_Controller, 'digitalMag').listen();
+			gui_ip.add(G_GUI_Controller, 'pixelSize_nm', 1, 1000, 1).onChange(G_GUI_Controller.updateViews);
+			gui_ip.open();
 
-			$('#iRows, #iCols, #iDelaySEM').keypress(function(e){
-				if ( e.which == 13 ) {
-					e.preventDefault();
-					doGenerateSubRegion();
+			var gui_do = gui.addFolder('Display Options');
+			gui_do.add(G_GUI_Controller, 'advancedMode').onChange(function(){
+				Utils.updateAdvancedMode();
+			});
+			gui_do.add(G_GUI_Controller, 'pause_vSEM').onChange(function(){
+				G_VSEM_PAUSED = G_GUI_Controller.pause_vSEM;
+			});
+			// gui.add(G_GUI_Controller, 'updateViews');
+
+			var gui_io = gui.addFolder('Input / Export Image');
+			gui_io.add(G_GUI_Controller, 'groundTruthImg', [
+				'grains1.png',
+				'grains1b.png',
+				'grains1c.png',
+				'grains2.png',
+				'grains2c.png',
+				'grains2tl.png',
+				'grains2nc.png',
+			]).listen().onChange(function(){
+				var fname = Utils.getGroundtruthImage();
+				if (fname.length > 0) {
+					G_INPUT_IMAGE = 'src/testimages/' + fname;
+					console.log("Ground Truth Image changed to: "+G_INPUT_IMAGE);
+					$(document.body).trigger('OnGroundtruthImageChange');
 				}
 			});
+			gui_io.add(G_GUI_Controller, 'importImage');
+			gui_io.add(G_GUI_Controller, 'exportResultImg');
+			gui_io.open();
 
-			$('#sb_groundtruthImage').on('change', function(e){
-				G_INPUT_IMAGE = Utils.getGroundtruthImage();
-				console.log("Ground Truth Image changed to: "+G_INPUT_IMAGE);
-				$(document.body).trigger('OnGroundtruthImageChange');
+			$("#options").append(gui.domElement).draggable({
+				// containment: 'body',
+				handle: '#options-handle',
 			});
-
-			$('#btn_updateViews').click(doGenerateSubRegion);
 
 			// used to auto-name the export files with a counter
 			var G_Export_img_count = 0;
-			$('#exportPNG').click(function(e){
+			var stageFinal = stages[stages.length - 1];
+			function exportResultImage(){
 				// Export image as file download
 				// https://konvajs.org/docs/data_and_serialization/High-Quality-Export.html
 
@@ -178,7 +157,7 @@
 				var url = finalImage.toDataURL({pixelRatio:2});
 				var filename = Utils.GetSuggestedFileName("result_image",++G_Export_img_count);
 				Utils.downloadURI(url, filename);
-			});
+			}
 
 			$('#_fileImgInput').change(function(e){
 				// https://stackoverflow.com/a/34840295/883015
@@ -189,10 +168,10 @@
 					console.log("Ground Truth Image changed to: "+file.name);
 
 					// clear selection in the combobox for included images
-					$('#sb_groundtruthImage').val('')
+					G_GUI_Controller.groundTruthImg = '';
 
-					// returns a data base64 url
-					G_INPUT_IMAGE = reader.result;
+					G_INPUT_IMAGE = reader.result; // returns a data base64 url
+					// G_INPUT_IMAGE = URL.createObjectURL(file); // makes a blob:// url
 					$(document.body).trigger('OnGroundtruthImageChange');
 				}
 
@@ -202,28 +181,6 @@
 					console.log('Imported image selection cleared.');
 					// preview.src = "";
 				}
-			});
-
-			// used to auto-name the export files with a counter
-			var G_Export_img_count = 0;
-			$('#exportPNG').click(function(e){
-				// Export image as file download
-				// https://konvajs.org/docs/data_and_serialization/High-Quality-Export.html
-				
-				// hide the indicator if possible
-				if (G_VirtualSEM_indicator != null)
-					G_VirtualSEM_indicator.hide();
-
-				// export the image
-				var url = stageFinal.toDataURL({pixelRatio:2});
-				var datestamp = new Date().toISOString().slice(0, 10).replaceAll('-','.');
-				var counter = String(++G_Export_img_count).padStart(3,'0');
-				var filename = "result_image-"+datestamp+"-"+counter+".png";
-				downloadURI(url, filename);
-				
-				// restore the indicator
-				if (G_VirtualSEM_indicator != null)
-					G_VirtualSEM_indicator.show();
 			});
 
 			$('#generateFull').click(function(e){

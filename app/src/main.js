@@ -7,7 +7,14 @@
  drawVirtualSEM
  */
 
-/* exported G_UpdateResampled, G_UpdateVirtualSEMConfig, ResampleFullImage */
+/* exported
+ * G_UpdateResampled,
+ * G_UpdateVirtualSEMConfig,
+ * ResampleFullImage,
+ * G_Update_GroundTruth
+ * G_AUTO_PREVIEW_LIMIT
+ * G_VSEM_PAUSED
+ */
 
 var G_DEBUG = false;
 
@@ -17,9 +24,12 @@ Konva.autoDrawEnabled = true;
 // eslint-disable-next-line no-magic-numbers
 var G_AUTO_PREVIEW_LIMIT = 16 * 16;
 
+/** Toggle value to pause the continously draw the Resulting Image / Virtual SEM view */
+var G_VSEM_PAUSED = false;
 
 /** global variable to set the input ground truth image */
-var G_INPUT_IMAGE = Utils.getGroundtruthImage();
+// var G_INPUT_IMAGE = Utils.getGroundtruthImage();
+var G_INPUT_IMAGE = 'src/testimages/grains2tl.png';
 
 /** global reference to update the resampling steps (spot layout,
  * sampled subregion, resulting subregion) displays,
@@ -28,6 +38,8 @@ var G_UpdateResampled = null;
 
 /** global reference to update the beam values for the Virtual SEM view */
 var G_UpdateVirtualSEMConfig = null;
+/** global reference to update the Groundtruth view */
+var G_Update_GroundTruth = null;
 
 
 /** a global reference to the main body container that holds the boxes/stages.
@@ -94,17 +106,20 @@ function OnImageLoaded(eImg, stages){
 
 	/** called when a change occurs in the spot profile, subregion, or spot content */
 	function doUpdate(){
-		updateSpotSignal();
+		if ($(spotSignalStage.getContainer()).is(':visible')) {
+			updateSpotSignal();
+		}
 		updateProbeLayout();
-		updateResamplingSteps(true);
+		updateResamplingSteps();
 		updateGroundtruthMap();
 		updateVirtualSEM_Config();
 
 		// update spot/beam info: size, rotation, shape
-		var cellSize = Utils.computeCellSize(probeLayout.image, Utils.getRowsInput(), Utils.getColsInput());
+		var cellSize = Utils.computeCellSize(subregionImage);
 		Utils.updateDisplayBeamParams(spotProfileStage, layoutBeam, cellSize, spotScaling, promptForSpotWidth);
 		Utils.updateMagInfo(baseImageStage, subregionImage);
 		Utils.updateImageMetricsInfo(groundtruthMapStage, virtualSEMStage);
+		Utils.updateSubregionPixelSize(resampledStage, subregionImage, eImg);
 	}
 
 	/** prompts the user for the spot width % */
@@ -128,7 +143,7 @@ function OnImageLoaded(eImg, stages){
 	// draw base image (can pan & zoom)
 	$(baseImageStage.getContainer())
 		.addClass('grabCursor')
-		.attr('box_label', 'Subregion/ROI View')
+		.attr('box_label', 'Subregion View / FOV')
 		.attr('note', 'Pan & Zoom: Drag and Scroll\nPress [R] to reset')
 		.css('border-color', 'blue');
 	var subregionImage = drawSubregionImage(baseImageStage, eImg, G_BOX_SIZE, false, doUpdate);
@@ -138,6 +153,7 @@ function OnImageLoaded(eImg, stages){
 
 	// draw Spot Content
 	$(spotContentStage.getContainer())
+		.addClass('advancedMode')
 		.addClass('grabCursor')
 		.attr('box_label', 'Spot Content')
 		.attr('note', 'Scroll to adjust spot size\nHold [Shift] for half rate');
@@ -152,7 +168,7 @@ function OnImageLoaded(eImg, stages){
 		var spotScaler = spotScaling;
 		
 		// calculate the new scale for spot-content image, based on the given spot width
-		var cellSize = Utils.computeCellSize(spotScaler, Utils.getRowsInput(), Utils.getColsInput());
+		var cellSize = Utils.computeCellSize(spotScaler);
 		var maxScale = Math.max(beam.scaleX(), beam.scaleY());
 		var eccScaled = beam.scaleX() / maxScale;
 		var newScale = ((beam.width() * eccScaled) / (spotWidth/100)) / cellSize.w;
@@ -166,6 +182,7 @@ function OnImageLoaded(eImg, stages){
 
 	// draw Spot Signal
 	$(spotSignalStage.getContainer())
+		.addClass('advancedMode')
 		.addClass('note_colored')
 		.attr('box_label', '(Integrated) Spot Signal');
 	var spotSignalBeam = beam.clone();
@@ -174,16 +191,17 @@ function OnImageLoaded(eImg, stages){
 	// draw Spot Layout
 	$(probeLayoutStage.getContainer()).attr('box_label', 'Spot Layout');
 	var layoutBeam = beam.clone();
-	var probeLayout = drawProbeLayout(probeLayoutStage, subregionImage, spotScaling, layoutBeam);
-	var updateProbeLayout = probeLayout.updateCallback;
+	var updateProbeLayout = drawProbeLayout(probeLayoutStage, subregionImage, spotScaling, layoutBeam);
 	
 	// draw Sampled Subregion
 	// compute resampled image
-	$(layoutSampledStage.getContainer()).attr('box_label', 'Sampled Subregion');
+	$(layoutSampledStage.getContainer())
+		.addClass('advancedMode')
+		.attr('box_label', 'Sampled Subregion');
 	var layoutSampledBeam = beam.clone();
 	var updateProbeLayoutSamplingPreview = drawProbeLayoutSampling(
 		layoutSampledStage,
-		probeLayout.image,
+		subregionImage,
 		spotScaling,
 		layoutSampledBeam
 	);
@@ -196,22 +214,21 @@ function OnImageLoaded(eImg, stages){
 	var updateResampled = drawResampled(
 		layoutSampledStage,
 		resampledStage,
-		probeLayout.image,
+		subregionImage,
 		spotScaling,
 		resampledBeam
 	);
-	
-	var updateResamplingSteps = function(internallyCalled){
-		var rows = Utils.getRowsInput();
-		var cols = Utils.getColsInput();
 
-		if (internallyCalled && (rows*cols > G_AUTO_PREVIEW_LIMIT)) {
-			console.warn('automatic preview disable for 64+ grid cells.');
-			return;
+	var updateResamplingSteps = function(){
+		updateProbeLayout();
+		if ($(layoutSampledStage.getContainer()).is(':visible')) {
+			updateProbeLayoutSamplingPreview();
+		}
+		if ($(resampledStage.getContainer()).is(':visible')) {
+			updateResampled();
 		}
 
-		updateProbeLayoutSamplingPreview();
-		updateResampled();
+		Utils.updateVSEM_ModeWarning(resampledStage);
 	};
 	G_UpdateResampled = updateResamplingSteps;
 
@@ -219,6 +236,7 @@ function OnImageLoaded(eImg, stages){
 	$(groundtruthMapStage.getContainer()).attr('box_label', 'Sample Ground Truth');
 	var groundtruthMap = drawGroundtruthImage(groundtruthMapStage, eImg, subregionImage, G_BOX_SIZE);
 	var updateGroundtruthMap = groundtruthMap.updateFunc;
+	G_Update_GroundTruth = updateGroundtruthMap;
 	
 	// draw Resulting Image
 	$(virtualSEMStage.getContainer()).attr('box_label', 'Resulting Image');
@@ -266,6 +284,8 @@ function OnImageLoaded(eImg, stages){
 	});
 
 	doUpdate();
+
+	Utils.updateAdvancedMode();
 }
 
 /** Draws the full resample image given the parameters in the GUI and logs

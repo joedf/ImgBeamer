@@ -1,4 +1,11 @@
-/* globals G_DEBUG, NRMSE */
+/* globals
+ G_DEBUG
+ NRMSE
+ G_GUI_Controller
+ UTIF
+ G_AUTO_PREVIEW_LIMIT
+ */
+
 /* exported GetOptimalBoxWidth */
 
 /**
@@ -77,11 +84,46 @@ const Utils = {
 	 * Initiates the image resource load with a callback once the image is loaded.
 	 * @param {string} url The url pointing to the image to load.
 	 * @param {function} callback The callback function to call/run once the image is loaded.
+	 * @param {boolean} _allowRetryAsUTIF Used internally to prevent a recursive retry loop with the UTIF decoder.
 	 */
-	loadImage: function(url, callback) {
+	loadImage: function(url, callback, _allowRetryAsUTIF = true) {
 		var imageObj = new Image();
 		imageObj.onload = callback;
+
+		imageObj.onerror = function(e){
+			// eslint-disable-next-line no-magic-numbers
+			if (_allowRetryAsUTIF && e.target.src.substring(0,22) == "data:image/tiff;base64") {
+				console.warn("ERROR: could not load the given TIFF image. Retrying with UTIF decoder.", e);
+				Utils._loadImageUTIF(url, callback);
+			} else {
+				console.error("ERROR: could not load the given image.", e);
+			}
+		};
+		
 		imageObj.src = url;
+	},
+
+	/**
+	 * Used internally by @see {@link Utils.loadImage} to retry loading TIFFs with the
+	 * UTIF.js decoder that otherwise failed with the built-in decoder.
+	 * @param {*} url The image base64 URL/URI.
+	 * @param {*} callback a function to call when image.onload happens.
+	 */
+	_loadImageUTIF: async function(url, callback) {
+		// useful links
+		// https://github.com/photopea/UTIF.js/
+		// https://observablehq.com/@ehouais/decoding-tiff-image-data
+		// https://stackoverflow.com/a/52410044/883015
+
+		// 
+		// let blob = await fetch(url).then(r => r.blob());
+		await fetch(url).then(response => response.blob()) // get the url as a blob
+			.then(blob => blob.arrayBuffer()) // get the data as a array/buffer
+			.then(UTIF.bufferToURI) // decode the data as an RGBA8 image data URI
+			.then(function(decoded_as_rgba8_url){
+				// load the image once again as usual...
+				Utils.loadImage(decoded_as_rgba8_url, callback, false);
+			}); 
 	},
 
 	/**
@@ -96,14 +138,15 @@ const Utils = {
 		return rawValue;
 	},
 
-	getRowsInput: function(){ return this.getInputValueInt($('#iRows')); },
-	getColsInput: function(){ return this.getInputValueInt($('#iCols')); },
+	getRowsInput: function(){ return G_GUI_Controller.pixelCountY; },
+	getColsInput: function(){ return G_GUI_Controller.pixelCountX; },
 	getCellWInput: function(){ return this.getInputValueInt($('#iCellW')); },
 	getCellHInput: function(){ return this.getInputValueInt($('#iCellH')); },
 	getSpotXInput: function(){ return this.getInputValueInt($('#iSpotX')); },
 	getSpotYInput: function(){ return this.getInputValueInt($('#iSpotY')); },
 	getSpotAngleInput: function(){ return this.getInputValueInt($('#iSpotAngle')); },
-	getGroundtruthImage: function(){ return $('#sb_groundtruthImage').val(); },
+	getGroundtruthImage: function(){ return G_GUI_Controller.groundTruthImg; },
+	getPixelSizeNmInput: function(){ return G_GUI_Controller.pixelSize_nm; },
 
 	/**
 	 * Creates a Zoom event handler to be used on a stage.
@@ -232,12 +275,18 @@ const Utils = {
 	/**
 	 * Calculates cell size based on imageRect, rows and cols
 	 * @param {*} image the subregion image object.
-	 * @param {number} rows the number of rows to split the subregion into.
-	 * @param {number} cols the number of columns to split the subregion into.
+	 * @param {number} rows (optional) the number of rows to split the subregion into.
+	 * If not is provided, attempts to get it from gui/input.
+	 * @param {number} cols (optional) the number of columns to split the subregion into.
+	 * If not is provided, attempts to get it from gui/input.
 	 * @returns the size (w,h) of a cell in the raster grid.
 	 */
-	computeCellSize: function(image, rows, cols){
+	computeCellSize: function(image, rows = -1, cols = -1){
 		var subregionRect = image.getSelfRect();
+
+		if (rows <= 0) { rows = this.getRowsInput(); }
+		if (cols <= 0) { cols = this.getColsInput(); }
+
 		var cellSize = {
 			w: subregionRect.width / cols,
 			h: subregionRect.height / rows
@@ -271,6 +320,7 @@ const Utils = {
 
 			// display it
 			element.innerHTML = fmtMag;
+			G_GUI_Controller.digitalMag = fmtMag;
 		}
 	},
 
@@ -303,6 +353,102 @@ const Utils = {
 		}
 	},
 
+	updateSubregionPixelSize: function(destStage, subregionImage, imageObj){
+		var rows = Utils.getRowsInput(), cols = Utils.getColsInput();
+
+		var rect = {
+			w: subregionImage.width() / subregionImage.scaleX(),
+			h: subregionImage.height() / subregionImage.scaleY(),
+		};
+
+		// TODO: maybe get the ground truth image stage for the size info instead,
+		// we are likely "cheating" here because all stages share the same size
+		// in the current design...
+		var gt_stage_size = destStage.size();
+
+		var pxSizeNm = Utils.getPixelSizeNmInput();
+		var pxSize = {
+			w: ((rect.w / gt_stage_size.width) * (imageObj.width * pxSizeNm)) / cols,
+			h: ((rect.h / gt_stage_size.height) * (imageObj.height * pxSizeNm)) / rows,
+		};
+
+		// get optimal / formated unit
+		var fmtPxSize = Utils.formatUnitNm(pxSize.w, pxSize.h);
+
+		// display coords & FOV size
+		Utils.updateExtraInfo(destStage,
+			fmtPxSize.value.toFixed(G_MATH_TOFIXED.SHORT) + ' x '
+			+ fmtPxSize.value2.toFixed(G_MATH_TOFIXED.SHORT)
+			+ ' ' + fmtPxSize.unit + '/px'
+		);
+	},
+
+	/**
+	 * Displays and updates additional info on the given stage
+	 * @param {*} destStage The stage to display info on.
+	 * @param {string} infoText Text to display.
+	 */
+	updateExtraInfo: function(destStage, infoText) {
+		const infoclass = "extraInfoDisplay";
+		var element = this.ensureInfoBox(destStage, infoclass);
+		if (element) {
+			// display it
+			element.innerHTML = infoText;
+		}	
+	},
+
+	/**
+	 * Conditionally displays a small warning icon if it meets the G_AUTO_PREVIEW_LIMIT.
+	 * This icon can be hovered or double-clicked to obtain
+	 * a message explaining the drawing is done row-by-row instead of frame-by-frame
+	 * for performance / responsiveness.
+	 * @param {*} stage The stage to display it on.
+	 * @todo Currently, only used for the Subregion resampled stage, could be used elsewhere?
+	 */
+	updateVSEM_ModeWarning: function(stage) {
+		// add Row-by-row / vSEM mode warning
+		var vSEM_note = $(stage.getContainer()).find('.vsem_mode').first();
+		var alreadyAdded = vSEM_note.length > 0;
+
+		// check if we should create it and add the UI element
+		if (!alreadyAdded) {
+			vSEM_note = Utils.ensureInfoBox(stage, 'vsem_mode',
+				function(){
+					alert($(this).attr('title'));
+				}
+			);
+			if (vSEM_note) {
+				// warn icon from GitHub's octicons (https://github.com/primer/octicons)
+				// eslint-disable-next-line max-len
+				const warnIcon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16"><path fill="#FFFF00" d="M6.457 1.047c.659-1.234 2.427-1.234 3.086 0l6.082 11.378A1.75 1.75 0 0 1 14.082 15H1.918a1.75 1.75 0 0 1-1.543-2.575Zm1.763.707a.25.25 0 0 0-.44 0L1.698 13.132a.25.25 0 0 0 .22.368h12.164a.25.25 0 0 0 .22-.368Zm.53 3.996v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 11a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"></path></svg>';
+				vSEM_note.innerHTML = warnIcon;
+				vSEM_note.title = "For higher pixel counts, the drawing is done "
+					+ "row-by-row instead of frame-by-frame "
+					+ "for improved performance / responsiveness.";
+				$(vSEM_note).hide();
+			}
+		}
+
+		// check if we should show/hide it
+		var rows = Utils.getRowsInput(), cols = Utils.getColsInput();
+		var showWarnVSEM = (rows*cols > G_AUTO_PREVIEW_LIMIT);
+		$(vSEM_note).toggle(showWarnVSEM);
+	},
+
+	/** 
+	 * Updates the displayed element to be shown/hidden according
+	 * to the advanced mode setting. Affects all HTML elements with
+	 * the class "advancedMode".
+	 */
+	updateAdvancedMode: function(){
+		var isAdvModeON = false;
+		if (typeof G_GUI_Controller !== 'undefined' || G_GUI_Controller !== null){
+			isAdvModeON = G_GUI_Controller.advancedMode;
+		}
+		
+		$('.advancedMode').toggle(isAdvModeON);
+	},
+
 	/**
 	 * Gets or creates an info-box element on the given stage.
 	 * @param {*} stage The stage on which display/have the info-box.
@@ -320,9 +466,6 @@ const Utils = {
 			// not found, so create it
 			eStage.prepend('<span class="infoBox '+className+'"></span>');
 			e = eStage.children('.'+className+':first');
-
-			if (typeof onDblClick == 'function')
-				e.dblclick(onDblClick);
 		}
 
 		// return the non-jquery-wrapped DOM element
@@ -331,6 +474,15 @@ const Utils = {
 		// but return false if not found or unsuccessful
 		if (typeof element == 'undefined')
 			return false;
+
+		// attach the dbclick event handler if one was given
+		// we bind everytime instead of only on-creation to prevent
+		// any issues with stale references in the given handler function.
+		if (typeof onDblClick == 'function') {
+			// ensure we remove all previous dblclick handlers so dont end up
+			// with multiple instances of the handler being triggered...
+			e.unbind('dblclick').on('dblclick', onDblClick);
+		}
 
 		return element;
 	},
@@ -584,6 +736,7 @@ const Utils = {
 	 * @param {number} rows The number of rows for the grid
 	 * @param {number} cols The number of columns for the grid
 	 * @param {*} rect The bounds for the grid
+	 * @todo Likely remove it, deprecated and no longer used by anything...
 	 */
 	computeResampledPreview: function(previewStage, image, probe, rows, cols, rect){
 		var previewLayer = previewStage.getLayers()[0];
@@ -694,16 +847,25 @@ const Utils = {
 	 * @param {number} rows The number of rows for the sampling grid
 	 * @param {number} cols The number of columns for the sampling grid
 	 * @param {number} rect The bounds of the sampling grid
+	 * @param {number} rowStart The row to start iterating over.
+	 * @param {number} rowEnd The row at which to stop iterating over.
+	 * @param {number} colStart The column to start iterating over.
+	 * @param {number} colEnd The column at which to stop iterating over.
+	 * @param {boolean} doClear Whether the layer should be cleared before drawing.
+	 * @param {boolean} useLastLayer Whether to use the last (true) or first (false) layer to draw on.
 	 */
-	computeResampledSlow: function(sourceStage, destStage, oImage, probe, rows, cols, rect){
-		var destLayer = destStage.getLayers()[0];
-		destLayer.destroyChildren(); 
+	computeResampledSlow: function(sourceStage, destStage, oImage, probe, rows, cols, rect,
+		rowStart = 0, rowEnd = -1, colStart = 0, colEnd = -1, doClear = true, useLastLayer = false){
+		
+		var layers = destStage.getLayers();
+		var destLayer = layers[0];
+		if (useLastLayer) { destLayer = layers[layers.length-1]; }
+		if (doClear) { destLayer.destroyChildren(); }
 
 		var pImage = oImage.image(),
 		canvas = document.createElement('canvas'),
 		// canvas = document.getElementById('testdemo'),
 		ctx = canvas.getContext('2d');
-
 
 		// get and transform cropped region based on user-sized konva-image for resampling
 		var sx = (sourceStage.x() - oImage.x()) / oImage.scaleX();
@@ -752,10 +914,13 @@ const Utils = {
 		var startX_stage = rect.x(), startY_stage = rect.y();
 		var stepSizeX_stage = rect.width() / cols, stepSizeY_stage = rect.height() / rows;
 
+		if (colEnd < 0) { colEnd = cols; }
+		if (rowEnd < 0) { rowEnd = rows; }
+
 		// interate over X
-		for (let i = 0; i < cols; i++) {
+		for (let i = colStart; i < colEnd; i++) {
 			// interate over Y
-			for (let j = 0; j < rows; j++) {
+			for (let j = rowStart; j < rowEnd; j++) {
 				var cellX = startX + (i * stepSizeX);
 				var cellY = startY + (j * stepSizeY);
 				var cellW = stepSizeX;
@@ -800,6 +965,30 @@ const Utils = {
 	 * @returns the angle in radians
 	 */
 	toRadians: function(angle) { return angle * (Math.PI / 180); },
+
+	/**
+	 * Formats the values given to the appropriate display unit (nm or μm).
+	 * @param {*} value_in_nm a value in nm.
+	 * @param {*} value2_in_nm (optional) a value in nm.
+	 * @returns an object containing the adjusted values and selected unit.
+	 */
+	formatUnitNm: function(value_in_nm, value2_in_nm = 0){
+		/* eslint-disable no-magic-numbers */
+		var out = {
+			value: value_in_nm,
+			value2: value2_in_nm,
+			unit: "nm",
+		};
+
+		if (Math.abs(out.value) > 1000 || Math.abs(out.value2) > 1000) {
+			out.value /= 1000;
+			out.value2 /= 1000;
+			out.unit = "μm";
+		}
+		/* eslint-enable no-magic-numbers */
+
+		return out;
+	},
 
 	/**
 	 * Generate a filename with a timestamp and the given prefix and counter.

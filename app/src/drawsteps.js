@@ -1,4 +1,8 @@
-/* globals Utils, G_BOX_SIZE, G_DEBUG */
+/* globals
+ * Utils,
+ * G_BOX_SIZE, G_DEBUG, G_AUTO_PREVIEW_LIMIT,
+ * G_VSEM_PAUSED, G_MATH_TOFIXED
+ */
 
 /* exported
  * drawSpotProfileEdit, drawSubregionImage, drawSpotContent, drawSpotSignal,
@@ -34,6 +38,7 @@ const KEYCODE_ESC = 27;
 const G_ZOOM_FACTOR_PER_TICK = 1.2;
 
 var G_VirtualSEM_animationFrameRequestId = null;
+var G_SubResampled_animationFrameRequestId = null;
 
 /**
  * Draws an node-editable ellipse shape on the given drawing stage.
@@ -417,8 +422,7 @@ function drawSpotSignal(sourceStage, destStage, sBeam) {
  * @param {*} baseImage The subregion image to draw with (cloned).
  * @param {*} spotScale an object to query for the spot scale X/Y.
  * @param {*} beam the beam/spot shape to draw with (cloned and scaled).
- * @returns an object with an update function to call when a redraw is needed,
- * 	and a reference to the subregion image drawn.
+ * @returns an update function to call when a redraw is needed.
  */
 function drawProbeLayout(drawStage, baseImage, spotScale, beam) {
 	// draws probe layout
@@ -432,6 +436,17 @@ function drawProbeLayout(drawStage, baseImage, spotScale, beam) {
 
 	baseLayer.add(imageCopy);
 	baseLayer.draw();
+
+	// setup "last" values to help optimize for draw performance
+	// no need to redraw the grid lines and spot outlines if the
+	// no. rows, columns, spot radii, or rotation didn't change...
+	var _last = {
+		rows: -1,
+		cols: -1,
+		radiusX: -1,
+		radiusY: -1,
+		rotation: 0,
+	};
 
 	var updateProbeLayout = function(){
 		// get the over-layer, create if not already added
@@ -462,43 +477,53 @@ function drawProbeLayout(drawStage, baseImage, spotScale, beam) {
 		imageCopy.y(baseImage.y());
 		imageCopy.scaleX(baseImage.scaleX());
 		imageCopy.scaleY(baseImage.scaleY());
-		imageCopy.draw();
 
 		var tRows = Utils.getRowsInput();
 		var tCols = Utils.getColsInput();
-		
-		// uncomment to draw grid only once
-		gridDrawn = false; gridLayer.destroyChildren();
 
-		// draw grid, based on rect
-		if (!gridDrawn)
-		Utils.drawGrid(gridLayer, baseGridRect, tRows, tCols);
-		
-		// clear the probe layer
-		probesLayer.destroyChildren();
+		var radiusX = (beam.width() / spotScale.scaleX()) / 2; //(cell.width/2) * .8
+		var radiusY = (beam.height() / spotScale.scaleY()) / 2; //(cell.height/2) * .8
 
-		var probe = new Konva.Ellipse({
-			radius : {
-				x : (beam.width() / spotScale.scaleX()) / 2, //(cell.width/2) * .8,
-				y : (beam.height() / spotScale.scaleY()) / 2 //(cell.height/2) * .8
-			},
-			rotation: beam.rotation(),
-			fill: 'rgba(255,0,0,.4)',
-			strokeWidth: 1,
-			stroke: 'red'
-		});
+		var beamRotation = beam.rotation();
 		
-		Utils.repeatDrawOnGrid(probesLayer, baseGridRect, probe, tRows, tCols);
+		// only redraw grid lines and spot outlines if they would change
+		if (_last.rows != tRows || _last.cols != tCols
+		|| _last.radiusX != radiusX || _last.radiusY != radiusY
+		|| _last.rotation != beamRotation){
+			// record for next change detect
+			_last.rows = tRows, _last.cols = tCols;
+			_last.radiusX = radiusX, _last.radiusY = radiusY,
+			_last.rotation = beamRotation;
+
+			// comment to draw grid only once
+			gridDrawn = false; gridLayer.destroyChildren();
+
+			// draw grid, based on rect
+			if (!gridDrawn)
+			Utils.drawGrid(gridLayer, baseGridRect, tRows, tCols);
+			
+			// clear the probe layer
+			probesLayer.destroyChildren();
+
+			var probe = new Konva.Ellipse({
+				radius : {
+					x : radiusX, 
+					y : radiusY,
+				},
+				rotation: beamRotation,
+				fill: 'rgba(255,0,0,.4)',
+				strokeWidth: 1,
+				stroke: 'red'
+			});
+			
+			Utils.repeatDrawOnGrid(probesLayer, baseGridRect, probe, tRows, tCols);
+		}
 	};
 
 	// run once immediately
 	updateProbeLayout();
 
-	// TODO: do we really to forward the image here???
-	return {
-		updateCallback: updateProbeLayout,
-		image: imageCopy
-	};
+	return updateProbeLayout;
 }
 
 /**
@@ -510,28 +535,72 @@ function drawProbeLayout(drawStage, baseImage, spotScale, beam) {
  * @returns an update function to call when a redraw is needed.
  */
 function drawProbeLayoutSampling(drawStage, originalImage, spotScale, sBeam) {
-	var baseImage = originalImage; //.clone();
+	var imageCopy = originalImage.clone();
 	var beam = sBeam; //.clone();
 
-	var baseGridRect = new Konva.Rect(baseImage.getSelfRect());
+	var drawLayer = drawStage.getLayers()[0];
+	drawLayer.destroyChildren(); // avoid memory leaks
+
+	var baseGridRect = new Konva.Rect(imageCopy.getSelfRect());
+
+	// setup "last" values to help optimize for draw performance
+	// similar reason as for drawProbeLayout()
+	var _last = {
+		rows: -1,
+		cols: -1,
+		radiusX: -1,
+		radiusY: -1,
+		rotation: 0,
+	};
 
 	var updateProbeLayoutSampling = function(){
 		var rows = Utils.getRowsInput();
 		var cols = Utils.getColsInput();
 
-		var probe = new Konva.Ellipse({
-			radius : {
-				x : (beam.width() / spotScale.scaleX()) / 2,
-				y : (beam.height() / spotScale.scaleY()) / 2
-			},
-			rotation: beam.rotation(),
-			fill: 'white',
-			listening: false,
-		});
+		var radiusX = (beam.width() / spotScale.scaleX()) / 2;
+		var radiusY = (beam.height() / spotScale.scaleY()) / 2;
 
-		Utils.computeResampledPreview(drawStage, baseImage, probe, rows, cols, baseGridRect);
+		var beamRotation = beam.rotation();
 
-		drawStage.draw();
+		// only redraw as necessary: if the spots would change...
+		if (_last.rows != rows || _last.cols != cols
+		|| _last.radiusX != radiusX || _last.radiusY != radiusY
+		|| _last.rotation != beamRotation){
+			// record for next change detect
+			_last.rows = rows, _last.cols = cols;
+			_last.radiusX = radiusX, _last.radiusY = radiusY,
+			_last.rotation = beamRotation;
+
+			// clear the layer before we draw
+			drawLayer.destroyChildren();
+
+			var probe = new Konva.Ellipse({
+				radius : {
+					x : radiusX,
+					y : radiusY,
+				},
+				rotation: beamRotation,
+				fill: 'white',
+				listening: false,
+			});
+			
+			//Utils.computeResampledPreview(drawStage, imageCopy, probe, rows, cols, baseGridRect);
+			
+			Utils.repeatDrawOnGrid(drawLayer, baseGridRect, probe, rows, cols);
+			imageCopy.globalCompositeOperation('source-in');
+			drawLayer.add(imageCopy);
+
+			// Not needed
+			// drawStage.draw();
+		}
+		else 
+		{
+			// otherwise only the image needs to updated by size & position
+			imageCopy.x(originalImage.x());
+			imageCopy.y(originalImage.y());
+			imageCopy.scaleX(originalImage.scaleX());
+			imageCopy.scaleY(originalImage.scaleY());
+		}
 	};
 
 	// run once immediately
@@ -555,11 +624,16 @@ function drawResampled(sourceStage, destStage, originalImage, spotScale, sBeam) 
 
 	var baseGridRect = new Konva.Rect(baseImage.getSelfRect());
 
-	var updateResampledDraw = function(){
-		var rows = Utils.getRowsInput();
-		var cols = Utils.getColsInput();
+	var rows = 0, cols = 0;
+	var probe = null;
 
-		var probe = new Konva.Ellipse({
+	var changeCount = 0, lastChange = 0;
+
+	var updateConfigValues = function(){
+		rows = Utils.getRowsInput();
+		cols = Utils.getColsInput();
+
+		probe = new Konva.Ellipse({
 			radius : {
 				x : (beam.width() / spotScale.scaleX()) / 2,
 				y : (beam.height() / spotScale.scaleY()) / 2
@@ -572,16 +646,73 @@ function drawResampled(sourceStage, destStage, originalImage, spotScale, sBeam) 
 		// update it globally, so we can limit zoom in Spot Content, based on this
 		G_BEAMRADIUS_SUBREGION_PX = {x:probe.radiusX()*2, y:probe.radiusY()*2};
 
-		// Utils.computeResampledFast(sourceStage, destStage, baseImage, probe, rows, cols);
-		Utils.computeResampledSlow(sourceStage, destStage, baseImage, probe, rows, cols, baseGridRect);
+		// manage layers to allow for multilayer draw as needed for row-by-row drawing
+		// guarantee at least one layer
+		var layers = destStage.getLayers();
+		if (layers.length < 1) { destStage.add(new Konva.Layer({ listening: false })); }
 
-		destStage.draw();
+		// TODO: display pixel size in physical units and use Utils.formatUnitNm()
+
+		changeCount++;
 	};
+	
+	var currentRow = 0;
+
+	function doUpdate(){
+		var layers = destStage.getLayers();
+
+		if (rows*cols > G_AUTO_PREVIEW_LIMIT) {
+			// do row-by-row draw
+			// otherwise, the app gets unresponsive since a frame may take too long to draw.
+
+			if (!G_VSEM_PAUSED) {
+				var row = currentRow++;
+
+				if (currentRow >= rows) {
+					currentRow = 0;
+					var layer = new Konva.Layer({ listening: false });
+					destStage.add(layer);
+				}
+		
+				if (layers.length > 2) { layers[0].destroy(); }
+				
+				Utils.computeResampledSlow(sourceStage, destStage, baseImage, probe, rows, cols, baseGridRect
+					,row,row+1,0,-1,false,true);
+			}
+		} else {
+			// do frame-by-frame draw
+			if (changeCount > lastChange) {
+				// reset change counts instead of recording it,
+				// a trick to avoid an integer rollover, yet still functional.
+				lastChange = changeCount = 0;
+
+				// ensure we only use one layer
+				// prevents any left over partially draw layers on top coming from the row-by-row draw
+				if (layers.length > 1) {
+					destStage.destroyChildren();
+					destStage.add(new Konva.Layer({ listening: false }));
+				}
+
+				// Utils.computeResampledFast(sourceStage, destStage, baseImage, probe, rows, cols);
+				// Utils.computeResampledSlow(sourceStage, destStage, baseImage, probe, rows, cols, baseGridRect);
+				Utils.computeResampledSlow(sourceStage, destStage, baseImage, probe, rows, cols, baseGridRect
+					,0,-1,0,-1,true,false);
+			}
+		}
+
+		// not needed
+		// destStage.draw()
+		
+		G_SubResampled_animationFrameRequestId = requestAnimationFrame(doUpdate);
+	}
 
 	// run once immediately
-	updateResampledDraw();
+	updateConfigValues();
 
-	return updateResampledDraw;
+	cancelAnimationFrame(G_SubResampled_animationFrameRequestId);
+	G_SubResampled_animationFrameRequestId = requestAnimationFrame(doUpdate);
+
+	return updateConfigValues;
 }
 
 /**
@@ -621,6 +752,7 @@ function drawGroundtruthImage(stage, imageObj, subregionImage, maxSize=G_BOX_SIZ
 		stroke: "#00FFFF",
 		strokeWidth: 1,
 		listening: false,
+		strokeScaleEnabled: false,
 	});
 
 	layer.add(image);
@@ -640,6 +772,54 @@ function drawGroundtruthImage(stage, imageObj, subregionImage, maxSize=G_BOX_SIZ
 		});
 
 		stage.draw();
+
+		// center of the rect coords
+		var center = {
+			x: rect.x() + rect.width()/2,
+			y: rect.y() + rect.height()/2,
+		};
+
+		// transform so that the coords have the middle of the stage as 0,0
+		var stageCentered = {
+			x: center.x - stage.width()/2,
+			y: center.y - stage.height()/2,
+		};
+
+		// transform to unit square coords
+		var unitCoords = {
+			x: stageCentered.x / stage.width(),
+			y: stageCentered.y / stage.height(),
+		};
+
+		// scale to original image pixel size
+		var pxImgCoords = {
+			x: unitCoords.x * imageObj.width,
+			y: unitCoords.y * imageObj.height,
+		};
+
+		var pxSizeNm = Utils.getPixelSizeNmInput();
+
+		// scale as real physical units
+		var middle = {
+			x: pxImgCoords.x * pxSizeNm,
+			y: pxImgCoords.y * pxSizeNm,
+		};
+		// get as optimal displayUnit
+		var fmtMiddle = Utils.formatUnitNm(middle.x, middle.y);
+
+		var sizeFOV = {
+			w: (rect.width() / stage.width()) * imageObj.width * pxSizeNm,
+		};
+		var fmtSizeFOV = Utils.formatUnitNm(sizeFOV.w);
+
+		// display coords & FOV size
+		Utils.updateExtraInfo(stage, '('
+			+ fmtMiddle.value.toFixed(G_MATH_TOFIXED.SHORT) + ', '
+			+ fmtMiddle.value2.toFixed(G_MATH_TOFIXED.SHORT) + ')'
+			+ ' ' + fmtMiddle.unit
+			+ '<br>FOV width: ' + fmtSizeFOV.value.toFixed(G_MATH_TOFIXED.SHORT)
+			+ ' ' + fmtSizeFOV.unit
+		);
 	};
 
 	update();
@@ -705,15 +885,17 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 	});
 	layer.add(indicator);
 
-	// global reference, so we can show/hide the indicator
-	G_VirtualSEM_indicator = indicator;
-
 	var context = canvas.getContext('2d');
 	context.imageSmoothingEnabled = false;
 
 	var beamRadius = {x : 0, y: 0};
 
 	var superScale = 1;
+
+	// original image size
+	var iw = originalImageObj.naturalWidth, ih = originalImageObj.naturalHeight;
+	// get scale factor for full image size
+	var irw = (iw / stage.width()), irh = (ih / stage.height());
 
 	var updateConfigValues = function(){
 		var ratioX = subregionRectStage.width() / subregionRect.width();
@@ -753,6 +935,18 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 			currentRow = 0; // restart drawing from the top
 			currentDrawPass = 0;
 		}
+
+		// display image size / pixel counts and the pixel size
+		var fullImgWidthNm = iw * Utils.getPixelSizeNmInput();
+		var fmtPxSize = Utils.formatUnitNm(
+			fullImgWidthNm / cols,
+			fullImgWidthNm / rows,
+		);
+		var displayUnit = fmtPxSize.unit + "/px";
+		Utils.updateExtraInfo(stage, cols + ' x ' + rows
+			+ ' px<br>' + fmtPxSize.value.toFixed(G_MATH_TOFIXED.SHORT)
+			+ " x " + fmtPxSize.value2.toFixed(G_MATH_TOFIXED.SHORT)
+			+ " " + displayUnit);
 	};
 	updateConfigValues();
 
@@ -760,83 +954,80 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 	var colors = ['#DDDDDD','#EEEEEE','#CCCCCC','#999999','#666666','#333333','#B6B6B6','#1A1A1A'];
 	var color = colors[Utils.getRandomInt(colors.length)];
 
-	// original image size
-	var iw = originalImageObj.naturalWidth, ih = originalImageObj.naturalHeight;
-	// get scale factor for full image size
-	var irw = (iw / stage.width()), irh = (ih / stage.height());
-
 	var doUpdate = function(){
-		// track time to draw the row
-		var timeRowStart = Date.now();
+		if (!G_VSEM_PAUSED) {
+			// track time to draw the row
+			var timeRowStart = Date.now();
 
-		var row = currentRow++;
-		var ctx = context;
+			var row = currentRow++;
+			var ctx = context;
 
-		if (currentRow >= rows) {
-			currentRow = 0;
-			currentDrawPass += 1;
-		}
-
-		var rowIntensitySum = 0;
-
-		// interate over X
-		for (let i = 0; i < cols; i++) {
-			const cellX = i * cellW;
-			const cellY = row * cellH;
-
-			// TODO: check these values and the Utils.ComputeProbeValue_gs again
-			// since the final image seems to differ...
-
-			// map/transform values to full resolution image coordinates
-			const scaledProbe = {
-				centerX: (cellX + cellW/2) * irw,
-				centerY: (cellY + cellH/2) * irh,
-				rotationRad: Utils.toRadians(beam.rotation()),
-				radiusX: beamRadius.x * irw,
-				radiusY: beamRadius.y * irh,
-			};
-
-			// compute the pixel value, for the given spot/probe profile
-			var gsValue = Utils.ComputeProbeValue_gs(originalImageObj, scaledProbe, superScale);
-			color = 'rgba('+[gsValue,gsValue,gsValue].join(',')+',1)';
-
-			ctx.fillStyle = color;
-
-			rowIntensitySum += gsValue;
-
-			// optionally, draw with overlap to reduce visual artifacts
-			if ((currentDrawPass < G_DRAW_OVERLAP_PASSES)
-			&& (G_DRAW_WITH_OVERLAP && pixelCount >= G_DRAW_OVERLAP_THRESHOLD)) {
-				ctx.fillRect(
-					cellX -G_DRAW_OVERLAP_PIXELS,
-					cellY -G_DRAW_OVERLAP_PIXELS,
-					cellW +G_DRAW_OVERLAP_PIXELS,
-					cellH +G_DRAW_OVERLAP_PIXELS
-				);
-			} else {
-				ctx.fillRect(cellX, cellY, cellW, cellH);
+			if (currentRow >= rows) {
+				currentRow = 0;
+				currentDrawPass += 1;
 			}
+
+			var rowIntensitySum = 0;
+
+			// interate over X
+			for (let i = 0; i < cols; i++) {
+				const cellX = i * cellW;
+				const cellY = row * cellH;
+
+				// TODO: check these values and the Utils.ComputeProbeValue_gs again
+				// since the final image seems to differ...
+
+				// map/transform values to full resolution image coordinates
+				const scaledProbe = {
+					centerX: (cellX + cellW/2) * irw,
+					centerY: (cellY + cellH/2) * irh,
+					rotationRad: Utils.toRadians(beam.rotation()),
+					radiusX: beamRadius.x * irw,
+					radiusY: beamRadius.y * irh,
+				};
+
+				// compute the pixel value, for the given spot/probe profile
+				var gsValue = Utils.ComputeProbeValue_gs(originalImageObj, scaledProbe, superScale);
+				color = 'rgba('+[gsValue,gsValue,gsValue].join(',')+',1)';
+
+				ctx.fillStyle = color;
+
+				rowIntensitySum += gsValue;
+
+				// optionally, draw with overlap to reduce visual artifacts
+				if ((currentDrawPass < G_DRAW_OVERLAP_PASSES)
+				&& (G_DRAW_WITH_OVERLAP && pixelCount >= G_DRAW_OVERLAP_THRESHOLD)) {
+					ctx.fillRect(
+						cellX -G_DRAW_OVERLAP_PIXELS,
+						cellY -G_DRAW_OVERLAP_PIXELS,
+						cellW +G_DRAW_OVERLAP_PIXELS,
+						cellH +G_DRAW_OVERLAP_PIXELS
+					);
+				} else {
+					ctx.fillRect(cellX, cellY, cellW, cellH);
+				}
+			}
+
+			// if the last drawn was essentially completely black
+			// assume the spot size was too small or no signal
+			// for 1-2 overlapped-draw passes...
+			var rowIntensityAvg = rowIntensitySum / cols;
+			if (rowIntensityAvg <= G_MIN_AVG_SIGNAL_VALUE) { // out of 255
+				currentDrawPass = -1;
+			}
+
+			// move/update the indicator
+			indicator.y((row+1) * cellH - indicator.height());
+
+			layer.batchDraw();
+
+			// use this for debugging, less heavy, draw random color rows
+			// color = colors[Utils.getRandomInt(colors.length)];
+			// updateConfigValues();
+
+			var timeDrawTotal = Date.now() - timeRowStart;
+			stage.getContainer().setAttribute('note', timeDrawTotal + " ms/Row");
 		}
-
-		// if the last drawn was essentially completely black
-		// assume the spot size was too small or no signal
-		// for 1-2 overlapped-draw passes...
-		var rowIntensityAvg = rowIntensitySum / cols;
-		if (rowIntensityAvg <= G_MIN_AVG_SIGNAL_VALUE) { // out of 255
-			currentDrawPass = -1;
-		}
-
-		// move/update the indicator
-		indicator.y((row+1) * cellH - indicator.height());
-
-		layer.batchDraw();
-
-		// use this for debugging, less heavy, draw random color rows
-		// color = colors[Utils.getRandomInt(colors.length)];
-		// updateConfigValues();
-
-		var timeDrawTotal = Date.now() - timeRowStart;
-		stage.getContainer().setAttribute('note', timeDrawTotal + " ms/Row");
 		
 		// see comment on using this instead of setInterval below
 		G_VirtualSEM_animationFrameRequestId = requestAnimationFrame(doUpdate);

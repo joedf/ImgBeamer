@@ -37,6 +37,7 @@ summary {
 	font-family: monospace;
 	background: rgba(0,0,0,0.5);
 	padding: 2px 4px;
+	user-select: none;
 }
 
 .box:before { content: attr(box_label); }
@@ -53,14 +54,23 @@ summary {
 
 .box.note_colored::after { color: yellow; }
 
-.box > span.infoBox {
+.vsem_mode,
+.parameterDisplay,
+.magDisplay,
+.metricsDisplay {
 	top: 0;
 	right: 0;
 	text-align: right;
-	user-select: none;
 }
 
+.box > .vsem_mode { cursor: pointer; }
+
 .box > span.parameterDisplay { cursor: pointer; }
+
+.box > .extraInfoDisplay {
+	bottom: 0;
+	left: 0;
+}
 
 .final {
 	background-color: #172542;
@@ -81,13 +91,36 @@ summary {
 }
 
 #options {
+	opacity: .9;
+	width: fit-content;
+	float: right;
+}
+
+#options-handle {
+	text-align: center;
+	background-color: #172542;
+}
+
+#options-anchor {
+	display: inline-block;
+	position: fixed;
+	top: 35vh;
+	right: 0.25em;
+	z-index: 101;
+	user-select: none;
+	cursor: move;
+	width: 0;
+	height: 0;
+}
+
+#options-full-resample {
 	padding: .5em;
 	z-index: 30;
 	background: rgba(0,0,0,0.6);
 	border: solid 1px rgba(255,255,255,0.6);
 }
 
-#options-anchor {
+#options-full-resample-anchor {
 	display: inline-block;
 	position: absolute;
 	right: .25em;
