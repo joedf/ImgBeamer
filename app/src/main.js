@@ -51,7 +51,7 @@ var G_MAIN_CONTAINER = $('#main-container');
 var G_BOX_SIZE = GetOptimalBoxWidth();
 
 /** The number of stages to create */
-const nStages = 9;
+const nStages = 8;
 
 // first create the stages
 var stages = [];
@@ -59,6 +59,8 @@ for (let i = 0; i < nStages; i++) {
 	var stage = Utils.newStageTemplate(G_MAIN_CONTAINER, G_BOX_SIZE, G_BOX_SIZE);
 	stages.push(stage);
 }
+
+stages.push(Utils.newStageTemplate(G_MAIN_CONTAINER, G_BOX_SIZE, G_BOX_SIZE, false));
 
 /////////////////////
 
@@ -118,7 +120,7 @@ function OnImageLoaded(eImg, stages){
 		var cellSize = Utils.computeCellSize(subregionImage);
 		Utils.updateDisplayBeamParams(spotProfileStage, layoutBeam, cellSize, spotScaling, promptForSpotWidth);
 		Utils.updateMagInfo(baseImageStage, subregionImage);
-		Utils.updateImageMetricsInfo(groundtruthMapStage, virtualSEMStage);
+		// Utils.updateImageMetricsInfo(groundtruthMapStage, virtualSEMStage);
 		Utils.updateSubregionPixelSize(resampledStage, subregionImage, eImg);
 	}
 
@@ -239,7 +241,8 @@ function OnImageLoaded(eImg, stages){
 	G_Update_GroundTruth = updateGroundtruthMap;
 	
 	// draw Resulting Image
-	$(virtualSEMStage.getContainer()).attr('box_label', 'Resulting Image');
+	// $(virtualSEMStage.getContainer()).attr('box_label', 'Resulting Image');
+	$(virtualSEMStage).attr('box_label', 'Resulting Image');
 	var vitualSEMBeam = beam.clone();
 	var updateVirtualSEM_Config = drawVirtualSEM(
 		virtualSEMStage,

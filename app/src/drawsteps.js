@@ -831,6 +831,9 @@ function drawGroundtruthImage(stage, imageObj, subregionImage, maxSize=G_BOX_SIZ
 	};
 }
 
+var G_vSEM_webworker = new Worker('./src/vsem_webworker.js');
+var G_vSEM_offscreenCanvas = null;
+var G_test = null;
 /**
  * Draws the resulting image continously row-by-row.
  * @param {*} stage the stage to draw on
@@ -847,77 +850,50 @@ function drawGroundtruthImage(stage, imageObj, subregionImage, maxSize=G_BOX_SIZ
  * @todo can we get rid userScaleImage / userImage throughout the source if possible, cleaner?
  */
 function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, originalImageObj, spotScale){
-	var rows = 0, cols = 0;
-	var cellW = 0, cellH = 0;
-	var currentRow = 0;
+	var canvas = stage.find('canvas').get(0);
 
-	const indicatorWidth = 20;
-	const indicatorHeight = 3;
+	if (G_vSEM_offscreenCanvas == null) {
+		var offscreen = G_vSEM_offscreenCanvas = canvas.transferControlToOffscreen();
+		// pass canvas into webworker, so we can do all rendering inside it
+		G_vSEM_webworker.postMessage({ canvas: offscreen}, [offscreen]);
+	}
 
-	var pixelCount = 0;
-
-	var currentDrawPass = 0;
-
-	// use the canvas API directly in a konva stage
-	// https://konvajs.org/docs/sandbox/Free_Drawing.html
-
-	var layer = stage.getLayers()[0];
-	layer.destroyChildren(); // avoid memory leaks
+	// todo: clean this up
+	// Get the original image as an ImageData object
+	var tmp_canvas = document.createElement("canvas");
+	tmp_canvas.width = originalImageObj.width;
+	tmp_canvas.height = originalImageObj.height;
+	var tmp_ctx = tmp_canvas.getContext("2d");
+	tmp_ctx.drawImage(originalImageObj, 0, 0);
+	var baseImageData = G_test = tmp_ctx.getImageData(0, 0, originalImageObj.width, originalImageObj.height);
 	
-	var canvas = document.createElement('canvas');
-	canvas.width = stage.width();
-	canvas.height = stage.height();
+	G_vSEM_webworker.postMessage({ imgData: baseImageData });
 
-	// the canvas is added to the layer as a "Konva.Image" element
-	var image = new Konva.Image({
-		image: canvas,
-		x: 0,
-		y: 0,
-	});
-	layer.add(image);
-
-	// draw an indicator to show which row was last drawn
-	var indicator = new Konva.Rect({
-		x: stage.width() - indicatorWidth, y: 0,
-		width: indicatorWidth,
-		height: indicatorHeight,
-		fill: 'red',
-	});
-	layer.add(indicator);
-
-	var context = canvas.getContext('2d');
-	context.imageSmoothingEnabled = false;
-
-	var beamRadius = {x : 0, y: 0};
-
-	var superScale = 1;
-
-	// original image size
-	var iw = originalImageObj.naturalWidth, ih = originalImageObj.naturalHeight;
-	// get scale factor for full image size
-	var irw = (iw / stage.width()), irh = (ih / stage.height());
+	var cellW = 0, cellH = 0;
 
 	var updateConfigValues = function(){
 		var ratioX = subregionRectStage.width() / subregionRect.width();
 		var ratioY = subregionRectStage.height() / subregionRect.height();
 
 		// multiply by the ratio, since we should have more cells on the full image
-		rows = Math.round(Utils.getRowsInput() * ratioY);
-		cols = Math.round(Utils.getColsInput() * ratioX);
-
-		// the total number of "pixels" (cells) that will drawn
-		pixelCount = rows * cols;
+		var rows = Math.round(Utils.getRowsInput() * ratioY);
+		var cols = Math.round(Utils.getColsInput() * ratioX);
 
 		// save last value, to detect significant change
 		var lastCellW = cellW, lastCellH = cellH;
 
-		cellW = stage.width() / cols;
-		cellH = stage.height() / rows;
+		var stageSize = {
+			w: canvas.width, // stage.width()
+			h: canvas.height, // stage.height()
+		};
+
+		cellW = stageSize.w / cols;
+		cellH = stageSize.h / rows;
 
 		var significantChange = (cellW != lastCellW) && (cellH != lastCellH);
 
 		// get beam size based on user-scaled image
-		beamRadius = {
+		var beamRadius = {
 			// divide by the ratio, since the spot should be smaller when mapped onto
 			// the full image which is scaled down to the same stage size...
 			x : (beam.width() / spotScale.scaleX()) / 2 / ratioX,
@@ -927,15 +903,31 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 		// check if we need to scale up the image for sampling...
 		// if the avg spot radius is less than 1, scale up at 1 / x (inversely proportional)
 		var radiusAvg = (beamRadius.x+beamRadius.y)/2;
-		superScale = (radiusAvg < 1) ? 1 / radiusAvg : 1;
+		var superScale = (radiusAvg < 1) ? 1 / radiusAvg : 1;
 
 		// we can clear the screen here, if we want to avoid lines from previous configs...
 		if (significantChange) { // if it affects the drawing
-			context.clearRect(0, 0, canvas.width, canvas.height);
-			currentRow = 0; // restart drawing from the top
-			currentDrawPass = 0;
+			G_vSEM_webworker.postMessage("clearCanvas");
 		}
 
+		
+
+		G_vSEM_webworker.postMessage({
+			config: {
+				rows: rows,
+				cols: cols,
+				stageWidth: stageSize.w,
+				stageHeight: stageSize.h,
+				cellSize: {w: cellW, h: cellH},
+				beamRadius: beamRadius,
+				beamRotation: beam.rotation(),
+			}
+		});
+
+		
+
+
+		/*
 		// display image size / pixel counts and the pixel size
 		var fullImgWidthNm = iw * Utils.getPixelSizeNmInput();
 		var fmtPxSize = Utils.formatUnitNm(
@@ -947,106 +939,10 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 			+ ' px<br>' + fmtPxSize.value.toFixed(G_MATH_TOFIXED.SHORT)
 			+ " x " + fmtPxSize.value2.toFixed(G_MATH_TOFIXED.SHORT)
 			+ " " + displayUnit);
+		*/
+
 	};
 	updateConfigValues();
-
-	// var colors = ['blue', 'yellow', 'red', 'green', 'cyan', 'pink'];
-	var colors = ['#DDDDDD','#EEEEEE','#CCCCCC','#999999','#666666','#333333','#B6B6B6','#1A1A1A'];
-	var color = colors[Utils.getRandomInt(colors.length)];
-
-	var doUpdate = function(){
-		if (!G_VSEM_PAUSED) {
-			// track time to draw the row
-			var timeRowStart = Date.now();
-
-			var row = currentRow++;
-			var ctx = context;
-
-			if (currentRow >= rows) {
-				currentRow = 0;
-				currentDrawPass += 1;
-			}
-
-			var rowIntensitySum = 0;
-
-			// interate over X
-			for (let i = 0; i < cols; i++) {
-				const cellX = i * cellW;
-				const cellY = row * cellH;
-
-				// TODO: check these values and the Utils.ComputeProbeValue_gs again
-				// since the final image seems to differ...
-
-				// map/transform values to full resolution image coordinates
-				const scaledProbe = {
-					centerX: (cellX + cellW/2) * irw,
-					centerY: (cellY + cellH/2) * irh,
-					rotationRad: Utils.toRadians(beam.rotation()),
-					radiusX: beamRadius.x * irw,
-					radiusY: beamRadius.y * irh,
-				};
-
-				// compute the pixel value, for the given spot/probe profile
-				var gsValue = Utils.ComputeProbeValue_gs(originalImageObj, scaledProbe, superScale);
-				color = 'rgba('+[gsValue,gsValue,gsValue].join(',')+',1)';
-
-				ctx.fillStyle = color;
-
-				rowIntensitySum += gsValue;
-
-				// optionally, draw with overlap to reduce visual artifacts
-				if ((currentDrawPass < G_DRAW_OVERLAP_PASSES)
-				&& (G_DRAW_WITH_OVERLAP && pixelCount >= G_DRAW_OVERLAP_THRESHOLD)) {
-					ctx.fillRect(
-						cellX -G_DRAW_OVERLAP_PIXELS,
-						cellY -G_DRAW_OVERLAP_PIXELS,
-						cellW +G_DRAW_OVERLAP_PIXELS,
-						cellH +G_DRAW_OVERLAP_PIXELS
-					);
-				} else {
-					ctx.fillRect(cellX, cellY, cellW, cellH);
-				}
-			}
-
-			// if the last drawn was essentially completely black
-			// assume the spot size was too small or no signal
-			// for 1-2 overlapped-draw passes...
-			var rowIntensityAvg = rowIntensitySum / cols;
-			if (rowIntensityAvg <= G_MIN_AVG_SIGNAL_VALUE) { // out of 255
-				currentDrawPass = -1;
-			}
-
-			// move/update the indicator
-			indicator.y((row+1) * cellH - indicator.height());
-
-			layer.batchDraw();
-
-			// use this for debugging, less heavy, draw random color rows
-			// color = colors[Utils.getRandomInt(colors.length)];
-			// updateConfigValues();
-
-			var timeDrawTotal = Date.now() - timeRowStart;
-			stage.getContainer().setAttribute('note', timeDrawTotal + " ms/Row");
-		}
-		
-		// see comment on using this instead of setInterval below
-		G_VirtualSEM_animationFrameRequestId = requestAnimationFrame(doUpdate);
-	};
-
-	// a warning is logged with slow setTimeout or requestAnimationFrame callbacks
-	// for each frame taking longer than ~60+ ms... resulting in hundreds/thousands,
-	// possibly slowing down the browser over time...
-
-	// ... read next comment block first, then come back to this one ...
-	// This cancel is needed, otherwise subsequent calls will multiple rogue update functions
-	// (going out of scope) running forever, but never allow itself to be garbage collected
-	// because the execution never ends... A similar case would likely happen with timers
-	// as well, e.g. self-calling setTimeout or setInterval...
-	cancelAnimationFrame(G_VirtualSEM_animationFrameRequestId);
-
-	// ... but we use requestAnimationFrame to let the browser determine what the
-	// fastest possible ideal speed is.
-	G_VirtualSEM_animationFrameRequestId = requestAnimationFrame(doUpdate);
 
 	return updateConfigValues;
 }

@@ -57,27 +57,37 @@ const Utils = {
 	 * @param {*} h the height of the stage
 	 * @returns the drawing stage.
 	 */
-	newStageTemplate: function(parentContainer, w, h) {
+	newStageTemplate: function(parentContainer, w, h, useKonva = true) {
 		var $e = $('<div/>').addClass('box').appendTo(parentContainer);
-		var stage = new Konva.Stage({
-			container: $e.get(0),
-			width: w,
-			height: h
-		});
 
-		// then create layer and to stage
-		var layer = new Konva.Layer({
-			listening: false // faster render
-		});
+		if (useKonva) {
+			var stage = new Konva.Stage({
+				container: $e.get(0),
+				width: w,
+				height: h
+			});
 
-		// antialiasing
-		var ctx = layer.getContext();
-		ctx.imageSmoothingEnabled = false;
+			// then create layer and to stage
+			var layer = new Konva.Layer({
+				listening: false // faster render
+			});
 
-		// add and push
-		stage.add(layer);
+			// antialiasing
+			var ctx = layer.getContext();
+			ctx.imageSmoothingEnabled = false;
 
-		return stage;
+			// add and push
+			stage.add(layer);
+
+			return stage;
+		} else {
+			var canvas = document.createElement('canvas');
+			canvas.width = w;
+			canvas.height = h;
+			$e.append(canvas);
+
+			return $e;
+		}
 	},
 
 	/**
