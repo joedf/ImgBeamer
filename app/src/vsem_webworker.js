@@ -52,9 +52,6 @@ self.onmessage = function (evt) {
 
 	if (evt.data.imgData) {
 		baseImageData = evt.data.imgData;
-
-		irw = baseImageData.width / stageWidth;
-		irh = baseImageData.height / stageHeight;
 	}
 
 	if (evt.data == "clearCanvas") {
@@ -80,6 +77,8 @@ var updateDraw = function(){
 	// ctx.clearRect(0, 0, canvas.width, canvas.height);
 	if (baseImageData != null) {
 		// ctx.putImageData(baseImageData, 0, 0);
+		irw = baseImageData.width / stageWidth;
+		irh = baseImageData.height / stageHeight;
 	}
 	
 
@@ -110,16 +109,26 @@ var updateDraw = function(){
 			radiusY: beamRadius.y * irh,
 		};
 
+
+		var gsValue = 128;
+		// var colors = ['#DDDDDD','#EEEEEE','#CCCCCC','#999999','#666666','#333333','#B6B6B6','#1A1A1A'];
+		// var color = colors[Utils.getRandomInt(colors.length)];
+
+
 		// compute the pixel value, for the given spot/probe profile
 		// var gsValue = Utils.ComputeProbeValue_gs(originalImageObj, scaledProbe, superScale);
-		// var color = 'rgba('+[gsValue,gsValue,gsValue].join(',')+',1)';
-		var gsValue = 128;
-		var colors = ['#DDDDDD','#EEEEEE','#CCCCCC','#999999','#666666','#333333','#B6B6B6','#1A1A1A'];
-		var color = colors[Utils.getRandomInt(colors.length)];
+
+		if (baseImageData != null)
+			gsValue = Utils.ComputeProbeValue_gs(baseImageData, scaledProbe, superScale);
+		var color = 'rgba('+[gsValue,gsValue,gsValue].join(',')+',1)';
+		
 
 		ctx.fillStyle = color;
 
 		rowIntensitySum += gsValue;
+
+		// the total number of "pixels" (cells) that will drawn
+		pixelCount = rows * cols;
 
 		// optionally, draw with overlap to reduce visual artifacts
 		if ((currentDrawPass < G_DRAW_OVERLAP_PASSES)

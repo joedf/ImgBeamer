@@ -1070,35 +1070,67 @@ const Utils = {
 		ctx.clearRect(0, 0, cv.width, cv.height);
 
 		// draw the image
-		// ctx.drawImage(image, 0, 0);
-		// optimization, to draw only the necessary area of the image
-		ctx.drawImage(image,
-			ellipseInfo.centerX - maxRadius,
-			ellipseInfo.centerY - maxRadius,
-			maxDiameter,
-			maxDiameter,
-			0,
-			0,
-			cv.width,
-			cv.height);
+		if (typeof image.data == 'object') {
+			cv.width = image.width;
+			cv.height = image.height;
+			ctx.putImageData(image,
+				0,
+				0,
+			);
+		} else {
+			// ctx.drawImage(image, 0, 0);
+			// optimization, to draw only the necessary area of the image
+			ctx.drawImage(image,
+				ellipseInfo.centerX - maxRadius,
+				ellipseInfo.centerY - maxRadius,
+				maxDiameter,
+				maxDiameter,
+				0,
+				0,
+				cv.width,
+				cv.height);
+		}
 
 		// then, set the composite operation
 		ctx.globalCompositeOperation = 'destination-in'; //TODO: Is this right? or 'source-in'?
 
 		// then draw the pixel selection shape
-		ctx.beginPath();
-		ctx.ellipse(
-			maxDiameter / 2 * superScale,
-			maxDiameter / 2 * superScale,
-			ellipseInfo.radiusX * superScale,
-			ellipseInfo.radiusY * superScale,
-			ellipseInfo.rotationRad,
-			0, 2 * Math.PI);
-		ctx.fillStyle = 'white';
-		ctx.fill();
+		if (typeof image.data == 'object') {
+			ctx.beginPath();
+			ctx.ellipse(
+				ellipseInfo.centerX,
+				ellipseInfo.centerY,
+				ellipseInfo.radiusX * superScale,
+				ellipseInfo.radiusY * superScale,
+				ellipseInfo.rotationRad,
+				0, 2 * Math.PI);
+			ctx.fillStyle = 'white';
+			ctx.fill();
+		} else {
+			ctx.beginPath();
+			ctx.ellipse(
+				maxDiameter / 2 * superScale,
+				maxDiameter / 2 * superScale,
+				ellipseInfo.radiusX * superScale,
+				ellipseInfo.radiusY * superScale,
+				ellipseInfo.rotationRad,
+				0, 2 * Math.PI);
+			ctx.fillStyle = 'white';
+			ctx.fill();
+		}
 
 		// grab the pixel data from the pixel selection area
-		var pxData = ctx.getImageData(0,0,cv.width,cv.height);
+		var pxData;
+		if (typeof image.data == 'object') {
+			// avoids artefacts by adding 0.5 ????!?!?!?
+			pxData = ctx.getImageData(
+				ellipseInfo.centerX - maxRadius + .5,
+				ellipseInfo.centerY - maxRadius + .5,
+				maxDiameter, maxDiameter
+			);
+		} else {
+			pxData = ctx.getImageData(0,0,cv.width,cv.height);
+		}
 
 		// compute the average pixel (excluding 0-0-0-0 rgba pixels)
 		var pxColor = this.get_avg_pixel_gs(pxData);
