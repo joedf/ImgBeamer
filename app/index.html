@@ -99,6 +99,7 @@
 					$('#_fileImgInput').click();
 				};
 				this.pixelSize_nm = 500; // nm/px default;
+				this.previewOpacity = 0.4;
 			};
 			
 			var gui_ip = gui.addFolder('Imaging Parameters');
@@ -114,6 +115,9 @@
 			});
 			gui_do.add(G_GUI_Controller, 'pause_vSEM').onChange(function(){
 				G_VSEM_PAUSED = G_GUI_Controller.pause_vSEM;
+			});
+			gui_do.add(G_GUI_Controller, 'previewOpacity', 0, 1, 0.01).onChange(function(){
+				G_UpdateResampled();
 			});
 			// gui.add(G_GUI_Controller, 'updateViews');
 

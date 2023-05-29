@@ -446,6 +446,7 @@ function drawProbeLayout(drawStage, baseImage, spotScale, beam) {
 		radiusX: -1,
 		radiusY: -1,
 		rotation: 0,
+		beamOpacity: Utils.getSpotLayoutOpacityInput(),
 	};
 
 	var updateProbeLayout = function(){
@@ -485,15 +486,20 @@ function drawProbeLayout(drawStage, baseImage, spotScale, beam) {
 		var radiusY = (beam.height() / spotScale.scaleY()) / 2; //(cell.height/2) * .8
 
 		var beamRotation = beam.rotation();
+
+		// preview spot display opacity
+		var beamOpacity = Utils.getSpotLayoutOpacityInput();
 		
 		// only redraw grid lines and spot outlines if they would change
 		if (_last.rows != tRows || _last.cols != tCols
 		|| _last.radiusX != radiusX || _last.radiusY != radiusY
-		|| _last.rotation != beamRotation){
+		|| _last.rotation != beamRotation
+		|| _last.beamOpacity != beamOpacity){
 			// record for next change detect
 			_last.rows = tRows, _last.cols = tCols;
 			_last.radiusX = radiusX, _last.radiusY = radiusY,
 			_last.rotation = beamRotation;
+			_last.beamOpacity = beamOpacity;
 
 			// comment to draw grid only once
 			gridDrawn = false; gridLayer.destroyChildren();
@@ -511,7 +517,7 @@ function drawProbeLayout(drawStage, baseImage, spotScale, beam) {
 					y : radiusY,
 				},
 				rotation: beamRotation,
-				fill: 'rgba(255,0,0,.4)',
+				fill: 'rgba(255,0,0,'+beamOpacity+')',
 				strokeWidth: 1,
 				stroke: 'red'
 			});
