@@ -25,7 +25,7 @@
 			</div>
 		</div>
 
-		<div id="options-full-resample-anchor">
+		<div id="options-full-resample-anchor" style="display: none;">
 			<div id="options-full-resample">
 				<details>
 					<summary>Full Resample Panel</summary>
@@ -186,6 +186,10 @@
 					// preview.src = "";
 				}
 			});
+
+			if (G_DEBUG) {
+				$('#options-full-resample-anchor').show();
+			}
 
 			$('#generateFull').click(function(e){
 				$('#loadspinner_full').show();
