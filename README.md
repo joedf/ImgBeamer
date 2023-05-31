@@ -6,6 +6,8 @@ Try it live [here](https://joedf.github.io/ImgBeamer/app/index.html), no setup o
 
 Simple demo tool of the image formation[<sup>1</sup>](#references) process used in a Scanning Electron Microscope (SEM).
 
+A quick start guide is available [here](https://joedf.github.io/ImgBeamer/misc/ImgBeamer_QS_guide.pdf).
+
 ### Description of Stages / Boxes
 1. Sample Ground Truth (map navigation)
 2. Subregion/ROI (Region of Interest) View ("zoomed" view)
