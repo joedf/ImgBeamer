@@ -40,6 +40,8 @@ var G_UpdateResampled = null;
 var G_UpdateVirtualSEMConfig = null;
 /** global reference to update the Groundtruth view */
 var G_Update_GroundTruth = null;
+/** global reference to update the Information displays */
+var G_Update_InfoDisplays = null;
 
 
 /** a global reference to the main body container that holds the boxes/stages.
@@ -114,13 +116,18 @@ function OnImageLoaded(eImg, stages){
 		updateGroundtruthMap();
 		updateVirtualSEM_Config();
 
+		updateInfoDisplays();
+	}
+
+	var updateInfoDisplays = function(){
 		// update spot/beam info: size, rotation, shape
 		var cellSize = Utils.computeCellSize(subregionImage);
 		Utils.updateDisplayBeamParams(spotProfileStage, layoutBeam, cellSize, spotScaling, promptForSpotWidth);
 		Utils.updateMagInfo(baseImageStage, subregionImage);
 		Utils.updateImageMetricsInfo(groundtruthMapStage, virtualSEMStage);
 		Utils.updateSubregionPixelSize(resampledStage, subregionImage, eImg);
-	}
+	};
+	G_Update_InfoDisplays = updateInfoDisplays;
 
 	/** prompts the user for the spot width % */
 	function promptForSpotWidth(){
