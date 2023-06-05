@@ -487,7 +487,7 @@ const Utils = {
 		};
 
 		// get optimal / formated unit
-		// TODO: use "this." instead of "Utils."
+		// TODO: maybe use "this." instead of "Utils."
 		// do it for all functions too?
 		var fmtPxSize = Utils.formatUnitNm(pxSize.w, pxSize.h);
 
