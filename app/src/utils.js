@@ -205,6 +205,119 @@ const Utils = {
 		return handler;
 	},
 
+	CreateRuler: function(layer, x1, y1, x2, y2) {
+		var updateText = function(){
+			var linePts = line.points();
+			// https://stackoverflow.com/a/33743107/883015
+			var dist = Math.hypot(linePts[2]-linePts[0], linePts[3]-linePts[1]);
+			// var distPx = ... // we need to scale by stage size as well and image size...
+			var distNm = dist * Utils.getPixelSizeNmInput();
+			var fmt = Utils.formatUnitNm(distNm);
+			text.text(fmt.value.toFixed(G_MATH_TOFIXED.SHORT) + " " + fmt.unit);
+		};
+
+		var anchorMove = function(anchor){
+			line.points([
+				anchors.start.x() - line.x(),
+				anchors.start.y() - line.y(),
+				anchors.end.x() - line.x(),
+				anchors.end.y() - line.y()
+			]);
+		};
+
+		var anchors = {
+			start: this.CreateAnchor(x1, y1, anchorMove),
+			end: this.CreateAnchor(x2, y2, anchorMove),
+		};
+
+		var group = new Konva.Group({
+			draggable: true,
+		});
+		var line = new Konva.Arrow({
+			strokeWidth: 2,
+			stroke: "lime",
+			fill: "lime",
+			pointerAtBeginning: true,
+			points: [x1, y1, x2, y2],
+			// draggable: true,
+		});
+		// line.on('dragmove', function(){
+		// 	var pts = line.points();
+		// 	anchors.start.x(pts[0] + line.x());
+		// 	anchors.start.y(pts[1] + line.y());
+		// 	anchors.end.x(pts[2] + line.x());
+		// 	anchors.end.y(pts[3] + line.y());
+		// });
+		line.on("mouseover", function(){
+			// document.body.style.cursor = "pointer";
+			this.strokeWidth(4);
+		});
+		line.on("mouseout", function(){
+			// document.body.style.cursor = "default";
+			this.strokeWidth(2);
+		});
+		group.on('mouseover', function(){ document.body.style.cursor = "pointer"; });
+		group.on('mouseout', function(){ document.body.style.cursor = "default"; });
+		var updateLabel = function(){
+			updateText();
+			var linePts = line.points();
+			text.position({
+				x: (linePts[0] + linePts[2]) / 2,
+				y: (linePts[1] + linePts[3]) / 2,
+			});
+			text.offsetX(text.width() / 2);
+		};
+		group.on('dragmove', updateLabel);
+
+		var label = new Konva.Label();
+		var text = new Konva.Text({
+			text: '0.00 nm',
+			fontFamily: 'monospace',
+			fontSize: 10,
+			padding: 5,
+			fill: 'yellow',
+		});
+		label.add(text);
+
+		group.add(line, anchors.start, anchors.end, label);
+		layer.add(group);
+
+		updateLabel();
+
+		return {"group": group, "archors": anchors, "line": line};
+	},
+
+	CreateAnchor: function(x, y, onMove, strokeWidth = 2) {
+		// modified from:
+		// https://konvajs.org/docs/sandbox/Modify_Curves_with_Anchor_Points.html
+		var anchor = new Konva.Circle({
+			x: x,
+			y: y,
+			radius: 5,
+			stroke: "#666",
+			fill: "#ddd",
+			strokeWidth: strokeWidth,
+			draggable: true,
+			opacity: 0.5,
+		});
+
+		// add hover styling
+		anchor.on("mouseover", function () {
+			document.body.style.cursor = "pointer";
+			this.strokeWidth(strokeWidth + 2);
+		});
+		anchor.on("mouseout", function () {
+			document.body.style.cursor = "default";
+			this.strokeWidth(strokeWidth);
+		});
+		anchor.on("dragmove", function () {
+			if (typeof onMove == 'function')
+				onMove(this);
+		});
+
+		return anchor;
+	},
+
 	/**
 	 * Creates a random integer between 0 and the given maximum.
 	 * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random
@@ -374,6 +487,8 @@ const Utils = {
 		};
 
 		// get optimal / formated unit
+		// TODO: use "this." instead of "Utils."
+		// do it for all functions too?
 		var fmtPxSize = Utils.formatUnitNm(pxSize.w, pxSize.h);
 
 		// display coords & FOV size

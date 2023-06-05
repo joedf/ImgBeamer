@@ -86,6 +86,16 @@ function UpdateBaseImage(){
 	});
 }
 
+function addRuler(){
+	var l = new Konva.Layer();
+	var r = Utils.CreateRuler(l,
+		stages[0].width()*(1/3), stages[0].height()/2,
+		stages[0].width()*(2/3), stages[0].height()/2
+	);
+	stages[0].add(l);
+	return r;
+}
+
 /**
  * Called by {@link UpdateBaseImage} once the image data has been loaded,
  * Draws and manages all the drawing stages with each their event handlers.
