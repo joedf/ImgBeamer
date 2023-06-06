@@ -42,7 +42,8 @@ var G_UpdateVirtualSEMConfig = null;
 var G_Update_GroundTruth = null;
 /** global reference to update the Information displays */
 var G_Update_InfoDisplays = null;
-
+/** global reference to update the ruler */
+var G_UpdateRuler = null;
 
 /** a global reference to the main body container that holds the boxes/stages.
  * @todo do we still need this? Maybe remove... */
@@ -84,17 +85,6 @@ function UpdateBaseImage(){
 		
 		OnImageLoaded(imageObj, stages);
 	});
-}
-
-function addRuler(oImg){
-	var l = new Konva.Layer();
-	stages[0].add(l);
-	var r = Utils.CreateRuler(l,
-		stages[0].width()*(1/3), stages[0].height()/2,
-		stages[0].width()*(2/3), stages[0].height()/2,
-		oImg,
-	);
-	return r;
 }
 
 /**
@@ -142,7 +132,7 @@ function OnImageLoaded(eImg, stages){
 
 	/** prompts the user for the spot width % */
 	function promptForSpotWidth(){
-		var spotWidth = prompt("Spot width (%) - Default is 100%", 100, 0);
+		var spotWidth = prompt("Spot width (%) - Default is 100%", 100);
 		if (spotWidth > 0) {
 			Utils_SetSpotWidth(spotWidth);
 		}
@@ -255,6 +245,23 @@ function OnImageLoaded(eImg, stages){
 	var groundtruthMap = drawGroundtruthImage(groundtruthMapStage, eImg, subregionImage, G_BOX_SIZE);
 	var updateGroundtruthMap = groundtruthMap.updateFunc;
 	G_Update_GroundTruth = updateGroundtruthMap;
+
+	// add ruler on Groun truth stage
+	var rulerLayer = new Konva.Layer({visible: false});
+	groundtruthMapStage.add(rulerLayer);
+	var ruler = Utils.CreateRuler(rulerLayer, eImg,
+		groundtruthMapStage.width()*(1/3), groundtruthMapStage.height()/2,
+		groundtruthMapStage.width()*(2/3), groundtruthMapStage.height()/2
+	);
+	ruler.element.on('dblclick', function(e){
+		var um = ruler.getLengthNm() / 1E3;
+		var pixelWidth = prompt("Please enter the length of the ruler in micrometers.", um, 0);
+		G_GUI_Controller.pixelSize_nm = ruler.getPixelSize(pixelWidth);
+	});
+	G_UpdateRuler = function(){
+		var show =  Utils.getShowRulerInput();
+		rulerLayer.visible(show);
+	};
 	
 	// draw Resulting Image
 	$(virtualSEMStage.getContainer()).attr('box_label', 'Resulting Image');
@@ -304,8 +311,6 @@ function OnImageLoaded(eImg, stages){
 	doUpdate();
 
 	Utils.updateAdvancedMode();
-
-	addRuler(eImg);
 }
 
 /** Draws the full resample image given the parameters in the GUI and logs

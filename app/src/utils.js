@@ -147,6 +147,7 @@ const Utils = {
 	getSpotAngleInput: function(){ return this.getInputValueInt($('#iSpotAngle')); },
 	getGroundtruthImage: function(){ return G_GUI_Controller.groundTruthImg; },
 	getPixelSizeNmInput: function(){ return G_GUI_Controller.pixelSize_nm; },
+	getShowRulerInput: function(){ return G_GUI_Controller.showRuler; },
 	getSpotLayoutOpacityInput: function(){ return G_GUI_Controller.previewOpacity; },
 
 	/**
@@ -205,8 +206,10 @@ const Utils = {
 		return handler;
 	},
 
-	CreateRuler: function(layer, x1, y1, x2, y2, oImg) {
+	CreateRuler: function(layer, oImg, x1, y1, x2, y2) {
 		var stage = layer.getStage();
+
+		var lengthNm = 0;
 
 		var updateText = function(){
 			var linePts = line.points();
@@ -225,6 +228,8 @@ const Utils = {
 			var distNm = Utils.distance(nm1.x, nm1.y, nm2.x, nm2.y);
 			var fmt = Utils.formatUnitNm(distNm);
 			text.text(fmt.value.toFixed(G_MATH_TOFIXED.SHORT) + " " + fmt.unit);
+
+			lengthNm = distNm;
 		};
 
 		var anchorMove = function(e, anchor){
@@ -238,7 +243,7 @@ const Utils = {
 			}
 
 			// ctrl-key makes straight vertical line
-			if (e.evt.ctrlKey) {
+			else if (e.evt.ctrlKey) {
 				if (anchor == anchors.start) {
 					anchors.start.x(anchors.end.x());
 				} else {
@@ -255,8 +260,8 @@ const Utils = {
 		};
 
 		var anchors = {
-			start: this.CreateAnchor(x1, y1, anchorMove),
-			end: this.CreateAnchor(x2, y2, anchorMove),
+			start: this._CreateAnchor(x1, y1, anchorMove),
+			end: this._CreateAnchor(x2, y2, anchorMove),
 		};
 
 		var group = new Konva.Group({
@@ -270,14 +275,8 @@ const Utils = {
 			fill: "lime",
 			stroke: 'lime',
 		});
-		line.on("mouseover", function(){
-			// document.body.style.cursor = "pointer";
-			this.strokeWidth(4);
-		});
-		line.on("mouseout", function(){
-			// document.body.style.cursor = "default";
-			this.strokeWidth(2);
-		});
+		line.on("mouseover", function(){ this.strokeWidth(4); });
+		line.on("mouseout", function(){ this.strokeWidth(2); });
 		group.on('mouseover', function(){ document.body.style.cursor = "pointer"; });
 		group.on('mouseout', function(){ document.body.style.cursor = "default"; });
 
@@ -311,10 +310,23 @@ const Utils = {
 
 		updateLabel();
 
-		return {"group": group, "archors": anchors, "line": line};
+		var calculateNewPixelSize = function(lengthNm){
+			// TODO: reverse calc the pixel size
+			// use trig to get x/y components and scale it accordingly
+			return 1.0;
+		};
+
+		// return {"group": group, "archors": anchors, "line": line};
+		return {
+			element: group,
+			getLengthNm: function(){ return lengthNm; },
+			getPixelSize: function(lengthNm){
+				return calculateNewPixelSize(lengthNm);
+			}
+		};
 	},
 
-	CreateAnchor: function(x, y, onMove, strokeWidth = 2) {
+	_CreateAnchor: function(x, y, onMove, strokeWidth = 2) {
 		// modified from:
 		// https://konvajs.org/docs/sandbox/Modify_Curves_with_Anchor_Points.html
 		var anchor = new Konva.Circle({
@@ -1123,6 +1135,13 @@ const Utils = {
 		return dist;
 	},
 
+	/**
+	 * Convert stage to unit square coordinates
+	 * @param {*} x 
+	 * @param {*} y 
+	 * @param {*} stage coordinates source stage
+	 * @returns unit square coordinates
+	 */
 	stageToUnitCoordinates: function(x, y, stage){
 		var centered = {
 			x: x - (stage.width() / 2),
@@ -1137,6 +1156,13 @@ const Utils = {
 		return unit;
 	},
 
+	/**
+	 * Convert unit square to image pixel coordinates.
+	 * @param {*} x 
+	 * @param {*} y 
+	 * @param {*} imageObj the original image object (with a width and height property)
+	 * @returns image pixel coordinates
+	 */
 	unitToImagePixelCoordinates: function(x, y, imageObj) {
 		return {
 			x: x * imageObj.width,
@@ -1144,12 +1170,28 @@ const Utils = {
 		};
 	},
 
+	/**
+	 * Convert stage to Image pixel coordinates
+	 * @param {*} x 
+	 * @param {*} y 
+	 * @param {*} stage coordinates source stage
+	 * @param {*} imageObj the original image object (with a width and height property)
+	 * @returns image pixel coordinates
+	 */
 	stageToImagePixelCoordinates: function(x, y, stage, imageObj) {
 		var unit = this.stageToUnitCoordinates(x, y, stage);
 		var ipixel = this.unitToImagePixelCoordinates(unit.x, unit.y, imageObj);
 		return ipixel;
 	},
 
+	/**
+	 * Convert image pixel to coordinates in "real" (or scaled) units
+	 * @param {*} x 
+	 * @param {*} y 
+	 * @param {*} pxSizeX the width of a pixel in "real" units
+	 * @param {*} pxSizeY the height of a pixel in "real" units
+	 * @returns "real" coordinates
+	 */
 	imagePixelToRealCoordinates: function(x, y, pxSizeX, pxSizeY = null) {
 		if (pxSizeY == null) { pxSizeY = pxSizeX; }
 		return {
