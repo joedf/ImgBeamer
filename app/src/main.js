@@ -86,13 +86,14 @@ function UpdateBaseImage(){
 	});
 }
 
-function addRuler(){
+function addRuler(oImg){
 	var l = new Konva.Layer();
+	stages[0].add(l);
 	var r = Utils.CreateRuler(l,
 		stages[0].width()*(1/3), stages[0].height()/2,
-		stages[0].width()*(2/3), stages[0].height()/2
+		stages[0].width()*(2/3), stages[0].height()/2,
+		oImg,
 	);
-	stages[0].add(l);
 	return r;
 }
 
@@ -303,6 +304,8 @@ function OnImageLoaded(eImg, stages){
 	doUpdate();
 
 	Utils.updateAdvancedMode();
+
+	addRuler(eImg);
 }
 
 /** Draws the full resample image given the parameters in the GUI and logs

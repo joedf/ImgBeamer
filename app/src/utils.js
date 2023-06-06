@@ -205,18 +205,47 @@ const Utils = {
 		return handler;
 	},
 
-	CreateRuler: function(layer, x1, y1, x2, y2) {
+	CreateRuler: function(layer, x1, y1, x2, y2, oImg) {
+		var stage = layer.getStage();
+
 		var updateText = function(){
 			var linePts = line.points();
-			// https://stackoverflow.com/a/33743107/883015
-			var dist = Math.hypot(linePts[2]-linePts[0], linePts[3]-linePts[1]);
-			// var distPx = ... // we need to scale by stage size as well and image size...
-			var distNm = dist * Utils.getPixelSizeNmInput();
+			var pxSizeNmX = Utils.getPixelSizeNmInput();
+			
+			// we need to scale by stage size as well and image size...
+			var pt1 = Utils.stageToImagePixelCoordinates(linePts[0], linePts[1], stage, oImg);
+			var pt2 = Utils.stageToImagePixelCoordinates(linePts[2], linePts[3], stage, oImg);
+
+			// and convert to "real" units
+			// currently we only have pixel size in X direction
+			var nm1 = Utils.imagePixelToRealCoordinates(pt1.x, pt1.y, pxSizeNmX);
+			var nm2 = Utils.imagePixelToRealCoordinates(pt2.x, pt2.y, pxSizeNmX);
+
+			// before we make the distance calculation
+			var distNm = Utils.distance(nm1.x, nm1.y, nm2.x, nm2.y);
 			var fmt = Utils.formatUnitNm(distNm);
 			text.text(fmt.value.toFixed(G_MATH_TOFIXED.SHORT) + " " + fmt.unit);
 		};
 
-		var anchorMove = function(anchor){
+		var anchorMove = function(e, anchor){
+			// shift-key makes straight horizontal line
+			if (e.evt.shiftKey) {
+				if (anchor == anchors.start) {
+					anchors.start.y(anchors.end.y());
+				} else {
+					anchors.end.y(anchors.start.y());
+				}
+			}
+
+			// ctrl-key makes straight vertical line
+			if (e.evt.ctrlKey) {
+				if (anchor == anchors.start) {
+					anchors.start.x(anchors.end.x());
+				} else {
+					anchors.end.x(anchors.start.x());
+				}
+			}
+
 			line.points([
 				anchors.start.x() - line.x(),
 				anchors.start.y() - line.y(),
@@ -234,20 +263,13 @@ const Utils = {
 			draggable: true,
 		});
 		var line = new Konva.Arrow({
-			strokeWidth: 2,
-			stroke: "lime",
-			fill: "lime",
 			pointerAtBeginning: true,
 			points: [x1, y1, x2, y2],
 			// draggable: true,
+			strokeWidth: 2,
+			fill: "lime",
+			stroke: 'lime',
 		});
-		// line.on('dragmove', function(){
-		// 	var pts = line.points();
-		// 	anchors.start.x(pts[0] + line.x());
-		// 	anchors.start.y(pts[1] + line.y());
-		// 	anchors.end.x(pts[2] + line.x());
-		// 	anchors.end.y(pts[3] + line.y());
-		// });
 		line.on("mouseover", function(){
 			// document.body.style.cursor = "pointer";
 			this.strokeWidth(4);
@@ -258,14 +280,16 @@ const Utils = {
 		});
 		group.on('mouseover', function(){ document.body.style.cursor = "pointer"; });
 		group.on('mouseout', function(){ document.body.style.cursor = "default"; });
+
 		var updateLabel = function(){
 			updateText();
 			var linePts = line.points();
-			text.position({
+			label.position({
 				x: (linePts[0] + linePts[2]) / 2,
 				y: (linePts[1] + linePts[3]) / 2,
 			});
-			text.offsetX(text.width() / 2);
+			label.offsetX(label.width() / 2);
+			label.offsetY(label.height() / 2);
 		};
 		group.on('dragmove', updateLabel);
 
@@ -273,9 +297,12 @@ const Utils = {
 		var text = new Konva.Text({
 			text: '0.00 nm',
 			fontFamily: 'monospace',
-			fontSize: 10,
+			fontSize: 12,
+			// fontStyle: 'bold',
 			padding: 5,
-			fill: 'yellow',
+			fill: 'lime',
+			fillAfterStrokeEnabled: true,
+			stroke: 'black',
 		});
 		label.add(text);
 
@@ -310,9 +337,9 @@ const Utils = {
 			document.body.style.cursor = "default";
 			this.strokeWidth(strokeWidth);
 		});
-		anchor.on("dragmove", function () {
+		anchor.on("dragmove", function (e) {
 			if (typeof onMove == 'function')
-				onMove(this);
+				onMove(e, this);
 		});
 
 		return anchor;
@@ -1082,6 +1109,55 @@ const Utils = {
 	 */
 	toRadians: function(angle) { return angle * (Math.PI / 180); },
 
+	/**
+	 * Calculates the euclidean distance.
+	 * @param {*} x1 
+	 * @param {*} y1 
+	 * @param {*} x2 
+	 * @param {*} y2 
+	 * @returns the distance in the given coordinates' units.
+	 */
+	distance: function(x1, y1, x2, y2) {
+		// https://stackoverflow.com/a/33743107/883015
+		var dist = Math.hypot(x2-x1, y2-y1);
+		return dist;
+	},
+
+	stageToUnitCoordinates: function(x, y, stage){
+		var centered = {
+			x: x - (stage.width() / 2),
+			y: y - (stage.height() / 2),
+		};
+
+		var unit = {
+			x: centered.x / stage.width(),
+			y: centered.y / stage.height(),
+		};
+
+		return unit;
+	},
+
+	unitToImagePixelCoordinates: function(x, y, imageObj) {
+		return {
+			x: x * imageObj.width,
+			y: y * imageObj.height,
+		};
+	},
+
+	stageToImagePixelCoordinates: function(x, y, stage, imageObj) {
+		var unit = this.stageToUnitCoordinates(x, y, stage);
+		var ipixel = this.unitToImagePixelCoordinates(unit.x, unit.y, imageObj);
+		return ipixel;
+	},
+
+	imagePixelToRealCoordinates: function(x, y, pxSizeX, pxSizeY = null) {
+		if (pxSizeY == null) { pxSizeY = pxSizeX; }
+		return {
+			x: x * pxSizeX,
+			y: y * pxSizeY,
+		};
+	},
+	
 	/**
 	 * Formats the values given to the appropriate display unit (nm or μm).
 	 * @param {*} value_in_nm a value in nm.
