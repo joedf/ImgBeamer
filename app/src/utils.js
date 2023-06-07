@@ -371,7 +371,8 @@ const Utils = {
 			getLengthNm: function(){ return lengthNm; },
 			getPixelSize: function(lengthNm){
 				return calculateNewPixelSize(lengthNm);
-			}
+			},
+			doUpdate: function(){ updateLabel(); },
 		};
 	},
 

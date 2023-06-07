@@ -262,6 +262,9 @@ function OnImageLoaded(eImg, stages){
 			// currently only support it in x-direction;
 			// TODO: support non-square pixel...
 			G_GUI_Controller.pixelSize_nm = pixelSize.x;
+			// TODO: another way to update? w/o using globals?
+			G_GUI_Controller.updateViews();
+			ruler.doUpdate();
 		}
 	});
 	G_UpdateRuler = function(){
