@@ -302,7 +302,6 @@ const Utils = {
 		var line = new Konva.Arrow({
 			pointerAtBeginning: true,
 			points: [x1, y1, x2, y2],
-			// draggable: true,
 			strokeWidth: 2,
 			fill: "lime",
 			stroke: 'lime',
@@ -310,7 +309,18 @@ const Utils = {
 		line.on("mouseover", function(){ this.strokeWidth(4); });
 		line.on("mouseout", function(){ this.strokeWidth(2); });
 		group.on('mouseover', function(){ document.body.style.cursor = "pointer"; });
-		group.on('mouseout', function(){ document.body.style.cursor = "default"; });
+		group.on('mouseout', function(){
+			document.body.style.cursor = "default";
+			tooltip.hide();
+		});
+		group.on('mousemove', function(){
+			var mousePos = stage.getPointerPosition();
+			tooltip.position(mousePos);
+			var offset = 5;
+			tooltip.offsetX(-offset);
+			tooltip.offsetY(-offset);
+			tooltip.show();
+		});
 
 		var updateLabel = function(){
 			updateCalc();
@@ -338,8 +348,20 @@ const Utils = {
 		});
 		label.add(text);
 
+		var tooltip = new Konva.Text({
+			text: 'Double-click to set the pixel size / scaling.',
+			fontSize: 12,
+			width: 150,
+			padding: 8,
+			fill: 'white',
+			fillAfterStrokeEnabled: true,
+			stroke: 'black',
+			visible: false,
+			listening: false,
+		});
+
 		group.add(line, anchors.start, anchors.end, label);
-		layer.add(group);
+		layer.add(group, tooltip);
 
 		updateLabel();
 
