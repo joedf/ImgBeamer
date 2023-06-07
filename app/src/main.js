@@ -256,7 +256,13 @@ function OnImageLoaded(eImg, stages){
 	ruler.element.on('dblclick', function(e){
 		var um = ruler.getLengthNm() / 1E3;
 		var pixelWidth = prompt("Please enter the length of the ruler in micrometers.", um, 0);
-		G_GUI_Controller.pixelSize_nm = ruler.getPixelSize(pixelWidth);
+		if (pixelWidth > 0) {
+			var pixelSize = ruler.getPixelSize(pixelWidth * 1E3);
+			
+			// currently only support it in x-direction;
+			// TODO: support non-square pixel...
+			G_GUI_Controller.pixelSize_nm = pixelSize.x;
+		}
 	});
 	G_UpdateRuler = function(){
 		var show =  Utils.getShowRulerInput();

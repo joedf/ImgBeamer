@@ -211,7 +211,8 @@ const Utils = {
 
 		var lengthNm = 0;
 
-		var updateText = function(){
+		var updateCalc = function(){
+			//TODO: maybe have scaling function for this...?
 			var linePts = line.points();
 			var pxSizeNmX = Utils.getPixelSizeNmInput();
 			
@@ -230,6 +231,37 @@ const Utils = {
 			text.text(fmt.value.toFixed(G_MATH_TOFIXED.SHORT) + " " + fmt.unit);
 
 			lengthNm = distNm;
+		};
+
+		var calculateNewPixelSize = function(lengthNm){
+			// does the "reverse" calculation for the pixel size
+			
+			// get points in image pixel coordinates
+			var linePts = line.points();
+			var pt1 = Utils.stageToImagePixelCoordinates(linePts[0], linePts[1], stage, oImg);
+			var pt2 = Utils.stageToImagePixelCoordinates(linePts[2], linePts[3], stage, oImg);
+
+			// compute x/y components and scale it accordingly
+			var dx = Math.abs(pt1.x - pt2.x);
+			var dy = Math.abs(pt1.y - pt2.y);
+
+			// compute angle
+			// https://stackoverflow.com/a/9614122/883015
+			var radAngle = Math.atan2(dy, dx);
+
+			// decompose the given length in to x/y components
+			var length = {
+				x: lengthNm * Math.cos(radAngle),
+				y: lengthNm * Math.sin(radAngle),
+			};
+
+			// calculate pixel size
+			var pxSizeNm = {
+				x: length.x / dx,
+				y: length.y / dy,
+			};
+
+			return pxSizeNm;
 		};
 
 		var anchorMove = function(e, anchor){
@@ -281,7 +313,7 @@ const Utils = {
 		group.on('mouseout', function(){ document.body.style.cursor = "default"; });
 
 		var updateLabel = function(){
-			updateText();
+			updateCalc();
 			var linePts = line.points();
 			label.position({
 				x: (linePts[0] + linePts[2]) / 2,
@@ -309,12 +341,6 @@ const Utils = {
 		layer.add(group);
 
 		updateLabel();
-
-		var calculateNewPixelSize = function(lengthNm){
-			// TODO: reverse calc the pixel size
-			// use trig to get x/y components and scale it accordingly
-			return 1.0;
-		};
 
 		// return {"group": group, "archors": anchors, "line": line};
 		return {
