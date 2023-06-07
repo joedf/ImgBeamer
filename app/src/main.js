@@ -255,7 +255,9 @@ function OnImageLoaded(eImg, stages){
 	);
 	ruler.element.on('dblclick', function(e){
 		var um = ruler.getLengthNm() / 1E3;
-		var pixelWidth = prompt("Please enter the length of the ruler in micrometers (μm).", um, 0);
+		var pixelWidth = prompt("Please enter the length of the ruler in micrometers (μm)."
+			+ "\n\nTIP! Try holding the [Shift] key for horizontal lines or "
+			+ "[Ctrl] for vertical lines.", um, 0);
 		if (pixelWidth > 0) {
 			var pixelSize = ruler.getPixelSize(pixelWidth * 1E3);
 			
