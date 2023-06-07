@@ -334,6 +334,7 @@ const Utils = {
 			fill: 'lime',
 			fillAfterStrokeEnabled: true,
 			stroke: 'black',
+			listening: false,
 		});
 		label.add(text);
 
