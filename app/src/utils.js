@@ -230,6 +230,7 @@ const Utils = {
 			var nm2 = Utils.imagePixelToRealCoordinates(pt2.x, pt2.y, pxSizeNmX);
 
 			// before we make the distance calculation
+			// this is done to support non-square pixels
 			var distNm = Utils.distance(nm1.x, nm1.y, nm2.x, nm2.y);
 			var fmt = Utils.formatUnitNm(distNm);
 			text.text(fmt.value.toFixed(G_MATH_TOFIXED.SHORT) + " " + fmt.unit);
@@ -254,6 +255,7 @@ const Utils = {
 			var radAngle = Math.atan2(dy, dx);
 
 			// decompose the given length in to x/y components
+			// this is done to support non-square pixels
 			var length = {
 				x: lengthNm * Math.cos(radAngle),
 				y: lengthNm * Math.sin(radAngle),
