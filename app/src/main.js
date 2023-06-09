@@ -250,6 +250,7 @@ function OnImageLoaded(eImg, stages){
 	var rulerLayer = new Konva.Layer({visible: false});
 	groundtruthMapStage.add(rulerLayer);
 	var ruler = Utils.CreateRuler(rulerLayer, eImg,
+		// Default is a ruler that is 2/3rd width of the stage and vertically in middle
 		groundtruthMapStage.width()*(1/3), groundtruthMapStage.height()/2,
 		groundtruthMapStage.width()*(2/3), groundtruthMapStage.height()/2
 	);
