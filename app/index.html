@@ -101,13 +101,22 @@
 				};
 				this.pixelSize_nm = 500; // nm/px default;
 				this.previewOpacity = 0.4;
+				this.showRuler = false;
+				this.controls = {};
 			};
 			
 			var gui_ip = gui.addFolder('Imaging Parameters');
 			gui_ip.add(G_GUI_Controller, 'pixelCountX', 1, 64, 1).onChange(G_GUI_Controller.updateViews);
 			gui_ip.add(G_GUI_Controller, 'pixelCountY', 1, 64, 1).onChange(G_GUI_Controller.updateViews);
 			gui_ip.add(G_GUI_Controller, 'digitalMag').listen();
-			gui_ip.add(G_GUI_Controller, 'pixelSize_nm', 1, 1000, 1).onChange(G_GUI_Controller.updateViews);
+			G_GUI_Controller.controls.pixelSize_nm = gui_ip
+			.add(G_GUI_Controller, 'pixelSize_nm', 1, 1000, 1).onChange(function(){
+				G_GUI_Controller.updateViews();
+				G_UpdateRuler();
+			});
+			gui_ip.add(G_GUI_Controller, 'showRuler').onChange(function(){
+				G_UpdateRuler();
+			});
 			gui_ip.open();
 
 			var gui_do = gui.addFolder('Display Options');

@@ -42,7 +42,8 @@ var G_UpdateVirtualSEMConfig = null;
 var G_Update_GroundTruth = null;
 /** global reference to update the Information displays */
 var G_Update_InfoDisplays = null;
-
+/** global reference to update the ruler */
+var G_UpdateRuler = null;
 
 /** a global reference to the main body container that holds the boxes/stages.
  * @todo do we still need this? Maybe remove... */
@@ -131,7 +132,7 @@ function OnImageLoaded(eImg, stages){
 
 	/** prompts the user for the spot width % */
 	function promptForSpotWidth(){
-		var spotWidth = prompt("Spot width (%) - Default is 100%", 100, 0);
+		var spotWidth = prompt("Spot width (%) - Default is 100%", 100);
 		if (spotWidth > 0) {
 			Utils_SetSpotWidth(spotWidth);
 		}
@@ -244,6 +245,34 @@ function OnImageLoaded(eImg, stages){
 	var groundtruthMap = drawGroundtruthImage(groundtruthMapStage, eImg, subregionImage, G_BOX_SIZE);
 	var updateGroundtruthMap = groundtruthMap.updateFunc;
 	G_Update_GroundTruth = updateGroundtruthMap;
+
+	// add ruler on Groun truth stage
+	var rulerLayer = new Konva.Layer({visible: false});
+	groundtruthMapStage.add(rulerLayer);
+	var ruler = Utils.CreateRuler(rulerLayer, eImg,
+		// Default is a ruler that is 2/3rd width of the stage and vertically in middle
+		groundtruthMapStage.width()*(1/3), groundtruthMapStage.height()/2,
+		groundtruthMapStage.width()*(2/3), groundtruthMapStage.height()/2
+	);
+	ruler.element.on('dblclick', function(e){
+		var um = ruler.getLengthNm() / 1E3;
+		var pixelWidth = prompt("Please enter the length of the ruler in micrometers (μm)."
+			+ "\n\nTIP! Try holding the [Shift] key for horizontal lines or "
+			+ "[Ctrl] for vertical lines.", um, 0);
+		if (pixelWidth > 0) {
+			var pixelSize = ruler.getPixelSize(pixelWidth * 1E3);
+			
+			// TODO: support non-square pixel...
+			// currently only support it in x-direction;
+			Utils.setPixelSizeNmInput(pixelSize.x);
+			ruler.doUpdate();
+		}
+	});
+	G_UpdateRuler = function(){
+		var show =  Utils.getShowRulerInput();
+		ruler.doUpdate(); // update the ruler
+		rulerLayer.visible(show); // update visibility
+	};
 	
 	// draw Resulting Image
 	$(virtualSEMStage.getContainer()).attr('box_label', 'Resulting Image');
