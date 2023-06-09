@@ -406,7 +406,7 @@ const Utils = {
 			fill: "#ddd",
 			strokeWidth: strokeWidth,
 			draggable: true,
-			opacity: 0.5,
+			opacity: 0.4,
 		});
 
 		// add hover styling
