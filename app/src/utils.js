@@ -147,7 +147,7 @@ const Utils = {
 	getSpotAngleInput: function(){ return this.getInputValueInt($('#iSpotAngle')); },
 	getGroundtruthImage: function(){ return G_GUI_Controller.groundTruthImg; },
 	getPixelSizeNmInput: function(){ return G_GUI_Controller.pixelSize_nm; },
-	setPixelSizeNmInput: function(val){ G_GUI_Controller._ctrl_pxSize.setValue(val); },
+	setPixelSizeNmInput: function(val){ G_GUI_Controller.controls.pixelSize_nm.setValue(val); },
 	getShowRulerInput: function(){ return G_GUI_Controller.showRuler; },
 	getSpotLayoutOpacityInput: function(){ return G_GUI_Controller.previewOpacity; },
 
