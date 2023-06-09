@@ -210,7 +210,23 @@ const Utils = {
 		return handler;
 	},
 
-	CreateRuler: function(layer, oImg, x1, y1, x2, y2) {
+	/**
+	 * Creates a ruler control / drawable on the given layer of a konva stage.
+	 * Scaling is calculated using the stage size, the input image size,
+	 * and the (globally set) image pixel size in "real" / physical units.
+	 * @param {*} layer The layer of the stage to draw on.
+	 * @param {*} oImg The input image.
+	 * @param {*} x1 the starting x coordinate of the ruler line.
+	 * @param {*} y1 the starting y coordinate of the ruler line.
+	 * @param {*} x2 the ending x coordinate of the ruler line.
+	 * @param {*} y2 the ending y coordinate of the ruler line.
+	 * @returns an object with the property "element" for the drawable control,
+	 * a getLengthNm() method to get the current length of the ruler in physical units,
+	 * a getPixelSize(lengthNm) method to calculate the pixel size in physical (nm) units
+	 * based on the new specified length of the ruler in physical (nm) units,
+	 * and a doUpdate() method to update the ruler to represent the its latest state.
+	 */
+	CreateRuler: function(layer, oImg, x1 = 0, y1 = 50, x2 = 50, y2 = 50) {
 		var stage = layer.getStage();
 
 		var lengthNm = 0;
