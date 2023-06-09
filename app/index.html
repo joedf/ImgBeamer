@@ -108,10 +108,11 @@
 			gui_ip.add(G_GUI_Controller, 'pixelCountX', 1, 64, 1).onChange(G_GUI_Controller.updateViews);
 			gui_ip.add(G_GUI_Controller, 'pixelCountY', 1, 64, 1).onChange(G_GUI_Controller.updateViews);
 			gui_ip.add(G_GUI_Controller, 'digitalMag').listen();
-			gui_ip.add(G_GUI_Controller, 'pixelSize_nm', 1, 1000, 1).onChange(function(){
+			G_GUI_Controller._ctrl_pxSize = gui_ip
+			.add(G_GUI_Controller, 'pixelSize_nm', 1, 1000, 1).onChange(function(){
 				G_GUI_Controller.updateViews();
 				G_UpdateRuler();
-			}).listen();
+			});
 			gui_ip.add(G_GUI_Controller, 'showRuler').onChange(function(){
 				G_UpdateRuler();
 			});

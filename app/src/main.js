@@ -270,7 +270,7 @@ function OnImageLoaded(eImg, stages){
 	});
 	G_UpdateRuler = function(){
 		var show =  Utils.getShowRulerInput();
-		// ruler.doUpdate(); // update the ruler
+		ruler.doUpdate(); // update the ruler
 		rulerLayer.visible(show); // update visibility
 	};
 	
