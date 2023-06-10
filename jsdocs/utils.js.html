@@ -218,6 +218,8 @@ const Utils = {
 	getSpotAngleInput: function(){ return this.getInputValueInt($('#iSpotAngle')); },
 	getGroundtruthImage: function(){ return G_GUI_Controller.groundTruthImg; },
 	getPixelSizeNmInput: function(){ return G_GUI_Controller.pixelSize_nm; },
+	setPixelSizeNmInput: function(val){ G_GUI_Controller.controls.pixelSize_nm.setValue(val); },
+	getShowRulerInput: function(){ return G_GUI_Controller.showRuler; },
 	getSpotLayoutOpacityInput: function(){ return G_GUI_Controller.previewOpacity; },
 
 	/**
@@ -274,6 +276,225 @@ const Utils = {
 		};
 
 		return handler;
+	},
+
+	/**
+	 * Creates a ruler control / drawable on the given layer of a konva stage.
+	 * Scaling is calculated using the stage size, the input image size,
+	 * and the (globally set) image pixel size in "real" / physical units.
+	 * @param {*} layer The layer of the stage to draw on.
+	 * @param {*} oImg The input image.
+	 * @param {*} x1 the starting x coordinate of the ruler line.
+	 * @param {*} y1 the starting y coordinate of the ruler line.
+	 * @param {*} x2 the ending x coordinate of the ruler line.
+	 * @param {*} y2 the ending y coordinate of the ruler line.
+	 * @returns an object with the property "element" for the drawable control,
+	 * a getLengthNm() method to get the current length of the ruler in physical units,
+	 * a getPixelSize(lengthNm) method to calculate the pixel size in physical (nm) units
+	 * based on the new specified length of the ruler in physical (nm) units,
+	 * and a doUpdate() method to update the ruler to represent the its latest state.
+	 */
+	CreateRuler: function(layer, oImg, x1 = 0, y1 = 50, x2 = 50, y2 = 50) {
+		var stage = layer.getStage();
+
+		var lengthNm = 0;
+
+		var updateCalc = function(){
+			//TODO: maybe have scaling function for this...?
+			var linePts = line.points();
+			var pxSizeNmX = Utils.getPixelSizeNmInput();
+			
+			// we need to scale by stage size as well and image size...
+			var pt1 = Utils.stageToImagePixelCoordinates(linePts[0], linePts[1], stage, oImg);
+			var pt2 = Utils.stageToImagePixelCoordinates(linePts[2], linePts[3], stage, oImg);
+
+			// and convert to "real" units
+			// currently we only have pixel size in X direction
+			var nm1 = Utils.imagePixelToRealCoordinates(pt1.x, pt1.y, pxSizeNmX);
+			var nm2 = Utils.imagePixelToRealCoordinates(pt2.x, pt2.y, pxSizeNmX);
+
+			// before we make the distance calculation
+			// this is done to support non-square pixels
+			var distNm = Utils.distance(nm1.x, nm1.y, nm2.x, nm2.y);
+			var fmt = Utils.formatUnitNm(distNm);
+			text.text(fmt.value.toFixed(G_MATH_TOFIXED.SHORT) + " " + fmt.unit);
+
+			lengthNm = distNm;
+		};
+
+		var calculateNewPixelSize = function(lengthNm){
+			// does the "reverse" calculation for the pixel size
+			
+			// get points in image pixel coordinates
+			var linePts = line.points();
+			var pt1 = Utils.stageToImagePixelCoordinates(linePts[0], linePts[1], stage, oImg);
+			var pt2 = Utils.stageToImagePixelCoordinates(linePts[2], linePts[3], stage, oImg);
+
+			// compute x/y components and scale it accordingly
+			var dx = Math.abs(pt1.x - pt2.x);
+			var dy = Math.abs(pt1.y - pt2.y);
+
+			// compute angle
+			// https://stackoverflow.com/a/9614122/883015
+			var radAngle = Math.atan2(dy, dx);
+
+			// decompose the given length in to x/y components
+			// this is done to support non-square pixels
+			var length = {
+				x: lengthNm * Math.cos(radAngle),
+				y: lengthNm * Math.sin(radAngle),
+			};
+
+			// calculate pixel size
+			var pxSizeNm = {
+				x: length.x / dx,
+				y: length.y / dy,
+			};
+
+			return pxSizeNm;
+		};
+
+		var anchorMove = function(e, anchor){
+			// shift-key makes straight horizontal line
+			if (e.evt.shiftKey) {
+				if (anchor == anchors.start) {
+					anchors.start.y(anchors.end.y());
+				} else {
+					anchors.end.y(anchors.start.y());
+				}
+			}
+
+			// ctrl-key makes straight vertical line
+			else if (e.evt.ctrlKey) {
+				if (anchor == anchors.start) {
+					anchors.start.x(anchors.end.x());
+				} else {
+					anchors.end.x(anchors.start.x());
+				}
+			}
+
+			line.points([
+				anchors.start.x() - line.x(),
+				anchors.start.y() - line.y(),
+				anchors.end.x() - line.x(),
+				anchors.end.y() - line.y()
+			]);
+		};
+
+		var anchors = {
+			start: this._CreateAnchor(x1, y1, anchorMove),
+			end: this._CreateAnchor(x2, y2, anchorMove),
+		};
+
+		var group = new Konva.Group({
+			draggable: true,
+		});
+		var line = new Konva.Arrow({
+			pointerAtBeginning: true,
+			points: [x1, y1, x2, y2],
+			strokeWidth: 2,
+			fill: "lime",
+			stroke: 'lime',
+		});
+		line.on("mouseover", function(){ this.strokeWidth(4); });
+		line.on("mouseout", function(){ this.strokeWidth(2); });
+		group.on('mouseover', function(){ document.body.style.cursor = "pointer"; });
+		group.on('mouseout', function(){
+			document.body.style.cursor = "default";
+			tooltip.hide();
+		});
+		group.on('mousemove', function(){
+			var mousePos = stage.getPointerPosition();
+			tooltip.position(mousePos);
+			var offset = 5;
+			tooltip.offsetX(-offset);
+			tooltip.offsetY(-offset);
+			tooltip.show();
+		});
+
+		var updateLabel = function(){
+			updateCalc();
+			var linePts = line.points();
+			label.position({
+				x: (linePts[0] + linePts[2]) / 2,
+				y: (linePts[1] + linePts[3]) / 2,
+			});
+			label.offsetX(label.width() / 2);
+			label.offsetY(label.height() / 2);
+		};
+		group.on('dragmove', updateLabel);
+
+		var label = new Konva.Label();
+		var text = new Konva.Text({
+			text: '0.00 nm',
+			fontFamily: 'monospace',
+			fontSize: 12,
+			// fontStyle: 'bold',
+			padding: 5,
+			fill: 'lime',
+			fillAfterStrokeEnabled: true,
+			stroke: 'black',
+			listening: false,
+		});
+		label.add(text);
+
+		var tooltip = new Konva.Text({
+			text: 'Double-click to set the pixel size / scaling.',
+			fontSize: 12,
+			width: 150,
+			padding: 8,
+			fill: 'white',
+			fillAfterStrokeEnabled: true,
+			stroke: 'black',
+			visible: false,
+			listening: false,
+		});
+
+		group.add(line, anchors.start, anchors.end, label);
+		layer.add(group, tooltip);
+
+		updateLabel();
+
+		// return {"group": group, "archors": anchors, "line": line};
+		return {
+			element: group,
+			getLengthNm: function(){ return lengthNm; },
+			getPixelSize: function(lengthNm){
+				return calculateNewPixelSize(lengthNm);
+			},
+			doUpdate: function(){ updateLabel(); },
+		};
+	},
+
+	_CreateAnchor: function(x, y, onMove, strokeWidth = 2) {
+		// modified from:
+		// https://konvajs.org/docs/sandbox/Modify_Curves_with_Anchor_Points.html
+		var anchor = new Konva.Circle({
+			x: x,
+			y: y,
+			radius: 5,
+			stroke: "#666",
+			fill: "#ddd",
+			strokeWidth: strokeWidth,
+			draggable: true,
+			opacity: 0.4,
+		});
+
+		// add hover styling
+		anchor.on("mouseover", function () {
+			document.body.style.cursor = "pointer";
+			this.strokeWidth(strokeWidth + 2);
+		});
+		anchor.on("mouseout", function () {
+			document.body.style.cursor = "default";
+			this.strokeWidth(strokeWidth);
+		});
+		anchor.on("dragmove", function (e) {
+			if (typeof onMove == 'function')
+				onMove(e, this);
+		});
+
+		return anchor;
 	},
 
 	/**
@@ -445,6 +666,8 @@ const Utils = {
 		};
 
 		// get optimal / formated unit
+		// TODO: maybe use "this." instead of "Utils."
+		// do it for all functions too?
 		var fmtPxSize = Utils.formatUnitNm(pxSize.w, pxSize.h);
 
 		// display coords &amp; FOV size
@@ -1039,6 +1262,85 @@ const Utils = {
 	toRadians: function(angle) { return angle * (Math.PI / 180); },
 
 	/**
+	 * Calculates the euclidean distance.
+	 * @param {*} x1 
+	 * @param {*} y1 
+	 * @param {*} x2 
+	 * @param {*} y2 
+	 * @returns the distance in the given coordinates' units.
+	 */
+	distance: function(x1, y1, x2, y2) {
+		// https://stackoverflow.com/a/33743107/883015
+		var dist = Math.hypot(x2-x1, y2-y1);
+		return dist;
+	},
+
+	/**
+	 * Convert stage to unit square coordinates
+	 * @param {*} x 
+	 * @param {*} y 
+	 * @param {*} stage coordinates source stage
+	 * @returns unit square coordinates
+	 */
+	stageToUnitCoordinates: function(x, y, stage){
+		var centered = {
+			x: x - (stage.width() / 2),
+			y: y - (stage.height() / 2),
+		};
+
+		var unit = {
+			x: centered.x / stage.width(),
+			y: centered.y / stage.height(),
+		};
+
+		return unit;
+	},
+
+	/**
+	 * Convert unit square to image pixel coordinates.
+	 * @param {*} x 
+	 * @param {*} y 
+	 * @param {*} imageObj the original image object (with a width and height property)
+	 * @returns image pixel coordinates
+	 */
+	unitToImagePixelCoordinates: function(x, y, imageObj) {
+		return {
+			x: x * imageObj.width,
+			y: y * imageObj.height,
+		};
+	},
+
+	/**
+	 * Convert stage to Image pixel coordinates
+	 * @param {*} x 
+	 * @param {*} y 
+	 * @param {*} stage coordinates source stage
+	 * @param {*} imageObj the original image object (with a width and height property)
+	 * @returns image pixel coordinates
+	 */
+	stageToImagePixelCoordinates: function(x, y, stage, imageObj) {
+		var unit = this.stageToUnitCoordinates(x, y, stage);
+		var ipixel = this.unitToImagePixelCoordinates(unit.x, unit.y, imageObj);
+		return ipixel;
+	},
+
+	/**
+	 * Convert image pixel to coordinates in "real" (or scaled) units
+	 * @param {*} x 
+	 * @param {*} y 
+	 * @param {*} pxSizeX the width of a pixel in "real" units
+	 * @param {*} pxSizeY the height of a pixel in "real" units
+	 * @returns "real" coordinates
+	 */
+	imagePixelToRealCoordinates: function(x, y, pxSizeX, pxSizeY = null) {
+		if (pxSizeY == null) { pxSizeY = pxSizeX; }
+		return {
+			x: x * pxSizeX,
+			y: y * pxSizeY,
+		};
+	},
+	
+	/**
 	 * Formats the values given to the appropriate display unit (nm or μm).
 	 * @param {*} value_in_nm a value in nm.
 	 * @param {*} value2_in_nm (optional) a value in nm.
@@ -1221,13 +1523,13 @@ const Utils = {
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="G_MATH_TOFIXED.html">G_MATH_TOFIXED</a></li><li><a href="NRMSE.html">NRMSE</a></li><li><a href="Utils.html">Utils</a></li></ul><h3>Global</h3><ul><li><a href="global.html#G_AUTO_PREVIEW_LIMIT">G_AUTO_PREVIEW_LIMIT</a></li><li><a href="global.html#G_BOX_SIZE">G_BOX_SIZE</a></li><li><a href="global.html#G_INPUT_IMAGE">G_INPUT_IMAGE</a></li><li><a href="global.html#G_MAIN_CONTAINER">G_MAIN_CONTAINER</a></li><li><a href="global.html#G_MAIN_IMAGE_OBJ">G_MAIN_IMAGE_OBJ</a></li><li><a href="global.html#G_UpdateResampled">G_UpdateResampled</a></li><li><a href="global.html#G_UpdateVirtualSEMConfig">G_UpdateVirtualSEMConfig</a></li><li><a href="global.html#G_Update_GroundTruth">G_Update_GroundTruth</a></li><li><a href="global.html#G_Update_InfoDisplays">G_Update_InfoDisplays</a></li><li><a href="global.html#G_VSEM_PAUSED">G_VSEM_PAUSED</a></li><li><a href="global.html#GetOptimalBoxWidth">GetOptimalBoxWidth</a></li><li><a href="global.html#OnImageLoaded">OnImageLoaded</a></li><li><a href="global.html#ResampleFullImage">ResampleFullImage</a></li><li><a href="global.html#UpdateBaseImage">UpdateBaseImage</a></li><li><a href="global.html#drawGroundtruthImage">drawGroundtruthImage</a></li><li><a href="global.html#drawProbeLayout">drawProbeLayout</a></li><li><a href="global.html#drawProbeLayoutSampling">drawProbeLayoutSampling</a></li><li><a href="global.html#drawResampled">drawResampled</a></li><li><a href="global.html#drawSpotContent">drawSpotContent</a></li><li><a href="global.html#drawSpotProfileEdit">drawSpotProfileEdit</a></li><li><a href="global.html#drawSpotSignal">drawSpotSignal</a></li><li><a href="global.html#drawSubregionImage">drawSubregionImage</a></li><li><a href="global.html#drawVirtualSEM">drawVirtualSEM</a></li><li><a href="global.html#nStages">nStages</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="G_MATH_TOFIXED.html">G_MATH_TOFIXED</a></li><li><a href="NRMSE.html">NRMSE</a></li><li><a href="Utils.html">Utils</a></li></ul><h3>Global</h3><ul><li><a href="global.html#G_AUTO_PREVIEW_LIMIT">G_AUTO_PREVIEW_LIMIT</a></li><li><a href="global.html#G_BOX_SIZE">G_BOX_SIZE</a></li><li><a href="global.html#G_INPUT_IMAGE">G_INPUT_IMAGE</a></li><li><a href="global.html#G_MAIN_CONTAINER">G_MAIN_CONTAINER</a></li><li><a href="global.html#G_MAIN_IMAGE_OBJ">G_MAIN_IMAGE_OBJ</a></li><li><a href="global.html#G_UpdateResampled">G_UpdateResampled</a></li><li><a href="global.html#G_UpdateRuler">G_UpdateRuler</a></li><li><a href="global.html#G_UpdateVirtualSEMConfig">G_UpdateVirtualSEMConfig</a></li><li><a href="global.html#G_Update_GroundTruth">G_Update_GroundTruth</a></li><li><a href="global.html#G_Update_InfoDisplays">G_Update_InfoDisplays</a></li><li><a href="global.html#G_VSEM_PAUSED">G_VSEM_PAUSED</a></li><li><a href="global.html#GetOptimalBoxWidth">GetOptimalBoxWidth</a></li><li><a href="global.html#OnImageLoaded">OnImageLoaded</a></li><li><a href="global.html#ResampleFullImage">ResampleFullImage</a></li><li><a href="global.html#UpdateBaseImage">UpdateBaseImage</a></li><li><a href="global.html#drawGroundtruthImage">drawGroundtruthImage</a></li><li><a href="global.html#drawProbeLayout">drawProbeLayout</a></li><li><a href="global.html#drawProbeLayoutSampling">drawProbeLayoutSampling</a></li><li><a href="global.html#drawResampled">drawResampled</a></li><li><a href="global.html#drawSpotContent">drawSpotContent</a></li><li><a href="global.html#drawSpotProfileEdit">drawSpotProfileEdit</a></li><li><a href="global.html#drawSpotSignal">drawSpotSignal</a></li><li><a href="global.html#drawSubregionImage">drawSubregionImage</a></li><li><a href="global.html#drawVirtualSEM">drawVirtualSEM</a></li><li><a href="global.html#nStages">nStages</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Wed May 31 2023 01:40:40 GMT-0400 (Eastern Daylight Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Sat Jun 10 2023 14:12:28 GMT-0400 (Eastern Daylight Time)
 </footer>
 
 <a id="backtotop" href="#"><div>&uarr; Top</div></a>
