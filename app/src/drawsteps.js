@@ -785,31 +785,17 @@ function drawGroundtruthImage(stage, imageObj, subregionImage, maxSize=G_BOX_SIZ
 			y: rect.y() + rect.height()/2,
 		};
 
-		// transform so that the coords have the middle of the stage as 0,0
-		var stageCentered = {
-			x: center.x - stage.width()/2,
-			y: center.y - stage.height()/2,
-		};
-
 		// transform to unit square coords
-		var unitCoords = {
-			x: stageCentered.x / stage.width(),
-			y: stageCentered.y / stage.height(),
-		};
+		var unitCoords = Utils.stageToUnitCoordinates(center.x, center.y, stage);
 
 		// scale to original image pixel size
-		var pxImgCoords = {
-			x: unitCoords.x * imageObj.width,
-			y: unitCoords.y * imageObj.height,
-		};
+		var pxImgCoords = Utils.unitToImagePixelCoordinates(unitCoords.x, unitCoords.y, imageObj);
 
 		var pxSizeNm = Utils.getPixelSizeNmInput();
 
 		// scale as real physical units
-		var middle = {
-			x: pxImgCoords.x * pxSizeNm,
-			y: pxImgCoords.y * pxSizeNm,
-		};
+		var middle = Utils.imagePixelToRealCoordinates(pxImgCoords.x, pxImgCoords.y, pxSizeNm);
+
 		// get as optimal displayUnit
 		var fmtMiddle = Utils.formatUnitNm(middle.x, middle.y);
 
