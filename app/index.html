@@ -99,6 +99,7 @@
 					// getInputImage();
 					$('#_fileImgInput').click();
 				};
+				this.aboutMessage = function(){ Utils.ShowAboutMessage(); };
 				this.pixelSize_nm = 500; // nm/px default;
 				this.previewOpacity = 0.4;
 				this.showRuler = false;
@@ -140,6 +141,8 @@
 				'grains2c.png',
 				'grains2tl.png',
 				'grains2nc.png',
+				'APT_needle.png',
+				'EL-JM-P4_448nm-px.png',
 			]).listen().onChange(function(){
 				var fname = Utils.getGroundtruthImage();
 				if (fname.length > 0) {
@@ -150,6 +153,8 @@
 			});
 			gui_io.add(G_GUI_Controller, 'importImage');
 			gui_io.add(G_GUI_Controller, 'exportResultImg');
+			var aboutBtn = gui.add(G_GUI_Controller, 'aboutMessage');
+			aboutBtn.name("About " + G_APP_NAME + " / Credits");
 			gui_io.open();
 
 			$("#options").append(gui.domElement).draggable({

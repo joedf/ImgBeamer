@@ -4,6 +4,7 @@
  G_GUI_Controller
  UTIF
  G_AUTO_PREVIEW_LIMIT
+ G_APP_NAME
  */
 
 /* exported GetOptimalBoxWidth */
@@ -1440,5 +1441,20 @@ const Utils = {
 		var ctx = cnv.getContext('2d');
 		var data = ctx.getImageData(0, 0, cnv.width, cnv.height);
 		return data;
+	},
+
+	/** Displays a message/dialog box with information about this application. */
+	ShowAboutMessage: function(){
+		alert(G_APP_NAME + " was created as an easy-to-use tool to understand the effects of "
+		+ "spot size to pixel size ratio on image clarity and resolution "
+		+ "in the SEM image formation / rasterization process.\n\n"
+
+		+ "Main developer: Joachim de Fourestier\n"
+		+ "Original concept: Michael W. Phaneuf"
+
+		+ "\n\nImage contributions:"
+		+ "\n-Bavley Guerguis for the APT needle image \"APT_needle.png\""
+		+ "\n-Joachim de Fourestier for the \"El Laco tephra\" image \"EL-JM-P4_448nm-px.png\""
+		);
 	}
 };
