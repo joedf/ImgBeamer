@@ -137,14 +137,11 @@
 			var gui_io = gui.addFolder('Input / Export Image');
 			gui_io.add(G_GUI_Controller, 'groundTruthImg', [
 				'grains1.png',
-				'grains1b.png',
-				'grains1c.png',
-				'grains2.png',
-				'grains2c.png',
+				'grains2full.png',
 				'grains2tl.png',
 				'grains2nc.png',
 				'APT_needle.png',
-				'EL-JM-P4_448nm-px.png',
+				'tephra_448nm.png',
 			]).listen().onChange(function(){
 				var fname = Utils.getGroundtruthImage();
 				if (fname.length > 0) {

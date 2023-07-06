@@ -1465,16 +1465,21 @@ const Utils = {
 			spot size to pixel size ratio on image clarity and resolution
 			in the SEM image formation / rasterization process.</p>
 			
+			<p><b>Application Development</b></p>
 			<ul>
 			<li>Main developer: Joachim de Fourestier</li>
 			<li>Original concept: Michael W. Phaneuf</li>
 			</ul>
 
-			<p><b>Image contributions</b></p>
+			<p><b>Image Contributions</b></p>
 			<ul>
 				<li>Bavley Guerguis for the APT needle image <q>APT_needle.png</q></li>
-				<li>Joachim de Fourestier for the <q>El Laco tephra</q> image <q>EL-JM-P4_448nm-px.png</q></li>
+				<li>Joachim de Fourestier for the <q>El Laco tephra (EL-JM-P4)</q> image <q>tephra_448nm.png</q>
+				and the virtual <q>grains</q> images.
+				</li>
 			</ul>
+
+			<p>All images belong to their respective owners and are used here with permission.</p>
 			</div>
 			`).appendTo('body');
 
