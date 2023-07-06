@@ -1457,8 +1457,10 @@ const Utils = {
 			})
 			.css({'display':'none'})
 			.addClass('jui')
+			// fix jquery-ui auto-focus bug: https://stackoverflow.com/a/14748517/883015
 			.html(`
 			<div>
+			<input type="hidden" autofocus="autofocus" />
 			<div style="float: left;margin: 0 4px;"><img src="src/img/icon128.png" width="48"></div>
 			<p><b>`	+G_APP_NAME+ `</b> was created as an easy-to-use tool to understand the effects of 
 			the spot size to pixel size ratio on image clarity and resolution
@@ -1474,6 +1476,7 @@ const Utils = {
 			<summary><b>Source Code and Documentation</b></summary>
 			<ul>
 			<li>Source code: <a href="https://github.com/joedf/ImgBeamer">https://github.com/joedf/ImgBeamer</a></li>
+			<li>Code documentation: <a href="https://joedf.github.io/ImgBeamer/jsdocs">https://joedf.github.io/ImgBeamer/jsdocs</a></li>
 			<li>Application design: <a href="https://github.com/joedf/CAS741_w23">https://github.com/joedf/CAS741_w23</a></li>
 			<li>Quick start guide: <a href="https://joedf.github.io/ImgBeamer/misc/ImgBeamer_QS_guide.pdf">ImgBeamer_QS_guide.pdf</a></li>
 			</ul>
