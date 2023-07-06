@@ -15,6 +15,9 @@
  * G_AUTO_PREVIEW_LIMIT
  * G_VSEM_PAUSED
  * G_APP_NAME
+ * G_INPUT_IMAGE
+ * G_PRELOADED_IMAGES
+ * G_PRELOADED_IMAGES_ROOT
  */
 
 /** Name of the application */
@@ -31,9 +34,26 @@ var G_AUTO_PREVIEW_LIMIT = 16 * 16;
 /** Toggle value to pause the continously draw the Resulting Image / Virtual SEM view */
 var G_VSEM_PAUSED = false;
 
+/** The root folder for all the preloaded images specified by {@link G_PRELOADED_IMAGES}. */
+const G_PRELOADED_IMAGES_ROOT = "src/testimages/";
+
+/**
+ * The list of default/preloaded images to use with the application.
+ * @see G_PRELOADED_IMAGES_ROOT
+ */
+const G_PRELOADED_IMAGES = [
+	'grains1.png',
+	'grains2full.png',
+	'grains2tl.png',
+	'grains2nc.png',
+	'APT_needle.png',
+	'tephra_448nm.png',
+	'tephra_200nm.png',
+];
+
 /** global variable to set the input ground truth image */
 // var G_INPUT_IMAGE = Utils.getGroundtruthImage();
-var G_INPUT_IMAGE = 'src/testimages/grains2tl.png';
+var G_INPUT_IMAGE = G_PRELOADED_IMAGES_ROOT + 'grains2tl.png';
 
 /** global reference to update the resampling steps (spot layout,
  * sampled subregion, resulting subregion) displays,

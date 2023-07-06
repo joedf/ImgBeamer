@@ -7,7 +7,7 @@
 		<title>ImgBeamer</title>
 
 		<link rel="icon" href="src/img/favicon.ico" type="image/x-icon" />
-		
+
 		<link rel="stylesheet" href="src/3rd-party/jquery-ui-1.13.2.custom/jquery-ui.min.css">
 
 		<link rel="stylesheet" href="src/css/style.css">
@@ -135,18 +135,10 @@
 			// gui.add(G_GUI_Controller, 'updateViews');
 
 			var gui_io = gui.addFolder('Input / Export Image');
-			gui_io.add(G_GUI_Controller, 'groundTruthImg', [
-				'grains1.png',
-				'grains2full.png',
-				'grains2tl.png',
-				'grains2nc.png',
-				'APT_needle.png',
-				'tephra_448nm.png',
-				'tephra_200nm.png',
-			]).listen().onChange(function(){
+			gui_io.add(G_GUI_Controller, 'groundTruthImg', G_PRELOADED_IMAGES).listen().onChange(function(){
 				var fname = Utils.getGroundtruthImage();
 				if (fname.length > 0) {
-					G_INPUT_IMAGE = 'src/testimages/' + fname;
+					G_INPUT_IMAGE = G_PRELOADED_IMAGES_ROOT + fname;
 					console.log("Ground Truth Image changed to: "+G_INPUT_IMAGE);
 					$(document.body).trigger('OnGroundtruthImageChange');
 				}
@@ -213,6 +205,20 @@
 					ResampleFullImage();
 					$('#loadspinner_full').hide();
 				}, 250);
+			});
+
+			// Preload the larger image files in the background
+			// without blocking the UI for improved responsiveness
+			window.addEventListener('load', function(){
+				// https://stackoverflow.com/a/59861857/883015
+				// var images = G_PRELOADED_IMAGES;
+				var images = ['APT_needle.png', 'tephra_448nm.png', 'tephra_200nm.png'];
+				var preload = '';
+				for(let i = images.length; i > 0; i--) {
+					preload += '<link rel="preload" href="' + G_PRELOADED_IMAGES_ROOT
+					+ images[i] + '" as="image">\n';
+				}
+				$('head').append(preload);
 			});
 		</script>
 	</body>
