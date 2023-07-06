@@ -1474,7 +1474,8 @@ const Utils = {
 			<p><b>Image Contributions</b></p>
 			<ul>
 				<li>Bavley Guerguis for the APT needle image <q>APT_needle.png</q></li>
-				<li>Joachim de Fourestier for the <q>El Laco tephra (EL-JM-P4)</q> image <q>tephra_448nm.png</q>
+				<li>Joachim de Fourestier for the <q>El Laco tephra (EL-JM-P4)</q> images
+				<q>tephra_448nm.png</q>, <q>tephra_200nm.png</q>,
 				and the virtual <q>grains</q> images.
 				</li>
 			</ul>
