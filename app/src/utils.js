@@ -1460,8 +1460,7 @@ const Utils = {
 			.html(`
 			<div>
 			<div style="float: left;margin: 0 4px;"><img src="src/img/icon128.png" width="48"></div>
-			<p>`
-			+G_APP_NAME+ ` was created as an easy-to-use tool to understand the effects of 
+			<p><b>`	+G_APP_NAME+ `</b> was created as an easy-to-use tool to understand the effects of 
 			the spot size to pixel size ratio on image clarity and resolution
 			in the SEM image formation / rasterization process.</p>
 			
