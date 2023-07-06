@@ -1445,16 +1445,48 @@ const Utils = {
 
 	/** Displays a message/dialog box with information about this application. */
 	ShowAboutMessage: function(){
-		alert(G_APP_NAME + " was created as an easy-to-use tool to understand the effects of "
-		+ "spot size to pixel size ratio on image clarity and resolution "
-		+ "in the SEM image formation / rasterization process.\n\n"
+		const id = '#dialog-about';
+		var about = $(id);
+		if (about.length) {
+			about.dialog('open');
+		} else {
+			var elem = $("<div/>")
+			.attr({
+				'id': id,
+				'title': "About " + G_APP_NAME
+			})
+			.css({'display':'none'})
+			.addClass('jui')
+			.html(`
+			<div>
+			<div style="float: left;margin: 0 4px;"><img src="src/img/icon128.png" width="48"></div>
+			<p>`
+			+G_APP_NAME+ ` was created as an easy-to-use tool to understand the effects of 
+			spot size to pixel size ratio on image clarity and resolution
+			in the SEM image formation / rasterization process.</p>
+			
+			<ul>
+			<li>Main developer: Joachim de Fourestier</li>
+			<li>Original concept: Michael W. Phaneuf</li>
+			</ul>
 
-		+ "Main developer: Joachim de Fourestier\n"
-		+ "Original concept: Michael W. Phaneuf"
+			<p><b>Image contributions</b></p>
+			<ul>
+				<li>Bavley Guerguis for the APT needle image <q>APT_needle.png</q></li>
+				<li>Joachim de Fourestier for the <q>El Laco tephra</q> image <q>EL-JM-P4_448nm-px.png</q></li>
+			</ul>
+			</div>
+			`).appendTo('body');
 
-		+ "\n\nImage contributions:"
-		+ "\n-Bavley Guerguis for the APT needle image \"APT_needle.png\""
-		+ "\n-Joachim de Fourestier for the \"El Laco tephra\" image \"EL-JM-P4_448nm-px.png\""
-		);
+			elem.dialog({
+				modal: true,
+				width: 500,
+				buttons: {
+					Ok: function() {
+						$( this ).dialog( "close" );
+					}
+				}
+			});
+		}
 	}
 };
