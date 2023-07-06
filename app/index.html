@@ -8,10 +8,12 @@
 
 		<link rel="icon" href="src/img/favicon.ico" type="image/x-icon" />
 		
+		<link rel="stylesheet" href="src/3rd-party/jquery-ui-1.13.2.custom/jquery-ui.min.css">
+
 		<link rel="stylesheet" href="src/css/style.css">
 		<script src="src/3rd-party/konva/konva.js"></script>
 		<script src="src/3rd-party/jquery-3.6.1.min.js"></script>
-		<script src="src/3rd-party/jquery-ui-1.13.2/jquery-ui.min.js"></script>
+		<script src="src/3rd-party/jquery-ui-1.13.2.custom/jquery-ui.min.js"></script>
 		<script src="src/3rd-party/dat.gui/dat.gui.min.js"></script>
 		<script src="src/3rd-party/UTIF.js"></script>
 	</head>
@@ -99,6 +101,7 @@
 					// getInputImage();
 					$('#_fileImgInput').click();
 				};
+				this.aboutMessage = function(){ Utils.ShowAboutMessage(); };
 				this.pixelSize_nm = 500; // nm/px default;
 				this.previewOpacity = 0.4;
 				this.showRuler = false;
@@ -134,12 +137,12 @@
 			var gui_io = gui.addFolder('Input / Export Image');
 			gui_io.add(G_GUI_Controller, 'groundTruthImg', [
 				'grains1.png',
-				'grains1b.png',
-				'grains1c.png',
-				'grains2.png',
-				'grains2c.png',
+				'grains2full.png',
 				'grains2tl.png',
 				'grains2nc.png',
+				'APT_needle.png',
+				'tephra_448nm.png',
+				'tephra_200nm.png',
 			]).listen().onChange(function(){
 				var fname = Utils.getGroundtruthImage();
 				if (fname.length > 0) {
@@ -150,6 +153,8 @@
 			});
 			gui_io.add(G_GUI_Controller, 'importImage');
 			gui_io.add(G_GUI_Controller, 'exportResultImg');
+			var aboutBtn = gui.add(G_GUI_Controller, 'aboutMessage');
+			aboutBtn.name("About " + G_APP_NAME + " / Credits");
 			gui_io.open();
 
 			$("#options").append(gui.domElement).draggable({

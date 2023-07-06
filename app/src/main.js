@@ -14,7 +14,11 @@
  * G_Update_GroundTruth
  * G_AUTO_PREVIEW_LIMIT
  * G_VSEM_PAUSED
+ * G_APP_NAME
  */
+
+/** Name of the application */
+const G_APP_NAME = "ImgBeamer";
 
 var G_DEBUG = false;
 
