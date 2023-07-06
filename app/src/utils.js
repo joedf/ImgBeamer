@@ -1486,7 +1486,7 @@ const Utils = {
 
 			elem.dialog({
 				modal: true,
-				width: 500,
+				width: 540,
 				buttons: {
 					Ok: function() {
 						$( this ).dialog( "close" );
