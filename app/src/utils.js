@@ -1462,7 +1462,7 @@ const Utils = {
 			<div style="float: left;margin: 0 4px;"><img src="src/img/icon128.png" width="48"></div>
 			<p>`
 			+G_APP_NAME+ ` was created as an easy-to-use tool to understand the effects of 
-			spot size to pixel size ratio on image clarity and resolution
+			the spot size to pixel size ratio on image clarity and resolution
 			in the SEM image formation / rasterization process.</p>
 			
 			<p><b>Application Development</b></p>
@@ -1471,14 +1471,25 @@ const Utils = {
 			<li>Original concept: Michael W. Phaneuf</li>
 			</ul>
 
-			<p><b>Image Contributions</b></p>
+			<details open>
+			<summary><b>Source Code and Documentation</b></summary>
 			<ul>
-				<li>Bavley Guerguis for the APT needle image <q>APT_needle.png</q></li>
-				<li>Joachim de Fourestier for the <q>El Laco tephra (EL-JM-P4)</q> images
-				<q>tephra_448nm.png</q>, <q>tephra_200nm.png</q>,
-				and the virtual <q>grains</q> images.
-				</li>
+			<li>Source code: <a href="https://github.com/joedf/ImgBeamer">https://github.com/joedf/ImgBeamer</a></li>
+			<li>Application design: <a href="https://github.com/joedf/CAS741_w23">https://github.com/joedf/CAS741_w23</a></li>
+			<li>Quick start guide: <a href="https://joedf.github.io/ImgBeamer/misc/ImgBeamer_QS_guide.pdf">ImgBeamer_QS_guide.pdf</a></li>
 			</ul>
+			</details>
+			
+			<details>
+			<summary><b>Image Contributions</b></p></summary>
+			<ul>
+			<li>Bavley Guerguis for the APT needle image <q>APT_needle.png</q></li>
+			<li>Joachim de Fourestier for the <q>El Laco tephra (EL-JM-P4)</q> images
+			<q>tephra_448nm.png</q>, <q>tephra_200nm.png</q>,
+			and the virtual <q>grains</q> images.
+			</li>
+			</ul>
+			</details>
 
 			<p>All images belong to their respective owners and are used here with permission.</p>
 			</div>
