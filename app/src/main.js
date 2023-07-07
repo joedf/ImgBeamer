@@ -165,7 +165,7 @@ function OnImageLoaded(eImg, stages){
 	// draw Spot Profile
 	$(spotProfileStage.getContainer())
 		.attr('box_label', 'Spot Profile')
-		.attr('note', 'Press [R] to reset shape')
+		.attr('note', 'Press [R] to reset shape\nScroll to change size')
 		.css('border-color', 'red');
 	var _spotProfileInfo = drawSpotProfileEdit(spotProfileStage, doUpdate);
 	var beam = _spotProfileInfo.beam;
