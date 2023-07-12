@@ -219,7 +219,7 @@
 				// var images = G_PRELOADED_IMAGES;
 				var images = ['APT_needle.png', 'tephra_448nm.png', 'tephra_200nm.png'];
 				var preload = '';
-				for(let i = images.length; i > 0; i--) {
+				for(let i = 0; i < images.length; i++) {
 					preload += '<link rel="preload" href="' + G_PRELOADED_IMAGES_ROOT
 					+ images[i] + '" as="image">\n';
 				}
