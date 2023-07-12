@@ -1454,8 +1454,8 @@ const Utils = {
 	/** Displays a message/dialog box with information about this application. */
 	ShowAboutMessage: function(){
 		/* eslint-disable max-len */
-		const id = '#dialog-about';
-		var about = $(id);
+		const id = 'dialog-about';
+		var about = $('#'+id);
 		if (about.length) {
 			about.dialog('open');
 		} else {
