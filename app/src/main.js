@@ -12,6 +12,8 @@
  * G_UpdateVirtualSEMConfig,
  * ResampleFullImage,
  * G_Update_GroundTruth
+ * G_Update_InfoDisplays
+ * G_UpdateRuler
  * G_AUTO_PREVIEW_LIMIT
  * G_VSEM_PAUSED
  * G_APP_NAME
@@ -278,7 +280,7 @@ function OnImageLoaded(eImg, stages){
 		groundtruthMapStage.width()*(1/3), groundtruthMapStage.height()/2,
 		groundtruthMapStage.width()*(2/3), groundtruthMapStage.height()/2
 	);
-	ruler.element.on('dblclick', function(e){
+	ruler.element.on('dblclick', function(){
 		var um = ruler.getLengthNm() / 1E3;
 		var pixelWidth = prompt("Please enter the length of the ruler in micrometers (μm)."
 			+ "\n\nTIP! Try holding the [Shift] key for horizontal lines or "

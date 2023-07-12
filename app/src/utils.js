@@ -224,7 +224,7 @@ const Utils = {
 	 * based on the new specified length of the ruler in physical (nm) units,
 	 * and a doUpdate() method to update the ruler to represent the its latest state.
 	 */
-	CreateRuler: function(layer, oImg, x1 = 0, y1 = 50, x2 = 50, y2 = 50) {
+	CreateRuler: function(layer, oImg, x1 = 0, y1 = 100, x2 = 100, y2 = 100) {
 		var stage = layer.getStage();
 
 		var lengthNm = 0;
@@ -1445,6 +1445,7 @@ const Utils = {
 
 	/** Displays a message/dialog box with information about this application. */
 	ShowAboutMessage: function(){
+		/* eslint-disable max-len */
 		const id = '#dialog-about';
 		var about = $(id);
 		if (about.length) {
@@ -1507,5 +1508,6 @@ const Utils = {
 				}
 			});
 		}
+		/* eslint-enable max-len */
 	}
 };
