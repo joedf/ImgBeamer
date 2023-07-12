@@ -13,9 +13,11 @@
  * ResampleFullImage,
  * G_Update_GroundTruth
  * G_Update_InfoDisplays
+ * G_update_ImgMetrics
  * G_UpdateRuler
  * G_AUTO_PREVIEW_LIMIT
  * G_VSEM_PAUSED
+ * G_IMG_METRIC_ENABLED
  * G_APP_NAME
  * G_INPUT_IMAGE
  * G_PRELOADED_IMAGES
@@ -35,6 +37,9 @@ var G_AUTO_PREVIEW_LIMIT = 16 * 16;
 
 /** Toggle value to pause the continously draw the Resulting Image / Virtual SEM view */
 var G_VSEM_PAUSED = false;
+
+/** Toggle value to pause/hide the image quality metric calculation of the Resulting Image / Virtual SEM view */
+var G_IMG_METRIC_ENABLED = true;
 
 /** The root folder for all the preloaded images specified by {@link G_PRELOADED_IMAGES}. */
 const G_PRELOADED_IMAGES_ROOT = "src/testimages/";
@@ -68,6 +73,8 @@ var G_UpdateVirtualSEMConfig = null;
 var G_Update_GroundTruth = null;
 /** global reference to update the Information displays */
 var G_Update_InfoDisplays = null;
+/** global reference to update the just the Image Metrics information display */
+var G_update_ImgMetrics = null;
 /** global reference to update the ruler */
 var G_UpdateRuler = null;
 
@@ -146,13 +153,18 @@ function OnImageLoaded(eImg, stages){
 		updateInfoDisplays();
 	}
 
+	var updateImgMetrics = function(){
+		Utils.updateImageMetricsInfo(groundtruthMapStage, virtualSEMStage);
+	};
+	G_update_ImgMetrics = updateImgMetrics;
+
 	var updateInfoDisplays = function(){
 		// update spot/beam info: size, rotation, shape
 		var cellSize = Utils.computeCellSize(subregionImage);
 		Utils.updateDisplayBeamParams(spotProfileStage, layoutBeam, cellSize, spotScaling, promptForSpotWidth);
 		Utils.updateMagInfo(baseImageStage, subregionImage);
-		Utils.updateImageMetricsInfo(groundtruthMapStage, virtualSEMStage);
 		Utils.updateSubregionPixelSize(resampledStage, subregionImage, eImg);
+		updateImgMetrics();
 	};
 	G_Update_InfoDisplays = updateInfoDisplays;
 

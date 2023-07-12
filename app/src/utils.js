@@ -4,6 +4,7 @@
  G_GUI_Controller
  UTIF
  G_AUTO_PREVIEW_LIMIT
+ G_IMG_METRIC_ENABLED
  G_APP_NAME
  */
 
@@ -548,7 +549,7 @@ const Utils = {
 	},
 
 	/**
-	 * Displays and updates the Image metrics
+	 * Displays and updates the Image metrics, if {@link G_IMG_METRIC_ENABLED} is true.
 	 * @param {*} sourceStage The stage for the ground truth / reference image
 	 * @param {*} destStage The stage for the image to compare
 	 */
@@ -557,22 +558,29 @@ const Utils = {
 		const infoclass = "metricsDisplay";
 		var element = this.ensureInfoBox(destStage, infoclass);
 		if (element) {
-			// compare without Image Smoothing
-			const imageSmoothing = false;
 
-			// get ground truth image
-			var refImage = this.getFirstImageFromStage(sourceStage);
-			var refData = this.getKonvaImageData(refImage, imageSmoothing);
+			// Show/hide the img-metric based on the global boolean
+			$(element).toggle(G_IMG_METRIC_ENABLED);
+			
+			// only do the calc, if enabled
+			if (G_IMG_METRIC_ENABLED) {
+				// compare without Image Smoothing
+				const imageSmoothing = false;
 
-			// get the image without the row/draw indicator
-			var finalImage = this.getVirtualSEM_KonvaImage(destStage);
-			var finalData = this.getKonvaImageData(finalImage, imageSmoothing);
+				// get ground truth image
+				var refImage = this.getFirstImageFromStage(sourceStage);
+				var refData = this.getKonvaImageData(refImage, imageSmoothing);
 
-			// Do the metric calculation here
-			var metrics = NRMSE.compare(refData, finalData);
+				// get the image without the row/draw indicator
+				var finalImage = this.getVirtualSEM_KonvaImage(destStage);
+				var finalData = this.getKonvaImageData(finalImage, imageSmoothing);
 
-			// display it
-			element.innerHTML = "iNRMSE = " + metrics.inrmse.toFixed(G_MATH_TOFIXED.LONG);
+				// Do the metric calculation here
+				var metrics = NRMSE.compare(refData, finalData);
+
+				// display it
+				element.innerHTML = "iNRMSE = " + metrics.inrmse.toFixed(G_MATH_TOFIXED.LONG);
+			}
 		}
 	},
 

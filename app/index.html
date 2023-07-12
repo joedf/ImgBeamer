@@ -96,6 +96,7 @@
 				};
 				this.groundTruthImg = 'grains2tl.png';
 				this.pause_vSEM = G_VSEM_PAUSED;
+				this.doImageMetric = G_IMG_METRIC_ENABLED;
 				this.exportResultImg = function(){ exportResultImage(); };
 				this.importImage = function(){
 					// getInputImage();
@@ -131,6 +132,10 @@
 			});
 			gui_do.add(G_GUI_Controller, 'previewOpacity', 0, 1, 0.01).onChange(function(){
 				G_UpdateResampled();
+			});
+			gui_do.add(G_GUI_Controller, 'doImageMetric').onChange(function(){
+				G_IMG_METRIC_ENABLED = G_GUI_Controller.doImageMetric;
+				G_update_ImgMetrics();
 			});
 			// gui.add(G_GUI_Controller, 'updateViews');
 
