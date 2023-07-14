@@ -554,6 +554,9 @@ const Utils = {
 	 * @param {*} destStage The stage for the image to compare
 	 */
 	updateImageMetricsInfo: function(sourceStage, destStage) {
+		// do a check first, so we dont waste more cpu on this than needed.
+		if (!G_IMG_METRIC_ENABLED) { return; }
+
 		// create info dialog as needed
 		const dialogId = "dialog-imgMetric";
 		const eTitle = "Double-click for more information.";
@@ -589,6 +592,10 @@ const Utils = {
 			is assumed to be of optimum quality for this comparision.
 			<p>
 
+			<p>For performance reasons, the metric is only updated at every quarter of the image
+			drawn, or if the draw-rate is fast, <i>i.e.</i>, less than 50 ms/row.
+			</p>
+
 			<details>
 			<summary><b>Additional Information</b></p></summary>
 			<p>Unfortunately, there is no flawless or foolproof image quality metric.
@@ -600,7 +607,7 @@ const Utils = {
 			<ul>
 			<li>More information on the purpose and intented use can be found
 			<a href="https://github.com/joedf/CAS741_w23/blob/main/docs/SRS/SRS.pdf">here</a>.</li>
-			<li>A comparisions of various image quality metrics are available
+			<li>A comparision of various image quality metrics used in this application is available
 			<a href="https://github.com/joedf/CAS741_w23/blob/main/docs/VnVReport/VnVReport.pdf">here</a>.</li>
 			</ul>
 			</details>
