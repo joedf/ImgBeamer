@@ -1491,9 +1491,20 @@ const Utils = {
 			and the virtual <q>grains</q> images.
 			</li>
 			</ul>
+			<p>All images belong to their respective owners and are used here with permission.</p>
 			</details>
 
-			<p>All images belong to their respective owners and are used here with permission.</p>
+			<details>
+			<summary><b>Open-Source Libraries</b></p></summary>
+			<ul>
+			<li><a href="https://konvajs.org">Konva.js</a> - HTML5 2d canvas js library</li>
+			<li><a href="https://jquery.com/">jQuery</a>
+			and <a href="https://jqueryui.com">jQuery-ui</a> - HTML DOM manipulation and UI elements</li>
+			<li><a href="https://github.com/dataarts/dat.gui">dat.gui</a> - Lightweight GUI for changing variables</li>
+			<li><a href="https://github.com/photopea/UTIF.js">UTIF.js</a> - Fast and advanced TIFF decoder</li>
+			</ul>
+			</details>
+
 			</div>
 			`).appendTo('body');
 
