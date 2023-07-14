@@ -554,9 +554,75 @@ const Utils = {
 	 * @param {*} destStage The stage for the image to compare
 	 */
 	updateImageMetricsInfo: function(sourceStage, destStage) {
+		// create info dialog as needed
+		const dialogId = "dialog-imgMetric";
+		const eTitle = "Double-click for more information.";
+		var onDblClick = function(){
+			let dialog = $('#'+dialogId);
+		if (dialog.length) {
+			dialog.dialog('open');
+		} else {
+			var elem = $("<div/>")
+			.attr({
+				'id': dialogId,
+				'title': G_APP_NAME + " - Image Quality Metric"
+			})
+			.css({'display':'none'})
+			.addClass('jui')
+			.html(`
+			<div>
+			<input type="hidden" autofocus="autofocus" />
+
+			<p><b>Image Quality</b></p>
+
+			<p>
+			The intended use of metric in this application is more of a qualitative nature,
+			rather than quantitative. The user should be able to grasp any trends in the
+			change of the image quality metric when the imaging parameters are changed.
+			</p>
+
+			<p>
+			That said, it is the trends or change in the image quality metric values that
+			are important, more so than the values themselves. A value of 0.0 indicates the lowest
+			score or match when compared to the original (ground truth) image. Whereas,
+			a maximum score of 1.0 indicates a perfect match. Naturally, the ground truth image
+			is assumed to be of optimum quality for this comparision.
+			<p>
+
+			<details>
+			<summary><b>Additional Information</b></p></summary>
+			<p>Unfortunately, there is no flawless or foolproof image quality metric.
+			Over 20 different image metrics have been reviewed and compared by
+			<a href="https://www.sciencedirect.com/science/article/pii/S2214241X15000206">
+			Jagalingam and Hegde in a 2015 paper</a>, each with
+			their different strengths and weaknesses.
+			</p>
+			<ul>
+			<li>More information on the purpose and intented use can be found
+			<a href="https://github.com/joedf/CAS741_w23/blob/main/docs/SRS/SRS.pdf">here</a>.</li>
+			<li>A comparisions of various image quality metrics are available
+			<a href="https://github.com/joedf/CAS741_w23/blob/main/docs/VnVReport/VnVReport.pdf">here</a>.</li>
+			</ul>
+			</details>
+
+			</div>
+			`);
+
+			elem.dialog({
+				modal: true,
+				width: 540,
+				buttons: {
+					Ok: function() {
+						$( this ).dialog( "close" );
+					}
+				}
+			});
+		}
+	};
+
 		// calculate and display
 		const infoclass = "metricsDisplay";
-		var element = this.ensureInfoBox(destStage, infoclass);
+		var element = this.ensureInfoBox(destStage, infoclass, onDblClick, eTitle);
 		if (element) {
 
 			// Show/hide the img-metric based on the global boolean
@@ -687,9 +753,10 @@ const Utils = {
 	 * @param {*} stage The stage on which display/have the info-box.
 	 * @param {string} className The class name of the info-box DOM element.
 	 * @param {function} [onDblClick] bound on creation, the event handler / callback for on-doubleclick event
+	 * @param {string} [title] Optional title / tooltip text.
 	 * @returns the info-box DOM element.
 	 */
-	ensureInfoBox: function(stage, className, onDblClick) {
+	ensureInfoBox: function(stage, className, onDblClick, title) {
 		// get stage container
 		var eStage = $(stage.getContainer());
 		
@@ -699,6 +766,10 @@ const Utils = {
 			// not found, so create it
 			eStage.prepend('<span class="infoBox '+className+'"></span>');
 			e = eStage.children('.'+className+':first');
+			
+			if (typeof title == 'string') {
+				e.attr('title', title);
+			}
 		}
 
 		// return the non-jquery-wrapped DOM element
