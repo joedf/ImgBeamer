@@ -1611,6 +1611,7 @@ const Utils = {
 			and <a href="https://jqueryui.com">jQuery-ui</a> - HTML DOM manipulation and UI elements</li>
 			<li><a href="https://github.com/dataarts/dat.gui">dat.gui</a> - Lightweight GUI for changing variables</li>
 			<li><a href="https://github.com/photopea/UTIF.js">UTIF.js</a> - Fast and advanced TIFF decoder</li>
+			<li><a href="https://github.com/darosh/image-ms-ssim-js">image-ms-ssim.js</a> - Image multi-scale structural similarity (MS-SSIM)</li>
 			</ul>
 			</details>
 
