@@ -1,9 +1,11 @@
 /* globals
  G_DEBUG
  NRMSE
+ ImageMSSSIM
  G_GUI_Controller
  UTIF
  G_AUTO_PREVIEW_LIMIT
+ G_IMG_METRIC_ENABLED
  G_APP_NAME
  */
 
@@ -151,6 +153,7 @@ const Utils = {
 	setPixelSizeNmInput: function(val){ G_GUI_Controller.controls.pixelSize_nm.setValue(val); },
 	getShowRulerInput: function(){ return G_GUI_Controller.showRuler; },
 	getSpotLayoutOpacityInput: function(){ return G_GUI_Controller.previewOpacity; },
+	getImageMetricAlgorithm: function(){ return G_GUI_Controller.imageMetricAlgo; },
 
 	/**
 	 * Creates a Zoom event handler to be used on a stage.
@@ -224,7 +227,7 @@ const Utils = {
 	 * based on the new specified length of the ruler in physical (nm) units,
 	 * and a doUpdate() method to update the ruler to represent the its latest state.
 	 */
-	CreateRuler: function(layer, oImg, x1 = 0, y1 = 50, x2 = 50, y2 = 50) {
+	CreateRuler: function(layer, oImg, x1 = 0, y1 = 100, x2 = 100, y2 = 100) {
 		var stage = layer.getStage();
 
 		var lengthNm = 0;
@@ -548,31 +551,133 @@ const Utils = {
 	},
 
 	/**
-	 * Displays and updates the Image metrics
+	 * Displays and updates the Image metrics, if {@link G_IMG_METRIC_ENABLED} is true.
 	 * @param {*} sourceStage The stage for the ground truth / reference image
 	 * @param {*} destStage The stage for the image to compare
 	 */
 	updateImageMetricsInfo: function(sourceStage, destStage) {
+		// create info dialog as needed
+		const dialogId = "dialog-imgMetric";
+		const eTitle = "Double-click for more information.";
+		var onDblClick = function(){
+			let dialog = $('#'+dialogId);
+			if (dialog.length) {
+				dialog.dialog('open');
+			} else {
+				var elem = $("<div/>")
+				.attr({
+					'id': dialogId,
+					'title': G_APP_NAME + " - Image Quality Metric"
+				})
+				.css({'display':'none'})
+				.addClass('jui')
+				.html(`
+				<div>
+				<input type="hidden" autofocus="autofocus" />
+
+				<p><b>Image Quality</b></p>
+
+				<p>
+				The intended use of metric in this application is more of a qualitative nature,
+				rather than quantitative. The user should be able to grasp any trends in the
+				change of the image quality metric when the imaging parameters are changed.
+				</p>
+
+				<p>
+				That said, it is the trends or change in the image quality metric values that
+				are important, more so than the values themselves.
+				Other than the MSE and PSNR algortihms, a value of 0.0 indicates the lowest
+				score or match when compared to the original (ground truth) image. Whereas,
+				a maximum score of 1.0 indicates a perfect match. Naturally, the ground truth image
+				is assumed to be of optimum quality for this comparision.
+				<p>
+
+				<details>
+				<summary><b>Additional Information</b></p></summary>
+				<p>For performance reasons, the metric is only updated at every quarter of the image
+				drawn, or if the draw-rate is fast, <i>i.e.</i>, less than 50 ms/row
+				(for non SSIM-based algortihms).
+				</p>
+
+				<p>Unfortunately, there is no flawless or foolproof image quality metric.
+				Over 20 different image metrics have been reviewed and compared by
+				<a href="https://www.sciencedirect.com/science/article/pii/S2214241X15000206">
+				Jagalingam and Hegde in a 2015 paper</a>, each with
+				their different strengths and weaknesses.
+				</p>
+				<ul>
+				<li>More information on the purpose and intented use can be found
+				<a href="https://github.com/joedf/CAS741_w23/blob/main/docs/SRS/SRS.pdf">here</a>.</li>
+				<li>A comparision of various image quality metrics used in this application is available
+				<a href="https://github.com/joedf/CAS741_w23/blob/main/docs/VnVReport/VnVReport.pdf">here</a>.</li>
+				</ul>
+				</details>
+
+				</div>
+				`);
+
+				elem.dialog({
+					modal: true,
+					width: 540,
+					buttons: {
+						Ok: function() {
+							$( this ).dialog( "close" );
+						}
+					}
+				});
+			}
+		};
+
 		// calculate and display
 		const infoclass = "metricsDisplay";
-		var element = this.ensureInfoBox(destStage, infoclass);
+		var element = this.ensureInfoBox(destStage, infoclass, onDblClick, eTitle);
 		if (element) {
-			// compare without Image Smoothing
-			const imageSmoothing = false;
 
-			// get ground truth image
-			var refImage = this.getFirstImageFromStage(sourceStage);
-			var refData = this.getKonvaImageData(refImage, imageSmoothing);
+			// Show/hide the img-metric based on the global boolean
+			$(element).toggle(G_IMG_METRIC_ENABLED);
+			
+			// only do the calc, if enabled
+			if (G_IMG_METRIC_ENABLED) {
+				// compare without Image Smoothing
+				const imageSmoothing = false;
 
-			// get the image without the row/draw indicator
-			var finalImage = this.getVirtualSEM_KonvaImage(destStage);
-			var finalData = this.getKonvaImageData(finalImage, imageSmoothing);
+				// get ground truth image
+				var refImage = this.getFirstImageFromStage(sourceStage);
+				var refData = this.getKonvaImageData(refImage, imageSmoothing);
 
-			// Do the metric calculation here
-			var metrics = NRMSE.compare(refData, finalData);
+				// get the image without the row/draw indicator
+				var finalImage = this.getVirtualSEM_KonvaImage(destStage);
+				var finalData = this.getKonvaImageData(finalImage, imageSmoothing);
 
-			// display it
-			element.innerHTML = "iNRMSE = " + metrics.inrmse.toFixed(G_MATH_TOFIXED.LONG);
+				// Do the metric calculation here
+				// based on the algorithm/metric chosen...
+				var metricValue = 0;
+				var algo = Utils.getImageMetricAlgorithm();
+				if (algo.indexOf('SSIM') >= 0) {
+					// needed for the SSIM / MS-SSIM library
+					const img_channel_count = 4;
+					refData.channels = img_channel_count;
+					finalData.channels = img_channel_count;
+
+					let metrics = ImageMSSSIM.compare(refData, finalData);
+					if (algo == "MS-SSIM") {
+						metricValue = metrics.msssim;
+					} else {
+						metricValue = metrics.ssim;
+					}
+				} else { // 'MSE', 'PSNR', 'iNRMSE', 'iNMSE'
+					let metrics = NRMSE.compare(refData, finalData);
+					switch(algo) {
+						case 'MSE': metricValue = metrics.mse; break;
+						case 'PSNR': metricValue = metrics.psnr; break;
+						case 'iNMSE': metricValue = metrics.inmse; break;
+						default: metricValue = metrics.inrmse;
+					}
+				}
+
+				// display it
+				element.innerHTML = algo + " = " + metricValue.toFixed(G_MATH_TOFIXED.LONG);
+			}
 		}
 	},
 
@@ -679,9 +784,10 @@ const Utils = {
 	 * @param {*} stage The stage on which display/have the info-box.
 	 * @param {string} className The class name of the info-box DOM element.
 	 * @param {function} [onDblClick] bound on creation, the event handler / callback for on-doubleclick event
+	 * @param {string} [title] Optional title / tooltip text.
 	 * @returns the info-box DOM element.
 	 */
-	ensureInfoBox: function(stage, className, onDblClick) {
+	ensureInfoBox: function(stage, className, onDblClick, title) {
 		// get stage container
 		var eStage = $(stage.getContainer());
 		
@@ -691,6 +797,10 @@ const Utils = {
 			// not found, so create it
 			eStage.prepend('<span class="infoBox '+className+'"></span>');
 			e = eStage.children('.'+className+':first');
+			
+			if (typeof title == 'string') {
+				e.attr('title', title);
+			}
 		}
 
 		// return the non-jquery-wrapped DOM element
@@ -1445,8 +1555,9 @@ const Utils = {
 
 	/** Displays a message/dialog box with information about this application. */
 	ShowAboutMessage: function(){
-		const id = '#dialog-about';
-		var about = $(id);
+		/* eslint-disable max-len */
+		const id = 'dialog-about';
+		var about = $('#'+id);
 		if (about.length) {
 			about.dialog('open');
 		} else {
@@ -1502,6 +1613,7 @@ const Utils = {
 			and <a href="https://jqueryui.com">jQuery-ui</a> - HTML DOM manipulation and UI elements</li>
 			<li><a href="https://github.com/dataarts/dat.gui">dat.gui</a> - Lightweight GUI for changing variables</li>
 			<li><a href="https://github.com/photopea/UTIF.js">UTIF.js</a> - Fast and advanced TIFF decoder</li>
+			<li><a href="https://github.com/darosh/image-ms-ssim-js">image-ms-ssim.js</a> - Image multi-scale structural similarity (MS-SSIM)</li>
 			</ul>
 			</details>
 
@@ -1518,5 +1630,6 @@ const Utils = {
 				}
 			});
 		}
+		/* eslint-enable max-len */
 	}
 };

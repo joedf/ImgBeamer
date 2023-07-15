@@ -63,8 +63,8 @@ summary {
 	text-align: right;
 }
 
-.box > .vsem_mode { cursor: pointer; }
-
+.metricsDisplay,
+.box > .vsem_mode,
 .box > span.parameterDisplay { cursor: pointer; }
 
 .box > .extraInfoDisplay {

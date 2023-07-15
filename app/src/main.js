@@ -12,12 +12,17 @@
  * G_UpdateVirtualSEMConfig,
  * ResampleFullImage,
  * G_Update_GroundTruth
+ * G_Update_InfoDisplays
+ * G_update_ImgMetrics
+ * G_UpdateRuler
  * G_AUTO_PREVIEW_LIMIT
  * G_VSEM_PAUSED
+ * G_IMG_METRIC_ENABLED
  * G_APP_NAME
  * G_INPUT_IMAGE
  * G_PRELOADED_IMAGES
  * G_PRELOADED_IMAGES_ROOT
+ * G_IMG_METRICS
  */
 
 /** Name of the application */
@@ -33,6 +38,9 @@ var G_AUTO_PREVIEW_LIMIT = 16 * 16;
 
 /** Toggle value to pause the continously draw the Resulting Image / Virtual SEM view */
 var G_VSEM_PAUSED = false;
+
+/** Toggle value to pause/hide the image quality metric calculation of the Resulting Image / Virtual SEM view */
+var G_IMG_METRIC_ENABLED = true;
 
 /** The root folder for all the preloaded images specified by {@link G_PRELOADED_IMAGES}. */
 const G_PRELOADED_IMAGES_ROOT = "src/testimages/";
@@ -51,6 +59,16 @@ const G_PRELOADED_IMAGES = [
 	'tephra_200nm.png',
 ];
 
+/** The list of image quality metrics supported by the application. */
+const G_IMG_METRICS = [
+	'SSIM',
+	'MS-SSIM',
+	'MSE',
+	'PSNR',
+	'iNRMSE',
+	'iNMSE',
+];
+
 /** global variable to set the input ground truth image */
 // var G_INPUT_IMAGE = Utils.getGroundtruthImage();
 var G_INPUT_IMAGE = G_PRELOADED_IMAGES_ROOT + 'grains2tl.png';
@@ -66,6 +84,8 @@ var G_UpdateVirtualSEMConfig = null;
 var G_Update_GroundTruth = null;
 /** global reference to update the Information displays */
 var G_Update_InfoDisplays = null;
+/** global reference to update the just the Image Metrics information display */
+var G_update_ImgMetrics = null;
 /** global reference to update the ruler */
 var G_UpdateRuler = null;
 
@@ -144,13 +164,18 @@ function OnImageLoaded(eImg, stages){
 		updateInfoDisplays();
 	}
 
+	var updateImgMetrics = function(){
+		Utils.updateImageMetricsInfo(groundtruthMapStage, virtualSEMStage);
+	};
+	G_update_ImgMetrics = updateImgMetrics;
+
 	var updateInfoDisplays = function(){
 		// update spot/beam info: size, rotation, shape
 		var cellSize = Utils.computeCellSize(subregionImage);
 		Utils.updateDisplayBeamParams(spotProfileStage, layoutBeam, cellSize, spotScaling, promptForSpotWidth);
 		Utils.updateMagInfo(baseImageStage, subregionImage);
-		Utils.updateImageMetricsInfo(groundtruthMapStage, virtualSEMStage);
 		Utils.updateSubregionPixelSize(resampledStage, subregionImage, eImg);
+		updateImgMetrics();
 	};
 	G_Update_InfoDisplays = updateInfoDisplays;
 
@@ -278,7 +303,7 @@ function OnImageLoaded(eImg, stages){
 		groundtruthMapStage.width()*(1/3), groundtruthMapStage.height()/2,
 		groundtruthMapStage.width()*(2/3), groundtruthMapStage.height()/2
 	);
-	ruler.element.on('dblclick', function(e){
+	ruler.element.on('dblclick', function(){
 		var um = ruler.getLengthNm() / 1E3;
 		var pixelWidth = prompt("Please enter the length of the ruler in micrometers (μm)."
 			+ "\n\nTIP! Try holding the [Shift] key for horizontal lines or "

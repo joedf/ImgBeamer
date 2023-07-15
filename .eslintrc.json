@@ -23,7 +23,7 @@
             "properties": "never"
         }],
         "no-magic-numbers": ["error", {
-            "ignore": [0, 1, 2, 3, 4, -1, 100, 180, 255, 1E3, 1000]
+            "ignore": [0, 1, 2, 3, 4, -1, 100, 180, 255, 1000]
         }]
     },
     "globals": {

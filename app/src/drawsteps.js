@@ -1,7 +1,8 @@
 /* globals
  * Utils,
  * G_BOX_SIZE, G_DEBUG, G_AUTO_PREVIEW_LIMIT,
- * G_VSEM_PAUSED, G_MATH_TOFIXED
+ * G_VSEM_PAUSED, G_MATH_TOFIXED,
+ * G_update_ImgMetrics
  */
 
 /* exported
@@ -1019,6 +1020,23 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 
 			var timeDrawTotal = Date.now() - timeRowStart;
 			stage.getContainer().setAttribute('note', timeDrawTotal + " ms/Row");
+
+			// update the image metric automatically a few times
+			// so the score updates as parts of the images changes
+			if (typeof G_update_ImgMetrics == "function") {
+				// update it every quarter of the rows drawn
+				let imgMetricUpdateTick = (currentRow % Math.floor(rows / 4) == 0) && (currentRow > 1);
+				
+				// or update if the draw-rate is fast (less than 50 ms/row)
+				const rowTime = 50; //ms
+				
+				// and not an SSIM-based algorithm, since they are comparatively slow...
+				var isSSIM = (Utils.getImageMetricAlgorithm()).indexOf('SSIM') >= 0;
+
+				if ( (timeDrawTotal < rowTime && !isSSIM) || imgMetricUpdateTick) {
+					G_update_ImgMetrics();
+				}
+			}
 		}
 		
 		// see comment on using this instead of setInterval below
