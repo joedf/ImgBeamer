@@ -22,6 +22,7 @@
  * G_INPUT_IMAGE
  * G_PRELOADED_IMAGES
  * G_PRELOADED_IMAGES_ROOT
+ * G_IMG_METRICS
  */
 
 /** Name of the application */
@@ -56,6 +57,16 @@ const G_PRELOADED_IMAGES = [
 	'APT_needle.png',
 	'tephra_448nm.png',
 	'tephra_200nm.png',
+];
+
+/** The list of image quality metrics supported by the application. */
+const G_IMG_METRICS = [
+	'SSIM',
+	'MS-SSIM',
+	'MSE',
+	'PSNR',
+	'iNRMSE',
+	'iNMSE',
 ];
 
 /** global variable to set the input ground truth image */

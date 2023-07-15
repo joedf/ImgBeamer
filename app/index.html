@@ -16,6 +16,7 @@
 		<script src="src/3rd-party/jquery-ui-1.13.2.custom/jquery-ui.min.js"></script>
 		<script src="src/3rd-party/dat.gui/dat.gui.min.js"></script>
 		<script src="src/3rd-party/UTIF.js"></script>
+		<script src="src/3rd-party/image-ms-ssim.js"></script>
 	</head>
 	<body>
 		<div class="layout" id="main-container"></div>
@@ -97,6 +98,7 @@
 				this.groundTruthImg = 'grains2tl.png';
 				this.pause_vSEM = G_VSEM_PAUSED;
 				this.doImageMetric = G_IMG_METRIC_ENABLED;
+				this.imageMetricAlgo = 'iNRMSE';
 				this.exportResultImg = function(){ exportResultImage(); };
 				this.importImage = function(){
 					// getInputImage();
@@ -137,6 +139,7 @@
 				G_IMG_METRIC_ENABLED = G_GUI_Controller.doImageMetric;
 				G_update_ImgMetrics();
 			});
+			gui_do.add(G_GUI_Controller, 'imageMetricAlgo', G_IMG_METRICS);
 			// gui.add(G_GUI_Controller, 'updateViews');
 
 			var gui_io = gui.addFolder('Input / Export Image');

@@ -1,6 +1,7 @@
 /* globals
  G_DEBUG
  NRMSE
+ ImageMSSSIM
  G_GUI_Controller
  UTIF
  G_AUTO_PREVIEW_LIMIT
@@ -152,6 +153,7 @@ const Utils = {
 	setPixelSizeNmInput: function(val){ G_GUI_Controller.controls.pixelSize_nm.setValue(val); },
 	getShowRulerInput: function(){ return G_GUI_Controller.showRuler; },
 	getSpotLayoutOpacityInput: function(){ return G_GUI_Controller.previewOpacity; },
+	getImageMetricAlgorithm: function(){ return G_GUI_Controller.imageMetricAlgo; },
 
 	/**
 	 * Creates a Zoom event handler to be used on a stage.
@@ -646,10 +648,33 @@ const Utils = {
 				var finalData = this.getKonvaImageData(finalImage, imageSmoothing);
 
 				// Do the metric calculation here
-				var metrics = NRMSE.compare(refData, finalData);
+				// based on the algorithm/metric chosen...
+				var metricValue = 0;
+				var algo = Utils.getImageMetricAlgorithm();
+				if (algo.indexOf('SSIM') >= 0) {
+					// needed for the SSIM / MS-SSIM library
+					const img_channel_count = 4;
+					refData.channels = img_channel_count;
+					finalData.channels = img_channel_count;
+
+					let metrics = ImageMSSSIM.compare(refData, finalData);
+					if (algo == "MS-SSIM") {
+						metricValue = metrics.msssim;
+					} else {
+						metricValue = metrics.ssim;
+					}
+				} else { // 'MSE', 'PSNR', 'iNRMSE', 'iNMSE'
+					let metrics = NRMSE.compare(refData, finalData);
+					switch(algo) {
+						case 'MSE': metricValue = metrics.mse; break;
+						case 'PSNR': metricValue = metrics.psnr; break;
+						case 'iNMSE': metricValue = metrics.inmse; break;
+						default: metricValue = metrics.inrmse;
+					}
+				}
 
 				// display it
-				element.innerHTML = "iNRMSE = " + metrics.inrmse.toFixed(G_MATH_TOFIXED.LONG);
+				element.innerHTML = algo + " = " + metricValue.toFixed(G_MATH_TOFIXED.LONG);
 			}
 		}
 	},

@@ -1,7 +1,8 @@
 /* globals
  * Utils,
  * G_BOX_SIZE, G_DEBUG, G_AUTO_PREVIEW_LIMIT,
- * G_VSEM_PAUSED, G_MATH_TOFIXED
+ * G_VSEM_PAUSED, G_MATH_TOFIXED,
+ * G_update_ImgMetrics
  */
 
 /* exported
