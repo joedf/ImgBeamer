@@ -554,78 +554,75 @@ const Utils = {
 	 * @param {*} destStage The stage for the image to compare
 	 */
 	updateImageMetricsInfo: function(sourceStage, destStage) {
-		// do a check first, so we dont waste more cpu on this than needed.
-		if (!G_IMG_METRIC_ENABLED) { return; }
-
 		// create info dialog as needed
 		const dialogId = "dialog-imgMetric";
 		const eTitle = "Double-click for more information.";
 		var onDblClick = function(){
 			let dialog = $('#'+dialogId);
-		if (dialog.length) {
-			dialog.dialog('open');
-		} else {
-			var elem = $("<div/>")
-			.attr({
-				'id': dialogId,
-				'title': G_APP_NAME + " - Image Quality Metric"
-			})
-			.css({'display':'none'})
-			.addClass('jui')
-			.html(`
-			<div>
-			<input type="hidden" autofocus="autofocus" />
+			if (dialog.length) {
+				dialog.dialog('open');
+			} else {
+				var elem = $("<div/>")
+				.attr({
+					'id': dialogId,
+					'title': G_APP_NAME + " - Image Quality Metric"
+				})
+				.css({'display':'none'})
+				.addClass('jui')
+				.html(`
+				<div>
+				<input type="hidden" autofocus="autofocus" />
 
-			<p><b>Image Quality</b></p>
+				<p><b>Image Quality</b></p>
 
-			<p>
-			The intended use of metric in this application is more of a qualitative nature,
-			rather than quantitative. The user should be able to grasp any trends in the
-			change of the image quality metric when the imaging parameters are changed.
-			</p>
+				<p>
+				The intended use of metric in this application is more of a qualitative nature,
+				rather than quantitative. The user should be able to grasp any trends in the
+				change of the image quality metric when the imaging parameters are changed.
+				</p>
 
-			<p>
-			That said, it is the trends or change in the image quality metric values that
-			are important, more so than the values themselves. A value of 0.0 indicates the lowest
-			score or match when compared to the original (ground truth) image. Whereas,
-			a maximum score of 1.0 indicates a perfect match. Naturally, the ground truth image
-			is assumed to be of optimum quality for this comparision.
-			<p>
+				<p>
+				That said, it is the trends or change in the image quality metric values that
+				are important, more so than the values themselves. A value of 0.0 indicates the lowest
+				score or match when compared to the original (ground truth) image. Whereas,
+				a maximum score of 1.0 indicates a perfect match. Naturally, the ground truth image
+				is assumed to be of optimum quality for this comparision.
+				<p>
 
-			<p>For performance reasons, the metric is only updated at every quarter of the image
-			drawn, or if the draw-rate is fast, <i>i.e.</i>, less than 50 ms/row.
-			</p>
+				<p>For performance reasons, the metric is only updated at every quarter of the image
+				drawn, or if the draw-rate is fast, <i>i.e.</i>, less than 50 ms/row.
+				</p>
 
-			<details>
-			<summary><b>Additional Information</b></p></summary>
-			<p>Unfortunately, there is no flawless or foolproof image quality metric.
-			Over 20 different image metrics have been reviewed and compared by
-			<a href="https://www.sciencedirect.com/science/article/pii/S2214241X15000206">
-			Jagalingam and Hegde in a 2015 paper</a>, each with
-			their different strengths and weaknesses.
-			</p>
-			<ul>
-			<li>More information on the purpose and intented use can be found
-			<a href="https://github.com/joedf/CAS741_w23/blob/main/docs/SRS/SRS.pdf">here</a>.</li>
-			<li>A comparision of various image quality metrics used in this application is available
-			<a href="https://github.com/joedf/CAS741_w23/blob/main/docs/VnVReport/VnVReport.pdf">here</a>.</li>
-			</ul>
-			</details>
+				<details>
+				<summary><b>Additional Information</b></p></summary>
+				<p>Unfortunately, there is no flawless or foolproof image quality metric.
+				Over 20 different image metrics have been reviewed and compared by
+				<a href="https://www.sciencedirect.com/science/article/pii/S2214241X15000206">
+				Jagalingam and Hegde in a 2015 paper</a>, each with
+				their different strengths and weaknesses.
+				</p>
+				<ul>
+				<li>More information on the purpose and intented use can be found
+				<a href="https://github.com/joedf/CAS741_w23/blob/main/docs/SRS/SRS.pdf">here</a>.</li>
+				<li>A comparision of various image quality metrics used in this application is available
+				<a href="https://github.com/joedf/CAS741_w23/blob/main/docs/VnVReport/VnVReport.pdf">here</a>.</li>
+				</ul>
+				</details>
 
-			</div>
-			`);
+				</div>
+				`);
 
-			elem.dialog({
-				modal: true,
-				width: 540,
-				buttons: {
-					Ok: function() {
-						$( this ).dialog( "close" );
+				elem.dialog({
+					modal: true,
+					width: 540,
+					buttons: {
+						Ok: function() {
+							$( this ).dialog( "close" );
+						}
 					}
-				}
-			});
-		}
-	};
+				});
+			}
+		};
 
 		// calculate and display
 		const infoclass = "metricsDisplay";
