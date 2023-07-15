@@ -72,7 +72,8 @@
             <pre class="prettyprint source linenums"><code>/* globals
  * Utils,
  * G_BOX_SIZE, G_DEBUG, G_AUTO_PREVIEW_LIMIT,
- * G_VSEM_PAUSED, G_MATH_TOFIXED
+ * G_VSEM_PAUSED, G_MATH_TOFIXED,
+ * G_update_ImgMetrics
  */
 
 /* exported
@@ -1090,6 +1091,23 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 
 			var timeDrawTotal = Date.now() - timeRowStart;
 			stage.getContainer().setAttribute('note', timeDrawTotal + " ms/Row");
+
+			// update the image metric automatically a few times
+			// so the score updates as parts of the images changes
+			if (typeof G_update_ImgMetrics == "function") {
+				// update it every quarter of the rows drawn
+				let imgMetricUpdateTick = (currentRow % Math.floor(rows / 4) == 0) &amp;&amp; (currentRow > 1);
+				
+				// or update if the draw-rate is fast (less than 50 ms/row)
+				const rowTime = 50; //ms
+				
+				// and not an SSIM-based algorithm, since they are comparatively slow...
+				var isSSIM = (Utils.getImageMetricAlgorithm()).indexOf('SSIM') >= 0;
+
+				if ( (timeDrawTotal &lt; rowTime &amp;&amp; !isSSIM) || imgMetricUpdateTick) {
+					G_update_ImgMetrics();
+				}
+			}
 		}
 		
 		// see comment on using this instead of setInterval below
@@ -1123,13 +1141,13 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="G_MATH_TOFIXED.html">G_MATH_TOFIXED</a></li><li><a href="NRMSE.html">NRMSE</a></li><li><a href="Utils.html">Utils</a></li></ul><h3>Global</h3><ul><li><a href="global.html#G_APP_NAME">G_APP_NAME</a></li><li><a href="global.html#G_AUTO_PREVIEW_LIMIT">G_AUTO_PREVIEW_LIMIT</a></li><li><a href="global.html#G_BOX_SIZE">G_BOX_SIZE</a></li><li><a href="global.html#G_INPUT_IMAGE">G_INPUT_IMAGE</a></li><li><a href="global.html#G_MAIN_CONTAINER">G_MAIN_CONTAINER</a></li><li><a href="global.html#G_MAIN_IMAGE_OBJ">G_MAIN_IMAGE_OBJ</a></li><li><a href="global.html#G_PRELOADED_IMAGES">G_PRELOADED_IMAGES</a></li><li><a href="global.html#G_PRELOADED_IMAGES_ROOT">G_PRELOADED_IMAGES_ROOT</a></li><li><a href="global.html#G_UpdateResampled">G_UpdateResampled</a></li><li><a href="global.html#G_UpdateRuler">G_UpdateRuler</a></li><li><a href="global.html#G_UpdateVirtualSEMConfig">G_UpdateVirtualSEMConfig</a></li><li><a href="global.html#G_Update_GroundTruth">G_Update_GroundTruth</a></li><li><a href="global.html#G_Update_InfoDisplays">G_Update_InfoDisplays</a></li><li><a href="global.html#G_VSEM_PAUSED">G_VSEM_PAUSED</a></li><li><a href="global.html#GetOptimalBoxWidth">GetOptimalBoxWidth</a></li><li><a href="global.html#OnImageLoaded">OnImageLoaded</a></li><li><a href="global.html#ResampleFullImage">ResampleFullImage</a></li><li><a href="global.html#UpdateBaseImage">UpdateBaseImage</a></li><li><a href="global.html#drawGroundtruthImage">drawGroundtruthImage</a></li><li><a href="global.html#drawProbeLayout">drawProbeLayout</a></li><li><a href="global.html#drawProbeLayoutSampling">drawProbeLayoutSampling</a></li><li><a href="global.html#drawResampled">drawResampled</a></li><li><a href="global.html#drawSpotContent">drawSpotContent</a></li><li><a href="global.html#drawSpotProfileEdit">drawSpotProfileEdit</a></li><li><a href="global.html#drawSpotSignal">drawSpotSignal</a></li><li><a href="global.html#drawSubregionImage">drawSubregionImage</a></li><li><a href="global.html#drawVirtualSEM">drawVirtualSEM</a></li><li><a href="global.html#nStages">nStages</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="G_MATH_TOFIXED.html">G_MATH_TOFIXED</a></li><li><a href="NRMSE.html">NRMSE</a></li><li><a href="Utils.html">Utils</a></li></ul><h3>Global</h3><ul><li><a href="global.html#G_APP_NAME">G_APP_NAME</a></li><li><a href="global.html#G_AUTO_PREVIEW_LIMIT">G_AUTO_PREVIEW_LIMIT</a></li><li><a href="global.html#G_BOX_SIZE">G_BOX_SIZE</a></li><li><a href="global.html#G_IMG_METRICS">G_IMG_METRICS</a></li><li><a href="global.html#G_IMG_METRIC_ENABLED">G_IMG_METRIC_ENABLED</a></li><li><a href="global.html#G_INPUT_IMAGE">G_INPUT_IMAGE</a></li><li><a href="global.html#G_MAIN_CONTAINER">G_MAIN_CONTAINER</a></li><li><a href="global.html#G_MAIN_IMAGE_OBJ">G_MAIN_IMAGE_OBJ</a></li><li><a href="global.html#G_PRELOADED_IMAGES">G_PRELOADED_IMAGES</a></li><li><a href="global.html#G_PRELOADED_IMAGES_ROOT">G_PRELOADED_IMAGES_ROOT</a></li><li><a href="global.html#G_UpdateResampled">G_UpdateResampled</a></li><li><a href="global.html#G_UpdateRuler">G_UpdateRuler</a></li><li><a href="global.html#G_UpdateVirtualSEMConfig">G_UpdateVirtualSEMConfig</a></li><li><a href="global.html#G_Update_GroundTruth">G_Update_GroundTruth</a></li><li><a href="global.html#G_Update_InfoDisplays">G_Update_InfoDisplays</a></li><li><a href="global.html#G_VSEM_PAUSED">G_VSEM_PAUSED</a></li><li><a href="global.html#G_update_ImgMetrics">G_update_ImgMetrics</a></li><li><a href="global.html#GetOptimalBoxWidth">GetOptimalBoxWidth</a></li><li><a href="global.html#OnImageLoaded">OnImageLoaded</a></li><li><a href="global.html#ResampleFullImage">ResampleFullImage</a></li><li><a href="global.html#UpdateBaseImage">UpdateBaseImage</a></li><li><a href="global.html#drawGroundtruthImage">drawGroundtruthImage</a></li><li><a href="global.html#drawProbeLayout">drawProbeLayout</a></li><li><a href="global.html#drawProbeLayoutSampling">drawProbeLayoutSampling</a></li><li><a href="global.html#drawResampled">drawResampled</a></li><li><a href="global.html#drawSpotContent">drawSpotContent</a></li><li><a href="global.html#drawSpotProfileEdit">drawSpotProfileEdit</a></li><li><a href="global.html#drawSpotSignal">drawSpotSignal</a></li><li><a href="global.html#drawSubregionImage">drawSubregionImage</a></li><li><a href="global.html#drawVirtualSEM">drawVirtualSEM</a></li><li><a href="global.html#nStages">nStages</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Thu Jul 06 2023 17:01:16 GMT-0400 (Eastern Daylight Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Sat Jul 15 2023 18:05:48 GMT-0400 (Eastern Daylight Time)
 </footer>
 
 <a id="backtotop" href="#"><div>&uarr; Top</div></a>

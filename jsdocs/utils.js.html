@@ -72,9 +72,11 @@
             <pre class="prettyprint source linenums"><code>/* globals
  G_DEBUG
  NRMSE
+ ImageMSSSIM
  G_GUI_Controller
  UTIF
  G_AUTO_PREVIEW_LIMIT
+ G_IMG_METRIC_ENABLED
  G_APP_NAME
  */
 
@@ -222,6 +224,7 @@ const Utils = {
 	setPixelSizeNmInput: function(val){ G_GUI_Controller.controls.pixelSize_nm.setValue(val); },
 	getShowRulerInput: function(){ return G_GUI_Controller.showRuler; },
 	getSpotLayoutOpacityInput: function(){ return G_GUI_Controller.previewOpacity; },
+	getImageMetricAlgorithm: function(){ return G_GUI_Controller.imageMetricAlgo; },
 
 	/**
 	 * Creates a Zoom event handler to be used on a stage.
@@ -295,7 +298,7 @@ const Utils = {
 	 * based on the new specified length of the ruler in physical (nm) units,
 	 * and a doUpdate() method to update the ruler to represent the its latest state.
 	 */
-	CreateRuler: function(layer, oImg, x1 = 0, y1 = 50, x2 = 50, y2 = 50) {
+	CreateRuler: function(layer, oImg, x1 = 0, y1 = 100, x2 = 100, y2 = 100) {
 		var stage = layer.getStage();
 
 		var lengthNm = 0;
@@ -619,31 +622,133 @@ const Utils = {
 	},
 
 	/**
-	 * Displays and updates the Image metrics
+	 * Displays and updates the Image metrics, if {@link G_IMG_METRIC_ENABLED} is true.
 	 * @param {*} sourceStage The stage for the ground truth / reference image
 	 * @param {*} destStage The stage for the image to compare
 	 */
 	updateImageMetricsInfo: function(sourceStage, destStage) {
+		// create info dialog as needed
+		const dialogId = "dialog-imgMetric";
+		const eTitle = "Double-click for more information.";
+		var onDblClick = function(){
+			let dialog = $('#'+dialogId);
+			if (dialog.length) {
+				dialog.dialog('open');
+			} else {
+				var elem = $("&lt;div/>")
+				.attr({
+					'id': dialogId,
+					'title': G_APP_NAME + " - Image Quality Metric"
+				})
+				.css({'display':'none'})
+				.addClass('jui')
+				.html(`
+				&lt;div>
+				&lt;input type="hidden" autofocus="autofocus" />
+
+				&lt;p>&lt;b>Image Quality&lt;/b>&lt;/p>
+
+				&lt;p>
+				The intended use of metric in this application is more of a qualitative nature,
+				rather than quantitative. The user should be able to grasp any trends in the
+				change of the image quality metric when the imaging parameters are changed.
+				&lt;/p>
+
+				&lt;p>
+				That said, it is the trends or change in the image quality metric values that
+				are important, more so than the values themselves.
+				Other than the MSE and PSNR algortihms, a value of 0.0 indicates the lowest
+				score or match when compared to the original (ground truth) image. Whereas,
+				a maximum score of 1.0 indicates a perfect match. Naturally, the ground truth image
+				is assumed to be of optimum quality for this comparision.
+				&lt;p>
+
+				&lt;details>
+				&lt;summary>&lt;b>Additional Information&lt;/b>&lt;/p>&lt;/summary>
+				&lt;p>For performance reasons, the metric is only updated at every quarter of the image
+				drawn, or if the draw-rate is fast, &lt;i>i.e.&lt;/i>, less than 50 ms/row
+				(for non SSIM-based algortihms).
+				&lt;/p>
+
+				&lt;p>Unfortunately, there is no flawless or foolproof image quality metric.
+				Over 20 different image metrics have been reviewed and compared by
+				&lt;a href="https://www.sciencedirect.com/science/article/pii/S2214241X15000206">
+				Jagalingam and Hegde in a 2015 paper&lt;/a>, each with
+				their different strengths and weaknesses.
+				&lt;/p>
+				&lt;ul>
+				&lt;li>More information on the purpose and intented use can be found
+				&lt;a href="https://github.com/joedf/CAS741_w23/blob/main/docs/SRS/SRS.pdf">here&lt;/a>.&lt;/li>
+				&lt;li>A comparision of various image quality metrics used in this application is available
+				&lt;a href="https://github.com/joedf/CAS741_w23/blob/main/docs/VnVReport/VnVReport.pdf">here&lt;/a>.&lt;/li>
+				&lt;/ul>
+				&lt;/details>
+
+				&lt;/div>
+				`);
+
+				elem.dialog({
+					modal: true,
+					width: 540,
+					buttons: {
+						Ok: function() {
+							$( this ).dialog( "close" );
+						}
+					}
+				});
+			}
+		};
+
 		// calculate and display
 		const infoclass = "metricsDisplay";
-		var element = this.ensureInfoBox(destStage, infoclass);
+		var element = this.ensureInfoBox(destStage, infoclass, onDblClick, eTitle);
 		if (element) {
-			// compare without Image Smoothing
-			const imageSmoothing = false;
 
-			// get ground truth image
-			var refImage = this.getFirstImageFromStage(sourceStage);
-			var refData = this.getKonvaImageData(refImage, imageSmoothing);
+			// Show/hide the img-metric based on the global boolean
+			$(element).toggle(G_IMG_METRIC_ENABLED);
+			
+			// only do the calc, if enabled
+			if (G_IMG_METRIC_ENABLED) {
+				// compare without Image Smoothing
+				const imageSmoothing = false;
 
-			// get the image without the row/draw indicator
-			var finalImage = this.getVirtualSEM_KonvaImage(destStage);
-			var finalData = this.getKonvaImageData(finalImage, imageSmoothing);
+				// get ground truth image
+				var refImage = this.getFirstImageFromStage(sourceStage);
+				var refData = this.getKonvaImageData(refImage, imageSmoothing);
 
-			// Do the metric calculation here
-			var metrics = NRMSE.compare(refData, finalData);
+				// get the image without the row/draw indicator
+				var finalImage = this.getVirtualSEM_KonvaImage(destStage);
+				var finalData = this.getKonvaImageData(finalImage, imageSmoothing);
 
-			// display it
-			element.innerHTML = "iNRMSE = " + metrics.inrmse.toFixed(G_MATH_TOFIXED.LONG);
+				// Do the metric calculation here
+				// based on the algorithm/metric chosen...
+				var metricValue = 0;
+				var algo = Utils.getImageMetricAlgorithm();
+				if (algo.indexOf('SSIM') >= 0) {
+					// needed for the SSIM / MS-SSIM library
+					const img_channel_count = 4;
+					refData.channels = img_channel_count;
+					finalData.channels = img_channel_count;
+
+					let metrics = ImageMSSSIM.compare(refData, finalData);
+					if (algo == "MS-SSIM") {
+						metricValue = metrics.msssim;
+					} else {
+						metricValue = metrics.ssim;
+					}
+				} else { // 'MSE', 'PSNR', 'iNRMSE', 'iNMSE'
+					let metrics = NRMSE.compare(refData, finalData);
+					switch(algo) {
+						case 'MSE': metricValue = metrics.mse; break;
+						case 'PSNR': metricValue = metrics.psnr; break;
+						case 'iNMSE': metricValue = metrics.inmse; break;
+						default: metricValue = metrics.inrmse;
+					}
+				}
+
+				// display it
+				element.innerHTML = algo + " = " + metricValue.toFixed(G_MATH_TOFIXED.LONG);
+			}
 		}
 	},
 
@@ -750,9 +855,10 @@ const Utils = {
 	 * @param {*} stage The stage on which display/have the info-box.
 	 * @param {string} className The class name of the info-box DOM element.
 	 * @param {function} [onDblClick] bound on creation, the event handler / callback for on-doubleclick event
+	 * @param {string} [title] Optional title / tooltip text.
 	 * @returns the info-box DOM element.
 	 */
-	ensureInfoBox: function(stage, className, onDblClick) {
+	ensureInfoBox: function(stage, className, onDblClick, title) {
 		// get stage container
 		var eStage = $(stage.getContainer());
 		
@@ -762,6 +868,10 @@ const Utils = {
 			// not found, so create it
 			eStage.prepend('&lt;span class="infoBox '+className+'">&lt;/span>');
 			e = eStage.children('.'+className+':first');
+			
+			if (typeof title == 'string') {
+				e.attr('title', title);
+			}
 		}
 
 		// return the non-jquery-wrapped DOM element
@@ -1516,8 +1626,9 @@ const Utils = {
 
 	/** Displays a message/dialog box with information about this application. */
 	ShowAboutMessage: function(){
-		const id = '#dialog-about';
-		var about = $(id);
+		/* eslint-disable max-len */
+		const id = 'dialog-about';
+		var about = $('#'+id);
 		if (about.length) {
 			about.dialog('open');
 		} else {
@@ -1562,9 +1673,21 @@ const Utils = {
 			and the virtual &lt;q>grains&lt;/q> images.
 			&lt;/li>
 			&lt;/ul>
+			&lt;p>All images belong to their respective owners and are used here with permission.&lt;/p>
 			&lt;/details>
 
-			&lt;p>All images belong to their respective owners and are used here with permission.&lt;/p>
+			&lt;details>
+			&lt;summary>&lt;b>Open-Source Libraries&lt;/b>&lt;/p>&lt;/summary>
+			&lt;ul>
+			&lt;li>&lt;a href="https://konvajs.org">Konva.js&lt;/a> - HTML5 2d canvas js library&lt;/li>
+			&lt;li>&lt;a href="https://jquery.com/">jQuery&lt;/a>
+			and &lt;a href="https://jqueryui.com">jQuery-ui&lt;/a> - HTML DOM manipulation and UI elements&lt;/li>
+			&lt;li>&lt;a href="https://github.com/dataarts/dat.gui">dat.gui&lt;/a> - Lightweight GUI for changing variables&lt;/li>
+			&lt;li>&lt;a href="https://github.com/photopea/UTIF.js">UTIF.js&lt;/a> - Fast and advanced TIFF decoder&lt;/li>
+			&lt;li>&lt;a href="https://github.com/darosh/image-ms-ssim-js">image-ms-ssim.js&lt;/a> - Image multi-scale structural similarity (MS-SSIM)&lt;/li>
+			&lt;/ul>
+			&lt;/details>
+
 			&lt;/div>
 			`).appendTo('body');
 
@@ -1578,6 +1701,7 @@ const Utils = {
 				}
 			});
 		}
+		/* eslint-enable max-len */
 	}
 };
 </code></pre>
@@ -1590,13 +1714,13 @@ const Utils = {
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="G_MATH_TOFIXED.html">G_MATH_TOFIXED</a></li><li><a href="NRMSE.html">NRMSE</a></li><li><a href="Utils.html">Utils</a></li></ul><h3>Global</h3><ul><li><a href="global.html#G_APP_NAME">G_APP_NAME</a></li><li><a href="global.html#G_AUTO_PREVIEW_LIMIT">G_AUTO_PREVIEW_LIMIT</a></li><li><a href="global.html#G_BOX_SIZE">G_BOX_SIZE</a></li><li><a href="global.html#G_INPUT_IMAGE">G_INPUT_IMAGE</a></li><li><a href="global.html#G_MAIN_CONTAINER">G_MAIN_CONTAINER</a></li><li><a href="global.html#G_MAIN_IMAGE_OBJ">G_MAIN_IMAGE_OBJ</a></li><li><a href="global.html#G_PRELOADED_IMAGES">G_PRELOADED_IMAGES</a></li><li><a href="global.html#G_PRELOADED_IMAGES_ROOT">G_PRELOADED_IMAGES_ROOT</a></li><li><a href="global.html#G_UpdateResampled">G_UpdateResampled</a></li><li><a href="global.html#G_UpdateRuler">G_UpdateRuler</a></li><li><a href="global.html#G_UpdateVirtualSEMConfig">G_UpdateVirtualSEMConfig</a></li><li><a href="global.html#G_Update_GroundTruth">G_Update_GroundTruth</a></li><li><a href="global.html#G_Update_InfoDisplays">G_Update_InfoDisplays</a></li><li><a href="global.html#G_VSEM_PAUSED">G_VSEM_PAUSED</a></li><li><a href="global.html#GetOptimalBoxWidth">GetOptimalBoxWidth</a></li><li><a href="global.html#OnImageLoaded">OnImageLoaded</a></li><li><a href="global.html#ResampleFullImage">ResampleFullImage</a></li><li><a href="global.html#UpdateBaseImage">UpdateBaseImage</a></li><li><a href="global.html#drawGroundtruthImage">drawGroundtruthImage</a></li><li><a href="global.html#drawProbeLayout">drawProbeLayout</a></li><li><a href="global.html#drawProbeLayoutSampling">drawProbeLayoutSampling</a></li><li><a href="global.html#drawResampled">drawResampled</a></li><li><a href="global.html#drawSpotContent">drawSpotContent</a></li><li><a href="global.html#drawSpotProfileEdit">drawSpotProfileEdit</a></li><li><a href="global.html#drawSpotSignal">drawSpotSignal</a></li><li><a href="global.html#drawSubregionImage">drawSubregionImage</a></li><li><a href="global.html#drawVirtualSEM">drawVirtualSEM</a></li><li><a href="global.html#nStages">nStages</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="G_MATH_TOFIXED.html">G_MATH_TOFIXED</a></li><li><a href="NRMSE.html">NRMSE</a></li><li><a href="Utils.html">Utils</a></li></ul><h3>Global</h3><ul><li><a href="global.html#G_APP_NAME">G_APP_NAME</a></li><li><a href="global.html#G_AUTO_PREVIEW_LIMIT">G_AUTO_PREVIEW_LIMIT</a></li><li><a href="global.html#G_BOX_SIZE">G_BOX_SIZE</a></li><li><a href="global.html#G_IMG_METRICS">G_IMG_METRICS</a></li><li><a href="global.html#G_IMG_METRIC_ENABLED">G_IMG_METRIC_ENABLED</a></li><li><a href="global.html#G_INPUT_IMAGE">G_INPUT_IMAGE</a></li><li><a href="global.html#G_MAIN_CONTAINER">G_MAIN_CONTAINER</a></li><li><a href="global.html#G_MAIN_IMAGE_OBJ">G_MAIN_IMAGE_OBJ</a></li><li><a href="global.html#G_PRELOADED_IMAGES">G_PRELOADED_IMAGES</a></li><li><a href="global.html#G_PRELOADED_IMAGES_ROOT">G_PRELOADED_IMAGES_ROOT</a></li><li><a href="global.html#G_UpdateResampled">G_UpdateResampled</a></li><li><a href="global.html#G_UpdateRuler">G_UpdateRuler</a></li><li><a href="global.html#G_UpdateVirtualSEMConfig">G_UpdateVirtualSEMConfig</a></li><li><a href="global.html#G_Update_GroundTruth">G_Update_GroundTruth</a></li><li><a href="global.html#G_Update_InfoDisplays">G_Update_InfoDisplays</a></li><li><a href="global.html#G_VSEM_PAUSED">G_VSEM_PAUSED</a></li><li><a href="global.html#G_update_ImgMetrics">G_update_ImgMetrics</a></li><li><a href="global.html#GetOptimalBoxWidth">GetOptimalBoxWidth</a></li><li><a href="global.html#OnImageLoaded">OnImageLoaded</a></li><li><a href="global.html#ResampleFullImage">ResampleFullImage</a></li><li><a href="global.html#UpdateBaseImage">UpdateBaseImage</a></li><li><a href="global.html#drawGroundtruthImage">drawGroundtruthImage</a></li><li><a href="global.html#drawProbeLayout">drawProbeLayout</a></li><li><a href="global.html#drawProbeLayoutSampling">drawProbeLayoutSampling</a></li><li><a href="global.html#drawResampled">drawResampled</a></li><li><a href="global.html#drawSpotContent">drawSpotContent</a></li><li><a href="global.html#drawSpotProfileEdit">drawSpotProfileEdit</a></li><li><a href="global.html#drawSpotSignal">drawSpotSignal</a></li><li><a href="global.html#drawSubregionImage">drawSubregionImage</a></li><li><a href="global.html#drawVirtualSEM">drawVirtualSEM</a></li><li><a href="global.html#nStages">nStages</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Thu Jul 06 2023 17:01:16 GMT-0400 (Eastern Daylight Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Sat Jul 15 2023 18:05:48 GMT-0400 (Eastern Daylight Time)
 </footer>
 
 <a id="backtotop" href="#"><div>&uarr; Top</div></a>
