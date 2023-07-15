@@ -1026,9 +1026,14 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 			if (typeof G_update_ImgMetrics == "function") {
 				// update it every quarter of the rows drawn
 				let imgMetricUpdateTick = (currentRow % Math.floor(rows / 4) == 0) && (currentRow > 1);
+				
 				// or update if the draw-rate is fast (less than 50 ms/row)
 				const rowTime = 50; //ms
-				if (timeDrawTotal < rowTime || imgMetricUpdateTick) {
+				
+				// and not an SSIM-based algorithm, since they are comparatively slow...
+				var isSSIM = (Utils.getImageMetricAlgorithm()).indexOf('SSIM') >= 0;
+
+				if ( (timeDrawTotal < rowTime && !isSSIM) || imgMetricUpdateTick) {
 					G_update_ImgMetrics();
 				}
 			}

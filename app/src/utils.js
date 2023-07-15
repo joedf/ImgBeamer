@@ -595,9 +595,10 @@ const Utils = {
 				<details>
 				<summary><b>Additional Information</b></p></summary>
 				<p>For performance reasons, the metric is only updated at every quarter of the image
-				drawn, or if the draw-rate is fast, <i>i.e.</i>, less than 50 ms/row.
+				drawn, or if the draw-rate is fast, <i>i.e.</i>, less than 50 ms/row
+				(for non SSIM-based algortihms).
 				</p>
-				
+
 				<p>Unfortunately, there is no flawless or foolproof image quality metric.
 				Over 20 different image metrics have been reviewed and compared by
 				<a href="https://www.sciencedirect.com/science/article/pii/S2214241X15000206">
