@@ -578,8 +578,8 @@ const Utils = {
 				<p><b>Image Quality</b></p>
 
 				<p>
-				The intended use of metric in this application is more of a qualitative nature,
-				rather than quantitative. The user should be able to grasp any trends in the
+				The intended use of an image metric in this application is more of a qualitative
+				nature, rather than quantitative. The user should be able to grasp any trends in the
 				change of the image quality metric when the imaging parameters are changed.
 				</p>
 
@@ -587,7 +587,7 @@ const Utils = {
 				That said, it is the trends or change in the image quality metric values that
 				are important, more so than the values themselves.
 				Other than the MSE and PSNR algorithms, a value of 0.0 indicates the lowest
-				score or match when compared to the original (ground truth) image. Whereas,
+				score or match when compared to the original (ground truth) image. Whereas
 				a maximum score of 1.0 indicates a perfect match. Naturally, the ground truth image
 				is assumed to be of optimum quality for this comparison.
 				<p>
@@ -606,7 +606,7 @@ const Utils = {
 				their different strengths and weaknesses.
 				</p>
 				<ul>
-				<li>More information on the purpose and intented use can be found
+				<li>More information on the purpose and intended use can be found
 				<a href="https://github.com/joedf/CAS741_w23/blob/main/docs/SRS/SRS.pdf">here</a>.</li>
 				<li>A comparison of various image quality metrics used in this application is available
 				<a href="https://github.com/joedf/CAS741_w23/blob/main/docs/VnVReport/VnVReport.pdf">here</a>.</li>
