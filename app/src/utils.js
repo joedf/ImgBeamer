@@ -589,7 +589,7 @@ const Utils = {
 				Other than the MSE and PSNR algortihms, a value of 0.0 indicates the lowest
 				score or match when compared to the original (ground truth) image. Whereas,
 				a maximum score of 1.0 indicates a perfect match. Naturally, the ground truth image
-				is assumed to be of optimum quality for this comparision.
+				is assumed to be of optimum quality for this comparison.
 				<p>
 
 				<details>
