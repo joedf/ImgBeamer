@@ -586,7 +586,7 @@ const Utils = {
 				<p>
 				That said, it is the trends or change in the image quality metric values that
 				are important, more so than the values themselves.
-				Other than the MSE and PSNR algortihms, a value of 0.0 indicates the lowest
+				Other than the MSE and PSNR algorithms, a value of 0.0 indicates the lowest
 				score or match when compared to the original (ground truth) image. Whereas,
 				a maximum score of 1.0 indicates a perfect match. Naturally, the ground truth image
 				is assumed to be of optimum quality for this comparison.
@@ -596,7 +596,7 @@ const Utils = {
 				<summary><b>Additional Information</b></p></summary>
 				<p>For performance reasons, the metric is only updated at every quarter of the image
 				drawn, or if the draw-rate is fast, <i>i.e.</i>, less than 50 ms/row
-				(for non SSIM-based algortihms).
+				(for non SSIM-based algorithms).
 				</p>
 
 				<p>Unfortunately, there is no flawless or foolproof image quality metric.
