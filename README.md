@@ -9,15 +9,15 @@ Simple demo tool of the image formation[<sup>1</sup>](#references) process used 
 A quick start guide is available [here](https://joedf.github.io/ImgBeamer/misc/ImgBeamer_QS_guide.pdf).
 
 ### Description of Stages / Boxes
-1. Sample Ground Truth (map navigation)
-2. Subregion/ROI (Region of Interest) View ("zoomed" view)
-3. Spot Profile
-4. Spot Content
-5. Spot Signal (rgba)
-6. Spot Layout
-7. Sampled Subregion
-8. Resulting Subregion
-9. Resulting Image (full, "virtual SEM")
+1. **Sample Ground Truth** (map navigation): a view the full image where the highlighted area represents the subregion area.
+2. **Subregion** or ROI (Region of Interest) View ("zoomed" view): a view of the subregion area as highlighted in the Sample Ground Truth.
+3. **Spot Profile**: visualization of the spot profile (shape and size) by changing the relative width/height, scale, and rotation.
+4. **Spot Content**: visualization of the spot content (Subregion “stenciled” with the spot profile) or area sampled by the spot.
+5. **Spot Signal** (rgba): the signal or pixel value to represent what has been sampled by the spot or beam, or the average pixel value from the Spot Content.
+6. **Spot Layout**: the layout of the sampling grid or array of spot sampling positions over the Subregion area.
+7. **Sampled Subregion**: the sampled or "stenciled" content of the Subregion as depicted by the Spot Layout.
+8. **Resulting Subregion**: the resulting image by filing each pixel in the grid by the signal of each corresponding spot as depicted in the Spot Layout.
+9. **Resulting Image** (full, "virtual SEM"): the resulting image full where the imaging process, as shown in the Resulting Subregion, is continued for the full extent of the Sample Ground Truth image.
  
 ### Screenshot
 ![screenshot](misc/screenshot4.png)
