@@ -145,6 +145,7 @@ const Utils = {
 	getColsInput: function(){ return G_GUI_Controller.pixelCountX; },
 	getBrightnessInput: function(){ return G_GUI_Controller.brightness; },
 	getContrastInput: function(){ return G_GUI_Controller.contrast; },
+	getGlobalBCInput: function(){ return G_GUI_Controller.globalBC; },
 	getCellWInput: function(){ return this.getInputValueInt($('#iCellW')); },
 	getCellHInput: function(){ return this.getInputValueInt($('#iCellH')); },
 	getSpotXInput: function(){ return this.getInputValueInt($('#iSpotX')); },

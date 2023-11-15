@@ -380,24 +380,27 @@ function OnImageLoaded(eImg, stages){
 	});
 
 	function updateFilters(){
-		// stages that we want to apply filters to...
-		var fStages = [
-			groundtruthMapStage, baseImageStage,
-			spotContentStage, probeLayoutStage,
-			layoutSampledStage
-		];
+		var doBC = Utils.getGlobalBCInput();
+		if (doBC) {	
+			// stages that we want to apply filters to...
+			var fStages = [
+				groundtruthMapStage, baseImageStage,
+				spotContentStage, probeLayoutStage,
+				layoutSampledStage
+			];
 
-		// apply the filters
-		const brightness = Utils.getBrightnessInput();
-		const contrast = Utils.getContrastInput();
-		for (let i = 0; i < fStages.length; i++) {
-			const fStage = fStages[i];
-			let image = Utils.getFirstImageFromStage(fStage);
-			Utils.applyBrightnessContrast(image, brightness, contrast);
+			// apply the filters
+			const brightness = Utils.getBrightnessInput();
+			const contrast = Utils.getContrastInput();
+			for (let i = 0; i < fStages.length; i++) {
+				const fStage = fStages[i];
+				let image = Utils.getFirstImageFromStage(fStage);
+				Utils.applyBrightnessContrast(image, brightness, contrast);
+			}
+
+			// for the resulting images, the sampling function, Utils.ComputeProbeValue_gs(),
+			// is made B/C aware and using Konva's built-in filters directly. 
 		}
-
-		// for the resulting images, the sampling function, Utils.ComputeProbeValue_gs(),
-		// is made B/C aware and using Konva's built-in filters directly. 
 
 		// call global visual update
 		doUpdate();

@@ -98,6 +98,7 @@
 					G_Update_InfoDisplays();
 				};
 				this.updateFilters = function(){ G_UpdateFilters(); },
+				this.globalBC = true;
 				this.resetBC = function(){
 					let cGui = G_GUI_Controller.controls;
 					cGui.brightness.setValue(0);
@@ -123,10 +124,15 @@
 			var gui_ip = gui.addFolder('Imaging Parameters');
 			gui_ip.add(G_GUI_Controller, 'pixelCountX', 1, 64, 1).onChange(G_GUI_Controller.updateViews);
 			gui_ip.add(G_GUI_Controller, 'pixelCountY', 1, 64, 1).onChange(G_GUI_Controller.updateViews);
-			G_GUI_Controller.controls.brightness = gui_ip.add(
-				G_GUI_Controller, 'brightness', -1, 1, 0.01).onChange(G_GUI_Controller.updateFilters);
-			G_GUI_Controller.controls.contrast = gui_ip.add(
-				G_GUI_Controller, 'contrast', -100, 100, 0.1).onChange(G_GUI_Controller.updateFilters);
+			G_GUI_Controller.controls.brightness = gui_ip
+				.add(G_GUI_Controller, 'brightness', -1, 1, 0.01)
+				.onChange(G_GUI_Controller.updateFilters);
+			G_GUI_Controller.controls.contrast = gui_ip
+				.add(G_GUI_Controller, 'contrast', -100, 100, 0.1)
+				.onChange(G_GUI_Controller.updateFilters);
+			gui_ip.add(G_GUI_Controller, 'globalBC')
+				.name('Global B/C')
+				.onChange(G_GUI_Controller.updateFilters);
 			gui_ip.add(G_GUI_Controller, 'resetBC').name('Reset Brightness / Contrast');
 			gui_ip.add(G_GUI_Controller, 'digitalMag').listen();
 			G_GUI_Controller.controls.pixelSize_nm = gui_ip
