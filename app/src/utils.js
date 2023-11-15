@@ -1529,6 +1529,23 @@ const Utils = {
 	},
 
 	/**
+	 * Finds (non-recusrive) the first layer with a matching on a given stage, null if n/a.
+	 * @param {*} stage The stage or element with layers.
+	 * @param {*} layerName The name of the layer.
+	 */
+	getLayerByName: function(stage, layerName){
+		var layers = stage.getLayers();
+		for (let i = 0; i < layers.length; i++) {
+			const layer = layers[i];
+			const name = layer.name();
+			if (name == layerName) {
+				return layer;
+			}
+		}
+		return null;
+	},
+
+	/**
 	 * get the image without the row/draw indicator
 	 * @param {*} stage the stage to search through
 	 * @returns the image object

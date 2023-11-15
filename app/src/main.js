@@ -295,8 +295,14 @@ function OnImageLoaded(eImg, stages){
 	var updateGroundtruthMap = groundtruthMap.updateFunc;
 	G_Update_GroundTruth = updateGroundtruthMap;
 
-	// add ruler on Groun truth stage
-	var rulerLayer = new Konva.Layer({visible: false});
+	// add ruler on Ground truth stage
+	var rulerLayer = Utils.getLayerByName(groundtruthMapStage, 'myRuler');
+	if (rulerLayer != null) {
+		// make sure we don't add a duplicate layer, to avoid memory leaks
+		// mainly when a new image is loaded.
+		rulerLayer.destroy();
+	}
+	rulerLayer = new Konva.Layer({visible: false, name: 'myRuler'});
 	groundtruthMapStage.add(rulerLayer);
 	var ruler = Utils.CreateRuler(rulerLayer, eImg,
 		// Default is a ruler that is 2/3rd width of the stage and vertically in middle
@@ -322,6 +328,8 @@ function OnImageLoaded(eImg, stages){
 		ruler.doUpdate(); // update the ruler
 		rulerLayer.visible(show); // update visibility
 	};
+	// update ruler once immediately
+	G_UpdateRuler();
 	
 	// draw Resulting Image
 	$(virtualSEMStage.getContainer()).attr('box_label', 'Resulting Image');
