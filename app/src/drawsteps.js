@@ -2,6 +2,7 @@
  * Utils,
  * G_BOX_SIZE, G_DEBUG, G_AUTO_PREVIEW_LIMIT,
  * G_VSEM_PAUSED, G_MATH_TOFIXED,
+ * G_SHOW_SUBREGION_OVERLAY,
  * G_update_ImgMetrics
  */
 
@@ -777,6 +778,9 @@ function drawGroundtruthImage(stage, imageObj, subregionImage, maxSize=G_BOX_SIZ
 			width: si.width() / si.scaleX(),
 			height: si.height() / si.scaleY(),
 		});
+
+		// subregion overlay visibility
+		rect.visible(G_SHOW_SUBREGION_OVERLAY);
 
 		stage.draw();
 

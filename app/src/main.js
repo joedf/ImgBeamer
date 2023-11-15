@@ -18,6 +18,7 @@
  * G_UpdateFilters
  * G_AUTO_PREVIEW_LIMIT
  * G_VSEM_PAUSED
+ * G_SHOW_SUBREGION_OVERLAY
  * G_IMG_METRIC_ENABLED
  * G_APP_NAME
  * G_INPUT_IMAGE
@@ -39,6 +40,9 @@ var G_AUTO_PREVIEW_LIMIT = 16 * 16;
 
 /** Toggle value to pause the continously draw the Resulting Image / Virtual SEM view */
 var G_VSEM_PAUSED = false;
+
+/** Toggle value to show/hide the subregion overlay on the Sample Ground Truth stage. */
+var G_SHOW_SUBREGION_OVERLAY = true;
 
 /** Toggle value to pause/hide the image quality metric calculation of the Resulting Image / Virtual SEM view */
 var G_IMG_METRIC_ENABLED = true;
@@ -156,6 +160,7 @@ function OnImageLoaded(eImg, stages){
 
 	/** called when a change occurs in the spot profile, subregion, or spot content */
 	function doUpdate(){
+		// don't update spot signal if not shown
 		if ($(spotSignalStage.getContainer()).is(':visible')) {
 			updateSpotSignal();
 		}

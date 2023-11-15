@@ -108,6 +108,7 @@
 				this.groundTruthImg = 'grains2tl.png';
 				this.pause_vSEM = G_VSEM_PAUSED;
 				this.doImageMetric = G_IMG_METRIC_ENABLED;
+				this.subregionOverlay = G_SHOW_SUBREGION_OVERLAY;
 				this.imageMetricAlgo = 'iNRMSE';
 				this.exportResultImg = function(){ exportResultImage(); };
 				this.importImage = function(){
@@ -151,6 +152,10 @@
 			});
 			gui_do.add(G_GUI_Controller, 'pause_vSEM').onChange(function(){
 				G_VSEM_PAUSED = G_GUI_Controller.pause_vSEM;
+			});
+			gui_do.add(G_GUI_Controller, 'subregionOverlay').onChange(function(){
+				G_SHOW_SUBREGION_OVERLAY = G_GUI_Controller.subregionOverlay;
+				G_GUI_Controller.updateViews();
 			});
 			gui_do.add(G_GUI_Controller, 'previewOpacity', 0, 1, 0.01).onChange(function(){
 				G_UpdateResampled();
