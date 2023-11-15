@@ -396,9 +396,8 @@ function OnImageLoaded(eImg, stages){
 			Utils.applyBrightnessContrast(image, brightness, contrast);
 		}
 
-		// apply it to the resulting images too
-		// this doesn't work...
-		// Utils.applyBrightnessContrast(subregionImage, brightness, contrast);
+		// for the resulting images, the sampling function, Utils.ComputeProbeValue_gs(),
+		// is made B/C aware and using Konva's built-in filters directly. 
 
 		// call global visual update
 		doUpdate();

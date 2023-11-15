@@ -1506,6 +1506,17 @@ const Utils = {
 		// grab the pixel data from the pixel selection area
 		var pxData = ctx.getImageData(0,0,cv.width,cv.height);
 
+		// hack to directly use Konva's built-in filters code
+		if (typeof Konva != 'undefined') {
+			var brightnessFunc = Konva.Filters.Brighten.bind({
+				brightness: () => this.getBrightnessInput()});
+			var contrastFunc = Konva.Filters.Contrast.bind({
+				contrast: () => this.getContrastInput()});
+			// apply it directly to out image data before we sample it.
+			brightnessFunc(pxData);
+			contrastFunc(pxData);
+		}
+
 		// compute the average pixel (excluding 0-0-0-0 rgba pixels)
 		var pxColor = this.get_avg_pixel_gs(pxData);
 
