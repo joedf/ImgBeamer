@@ -177,7 +177,9 @@
 			aboutBtn.name("About " + G_APP_NAME + " / Credits");
 			gui_io.open();
 
-			$("#options").append(gui.domElement).draggable({
+			$("#options").append(gui.domElement)
+			.position({at:'right bottom', my:'right bottom', of: '#options-anchor'})
+			.draggable({
 				// containment: 'body',
 				handle: '#options-handle',
 			});
