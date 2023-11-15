@@ -104,13 +104,14 @@ summary {
 #options-anchor {
 	display: inline-block;
 	position: fixed;
-	top: 35vh;
-	right: 0.25em;
+	bottom: 0;
+	right: 0;
 	z-index: 69;
 	user-select: none;
 	cursor: move;
 	width: 0;
 	height: 0;
+	margin: 2em 1em;
 }
 
 #options-full-resample {

@@ -143,6 +143,9 @@ const Utils = {
 
 	getRowsInput: function(){ return G_GUI_Controller.pixelCountY; },
 	getColsInput: function(){ return G_GUI_Controller.pixelCountX; },
+	getBrightnessInput: function(){ return G_GUI_Controller.brightness; },
+	getContrastInput: function(){ return G_GUI_Controller.contrast; },
+	getGlobalBCInput: function(){ return G_GUI_Controller.globalBC; },
 	getCellWInput: function(){ return this.getInputValueInt($('#iCellW')); },
 	getCellHInput: function(){ return this.getInputValueInt($('#iCellH')); },
 	getSpotXInput: function(){ return this.getInputValueInt($('#iSpotX')); },
@@ -1504,6 +1507,17 @@ const Utils = {
 		// grab the pixel data from the pixel selection area
 		var pxData = ctx.getImageData(0,0,cv.width,cv.height);
 
+		// hack to directly use Konva's built-in filters code
+		if (typeof Konva != 'undefined') {
+			var brightnessFunc = Konva.Filters.Brighten.bind({
+				brightness: () => this.getBrightnessInput()});
+			var contrastFunc = Konva.Filters.Contrast.bind({
+				contrast: () => this.getContrastInput()});
+			// apply it directly to out image data before we sample it.
+			brightnessFunc(pxData);
+			contrastFunc(pxData);
+		}
+
 		// compute the average pixel (excluding 0-0-0-0 rgba pixels)
 		var pxColor = this.get_avg_pixel_gs(pxData);
 
@@ -1513,6 +1527,43 @@ const Utils = {
 		cv = null;
 
 		return pxColor;
+	},
+
+	/**
+	 * Applies Brightness/Contrast (B/C) values to a given Konva stage or drawable.
+	 * @param {*} drawable The Konva stage or drawable / drawElement.
+	 * @param {*} brightness The brightness value, from -1 to 1.
+	 * @param {*} contrast The contrast value, mainly from -100 to 100.
+	 */
+	applyBrightnessContrast: function(drawable, brightness=0, contrast=0) {
+		// cache step is need for filter effects to be visible.
+		// https://konvajs.org/docs/performance/Shape_Caching.html
+		drawable.cache();
+
+		// Filters: https://konvajs.org/api/Konva.Filters.html
+		// Brightness => https://konvajs.org/docs/filters/Brighten.html
+		// Contrast => https://konvajs.org/docs/filters/Contrast.html
+		var currentFilters = drawable.filters();
+		// null check, default to empty array if n/a.
+		currentFilters = currentFilters != null ? currentFilters : [];
+		// Add filter if not already included...
+		var currentFiltersByName = currentFilters.map(x => x.name);
+		var filtersToSet = currentFilters;
+		var added = 0;
+		['Brighten', 'Contrast'].forEach(filterName => {
+			if (!currentFiltersByName.includes(filterName)) {
+				filtersToSet.push(Konva.Filters[filterName]);
+				added++;
+			}
+		});
+		drawable.filters(filtersToSet);
+		if (G_DEBUG) {
+			console.log("filters added:", added);
+		}
+
+		// apply B/C filter values
+		drawable.brightness(brightness);
+		drawable.contrast(contrast);
 	},
 
 	/**

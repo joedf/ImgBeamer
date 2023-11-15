@@ -15,6 +15,7 @@
  * G_Update_InfoDisplays
  * G_update_ImgMetrics
  * G_UpdateRuler
+ * G_UpdateFilters
  * G_AUTO_PREVIEW_LIMIT
  * G_VSEM_PAUSED
  * G_IMG_METRIC_ENABLED
@@ -88,6 +89,8 @@ var G_Update_InfoDisplays = null;
 var G_update_ImgMetrics = null;
 /** global reference to update the ruler */
 var G_UpdateRuler = null;
+/** global reference to update/apply image filters */
+var G_UpdateFilters = null;
 
 /** a global reference to the main body container that holds the boxes/stages.
  * @todo do we still need this? Maybe remove... */
@@ -375,6 +378,36 @@ function OnImageLoaded(eImg, stages){
 		updateBeams();
 		doUpdate();
 	});
+
+	function updateFilters(){
+		var doBC = Utils.getGlobalBCInput();
+		if (doBC) {	
+			// stages that we want to apply filters to...
+			var fStages = [
+				groundtruthMapStage, baseImageStage,
+				spotContentStage, probeLayoutStage,
+				layoutSampledStage
+			];
+
+			// apply the filters
+			const brightness = Utils.getBrightnessInput();
+			const contrast = Utils.getContrastInput();
+			for (let i = 0; i < fStages.length; i++) {
+				const fStage = fStages[i];
+				let image = Utils.getFirstImageFromStage(fStage);
+				Utils.applyBrightnessContrast(image, brightness, contrast);
+			}
+
+			// for the resulting images, the sampling function, Utils.ComputeProbeValue_gs(),
+			// is made B/C aware and using Konva's built-in filters directly. 
+		}
+
+		// call global visual update
+		doUpdate();
+	}
+	// update filters once immediately
+	updateFilters();
+	G_UpdateFilters = updateFilters;
 
 	doUpdate();
 
