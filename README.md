@@ -8,6 +8,8 @@ Simple demo tool of the image formation[<sup>1</sup>](#references) process used 
 
 A quick start guide is available [here](https://joedf.github.io/ImgBeamer/misc/ImgBeamer_QS_guide.pdf).
 
+The source code is available [here](https://github.com/joedf/ImgBeamer).
+
 ### Description of Stages / Boxes
 1. **Sample Ground Truth** (map navigation): a view the full image where the highlighted area represents the subregion area.
 2. **Subregion** or ROI (Region of Interest) View ("zoomed" view): a view of the subregion area as highlighted in the Sample Ground Truth.
