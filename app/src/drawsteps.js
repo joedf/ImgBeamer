@@ -729,11 +729,12 @@ function drawResampled(sourceStage, destStage, originalImage, spotScale, sBeam) 
  * @param {*} imageObj the original/full-size image to draw
  * @param {*} subregionImage the subregion image (to get the bounds from)
  * @param {number} maxSize (to be removed) the maximum size (width or height) of the stage to fit the image?
+ * @param {Function} updateCallback called when a change is made to the subregion
  * @returns an object with an update function to call for needed redraws and the subregion bounds.
  * @todo remove maxSize if possible?
  * @todo do we really need to return the subregioRect as well?
  */
-function drawGroundtruthImage(stage, imageObj, subregionImage, maxSize=G_BOX_SIZE){
+function drawGroundtruthImage(stage, imageObj, subregionImage, maxSize=G_BOX_SIZE, updateCallback = null){
 
 	var fit = Utils.fitImageProportions(imageObj.naturalWidth, imageObj.naturalHeight, maxSize);
 
@@ -759,8 +760,97 @@ function drawGroundtruthImage(stage, imageObj, subregionImage, maxSize=G_BOX_SIZ
 		fill: "rgba(0,255,255,0.4)",
 		stroke: "#00FFFF",
 		strokeWidth: 1,
-		listening: false,
+		// listening: false,
+		draggable: true,
 		strokeScaleEnabled: false,
+	});
+
+	// Draggable nav-rect
+	// https://github.com/joedf/ImgBeamer/issues/41
+	rect.on('dragmove', function(){
+		constrainRect();
+		applyChangesFromNavRect();
+	});
+	var constrainRect = function(){
+		var rw = rect.width() * rect.scaleX();
+		var rh = rect.height() * rect.scaleY();
+		var ss = stage.size();
+
+		// top left corner limit
+		if (rect.x() < 0) { rect.x(0); }
+		if (rect.y() < 0) { rect.y(0); }
+
+		// bottom right limit
+		if (rect.x() > ss.width - rw) { rect.x(ss.width - rw); }
+		if (rect.y() > ss.height - rh) { rect.y(ss.height - rh); }
+	};
+	stage.on('wheel', function(e) {
+		// code is based on Uitls.MakeZoomHandler()
+		e.evt.preventDefault(); // stop default scrolling
+
+		const scaleFactor = G_ZOOM_FACTOR_PER_TICK;
+		var scaleBy = scaleFactor;
+
+		// Do half rate scaling, if shift is pressed
+		if (e.evt.shiftKey) {
+			scaleBy = 1 +((scaleBy-1) / 2);
+		}
+
+		// calculate scale with direction
+		let direction = e.evt.deltaY > 0 ? -1 : 1;
+		var scale = direction > 0 ? 1.0 / scaleBy : 1.0 * scaleBy;
+
+		// calculate new size
+		var rs = rect.size();
+		var newWidth = rs.width * scale;
+		var newHeigth = rs.height * scale;
+
+		// constrain size
+		var limitW = Math.min(Math.max(newWidth, 1), stage.width());
+		var limitH = Math.min(Math.max(newHeigth, 1), stage.height());
+
+		// get rect center point delta
+		var dx = rect.width() - limitW;
+		var dy = rect.height() - limitH;
+
+		// apply new size
+		rect.size({ width: limitW, height: limitH });
+
+		// center rect based on new size
+		rect.position({
+			x: rect.x() + dx/2,
+			y: rect.y() + dy/2
+		});
+
+		constrainRect();
+		applyChangesFromNavRect();
+	});
+	var applyChangesFromNavRect = function(){
+		// update the subregion view to the new position and zoom based on changes
+		// to the nav-rect by the user
+		var si = subregionImage;
+
+		si.scale({
+			x: stage.width() / rect.width(),
+			y: stage.height() / rect.height(),
+		});
+
+		si.position({
+			x: (stage.x() - rect.x()) * si.scaleX(),
+			y: (stage.y() - rect.y()) * si.scaleY(),
+		});
+
+		// this propagates the changes to the subregion to the rest of the app
+		if (typeof updateCallback == 'function')
+			return updateCallback();
+	};
+	// Grab cursor for nav-rectangle overlay
+	// https://konvajs.org/docs/styling/Mouse_Cursor.html
+	layer.listening(true);
+	rect.on('mouseenter', function () {
+		stage.container().style.cursor = 'grab';
+	}).on('mouseleave', function () {
+		stage.container().style.cursor = 'default';
 	});
 
 	layer.add(image);

@@ -299,7 +299,7 @@ function OnImageLoaded(eImg, stages){
 
 	// draw Sample Ground Truth
 	$(groundtruthMapStage.getContainer()).attr('box_label', 'Sample Ground Truth');
-	var groundtruthMap = drawGroundtruthImage(groundtruthMapStage, eImg, subregionImage, G_BOX_SIZE);
+	var groundtruthMap = drawGroundtruthImage(groundtruthMapStage, eImg, subregionImage, G_BOX_SIZE, doUpdate);
 	var updateGroundtruthMap = groundtruthMap.updateFunc;
 	G_Update_GroundTruth = updateGroundtruthMap;
 
