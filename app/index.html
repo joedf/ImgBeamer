@@ -107,6 +107,7 @@
 				},
 				this.groundTruthImg = 'grains2tl.png';
 				this.pause_vSEM = G_VSEM_PAUSED;
+				this.imageSmoothing = true;
 				this.doImageMetric = G_IMG_METRIC_ENABLED;
 				this.subregionOverlay = G_SHOW_SUBREGION_OVERLAY;
 				this.imageMetricAlgo = 'iNRMSE';
@@ -153,6 +154,9 @@
 			gui_do.add(G_GUI_Controller, 'pause_vSEM').onChange(function(){
 				G_VSEM_PAUSED = G_GUI_Controller.pause_vSEM;
 			});
+			gui_do.add(G_GUI_Controller, 'imageSmoothing').onChange(function(){
+				G_UpdateStageSettings();
+			});
 			gui_do.add(G_GUI_Controller, 'subregionOverlay').onChange(function(){
 				G_SHOW_SUBREGION_OVERLAY = G_GUI_Controller.subregionOverlay;
 				G_GUI_Controller.updateViews();
@@ -188,7 +192,7 @@
 
 			// used to auto-name the export files with a counter
 			var G_Export_img_count = 0;
-			var stageFinal = stages[stages.length - 1];
+			var stageFinal = G_STAGES[G_STAGES.length - 1];
 			function exportResultImage(){
 				// Export image as file download
 				// https://konvajs.org/docs/data_and_serialization/High-Quality-Export.html
