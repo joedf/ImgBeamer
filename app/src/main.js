@@ -16,6 +16,7 @@
  * G_update_ImgMetrics
  * G_UpdateRuler
  * G_UpdateFilters
+ * G_UpdateStageSettings
  * G_AUTO_PREVIEW_LIMIT
  * G_VSEM_PAUSED
  * G_SHOW_SUBREGION_OVERLAY
@@ -25,6 +26,7 @@
  * G_PRELOADED_IMAGES
  * G_PRELOADED_IMAGES_ROOT
  * G_IMG_METRICS
+ * G_STAGES
  */
 
 /** Name of the application */
@@ -95,6 +97,8 @@ var G_update_ImgMetrics = null;
 var G_UpdateRuler = null;
 /** global reference to update/apply image filters */
 var G_UpdateFilters = null;
+/** global reference to update stage related settings */
+var G_UpdateStageSettings = null;
 
 /** a global reference to the main body container that holds the boxes/stages.
  * @todo do we still need this? Maybe remove... */
@@ -107,11 +111,12 @@ var G_BOX_SIZE = GetOptimalBoxWidth();
 /** The number of stages to create */
 const nStages = 9;
 
+/** The array/list of all the stages. */
+var G_STAGES = [];
 // first create the stages
-var stages = [];
 for (let i = 0; i < nStages; i++) {
 	var stage = Utils.newStageTemplate(G_MAIN_CONTAINER, G_BOX_SIZE, G_BOX_SIZE);
-	stages.push(stage);
+	G_STAGES.push(stage);
 }
 
 /////////////////////
@@ -134,7 +139,7 @@ function UpdateBaseImage(){
 		var imageObj = event.target;
 		G_MAIN_IMAGE_OBJ = imageObj;
 		
-		OnImageLoaded(imageObj, stages);
+		OnImageLoaded(imageObj, G_STAGES);
 	});
 }
 
@@ -417,6 +422,18 @@ function OnImageLoaded(eImg, stages){
 	doUpdate();
 
 	Utils.updateAdvancedMode();
+
+	// update stage related settings
+	G_UpdateStageSettings = function(){
+		// update image smoothing for all stages
+		var smooth = Utils.getImageSmoothing();
+		for (let i = 0; i < stages.length; i++) {
+			const stage = stages[i];
+			Utils.setStageImageSmoothing(stage, smooth);
+		}
+	};
+	// update once immediately to stay in sync on start up
+	G_UpdateStageSettings();
 }
 
 /** Draws the full resample image given the parameters in the GUI and logs

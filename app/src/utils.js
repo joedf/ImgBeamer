@@ -73,12 +73,13 @@ const Utils = {
 			listening: false // faster render
 		});
 
-		// antialiasing
-		var ctx = layer.getContext();
-		ctx.imageSmoothingEnabled = false;
-
 		// add and push
 		stage.add(layer);
+
+		// turn off by default antialiasing/smoothing
+		// important do that AFTER you added layer to a stage
+		// https://github.com/konvajs/konva/issues/306#issuecomment-351263036
+		layer.imageSmoothingEnabled(false);
 
 		return stage;
 	},
@@ -157,6 +158,7 @@ const Utils = {
 	getShowRulerInput: function(){ return G_GUI_Controller.showRuler; },
 	getSpotLayoutOpacityInput: function(){ return G_GUI_Controller.previewOpacity; },
 	getImageMetricAlgorithm: function(){ return G_GUI_Controller.imageMetricAlgo; },
+	getImageSmoothing: function(){ return G_GUI_Controller.imageSmoothing; },
 
 	/**
 	 * Creates a Zoom event handler to be used on a stage.
@@ -1564,6 +1566,26 @@ const Utils = {
 		// apply B/C filter values
 		drawable.brightness(brightness);
 		drawable.contrast(contrast);
+	},
+
+	/**
+	 * Sets the image Smoothing option for a given stage.
+	 * Currently, this only affects the "base" layer.
+	 * For now it doesn't make sense to remove smoothing from overlay layers
+	 * which are currently used for annotations and such.
+	 * @param {*} stage The stage
+	 * @param {*} enabled True for enabled, false for disabled
+	 */
+	setStageImageSmoothing: function(stage, enabled=true){
+		var layers = stage.getLayers();
+
+		// if we need / want this for all layers, we could loop over all layers
+		if (layers.length > 0) {
+			var baseLayer = layers[0];
+			baseLayer.imageSmoothingEnabled(enabled);
+			// 2024.02.05: imageSmoothingQuality is not yet fully supported...
+			// baseLayer.imageSmoothingQuality = 'low';
+		}
 	},
 
 	/**
