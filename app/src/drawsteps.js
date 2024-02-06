@@ -230,23 +230,26 @@ function drawSubregionImage(stage, oImg, size, doFill = false, updateCallback = 
 	if (G_DEBUG)
 		console.log("img natural size:", oImg.naturalWidth, oImg.naturalHeight);
 	
+	
+	var img_width = oImg.naturalWidth, img_height = oImg.naturalHeight;
+
+
 	var img_width = oImg.naturalWidth, img_height = oImg.naturalHeight;
 
 	// image ratio to "fit" in canvas
-	var fitSize = Utils.fitImageProportions(img_width, img_height, max, doFill);
+	var fitSize = Utils.fitImageProportions(oImg.naturalWidth, oImg.naturalHeight, max, doFill);
 
-	var minScaleX = fitSize.w / img_width;
+	var minScale = {
+		x: fitSize.w / oImg.naturalWidth,
+		y: fitSize.h / oImg.naturalHeight,
+	};
 
 	// TODO: this shouldnt be need or it at least duplicate with part of drawGroundtruthImage()
 	var kImage = new Konva.Image({
-		// x: (max - fitSize.w)/2,
-		// y: (max - fitSize.h)/2,
 		image: oImg,
-		// width: fitSize.w,
-		// height: fitSize.h,
 		scale: {
-			x: minScaleX,
-			y: fitSize.h / img_height,
+			x: minScale.x,
+			y: minScale.y,
 		},
 		draggable: true,
 	});
@@ -291,7 +294,7 @@ function drawSubregionImage(stage, oImg, size, doFill = false, updateCallback = 
 
 		// callback here, e.g. doUpdate();
 		doUpdate();
-	}, G_ZOOM_FACTOR_PER_TICK, minScaleX));
+	}, G_ZOOM_FACTOR_PER_TICK, minScale.x));
 
 	layer.add(kImage);
 
@@ -311,7 +314,11 @@ function drawSubregionImage(stage, oImg, size, doFill = false, updateCallback = 
 
 		switch (e.keyCode) {
 			case KEYCODE_R: // 'r' key, reset scale & position
-				kImage.setAttrs({scaleX:1,scaleY:1,x:0,y:0});
+				kImage.setAttrs({
+					scaleX: minScale.x,
+					scaleY: minScale.y,
+					x:0, y:0
+				});
 				doUpdate();
 				break;
 		
@@ -778,8 +785,8 @@ function drawGroundtruthImage(stage, imageObj, subregionImage, maxSize=G_BOX_SIZ
 		applyChangesFromNavRect();
 	});
 	var constrainRect = function(){
-		var rw = rect.width() * rect.scaleX();
-		var rh = rect.height() * rect.scaleY();
+		var rw = rect.width();
+		var rh = rect.height();
 		var ss = stage.size();
 
 		// top left corner limit
@@ -791,7 +798,7 @@ function drawGroundtruthImage(stage, imageObj, subregionImage, maxSize=G_BOX_SIZ
 		if (rect.y() > ss.height - rh) { rect.y(ss.height - rh); }
 	};
 	stage.on('wheel', function(e) {
-		// code is based on Uitls.MakeZoomHandler()
+		// code is based on Utils.MakeZoomHandler()
 		e.evt.preventDefault(); // stop default scrolling
 
 		const scaleFactor = G_ZOOM_FACTOR_PER_TICK;
@@ -835,20 +842,30 @@ function drawGroundtruthImage(stage, imageObj, subregionImage, maxSize=G_BOX_SIZ
 		// update the subregion view to the new position and zoom based on changes
 		// to the nav-rect by the user
 		var si = subregionImage;
+		var imagePixelScaling = {
+			x: (image.width() / imageObj.naturalWidth),
+			y: (image.height() / imageObj.naturalHeight),
+		};
 
 		si.scale({
-			x: stage.width() / rect.width(),
-			y: stage.height() / rect.height(),
+			// old broken
+			// x: stage.width() / rect.width(),
+			// y: stage.height() / rect.height(),
+			x: (stage.width() / rect.width()) * imagePixelScaling.x,
+			y: (stage.height() / rect.height()) * imagePixelScaling.y,
 		});
 
 		si.position({
-			x: (stage.x() - rect.x()) * si.scaleX(),
-			y: (stage.y() - rect.y()) * si.scaleY(),
+			// old broken
+			// x: (stage.x() - rect.x()) * si.scaleX(),
+			// y: (stage.y() - rect.y()) * si.scaleY(),
+			x: ((image.x() - rect.x()) / si.scaleX()) * imagePixelScaling.x,
+			y: ((image.y() - rect.y()) / si.scaleY()) * imagePixelScaling.y,
 		});
 
 		// this propagates the changes to the subregion to the rest of the app
-		if (typeof updateCallback == 'function')
-			return updateCallback();
+		// if (typeof updateCallback == 'function')
+		// 	return updateCallback();
 	};
 	// Grab cursor for nav-rectangle overlay
 	// https://konvajs.org/docs/styling/Mouse_Cursor.html
@@ -866,28 +883,20 @@ function drawGroundtruthImage(stage, imageObj, subregionImage, maxSize=G_BOX_SIZ
 		// calc location rect from subregionImage
 		// and update bounds drawn rectangle
 		var si = subregionImage;
+		var imagePixelScaling = {
+			x: (image.width() / imageObj.naturalWidth),
+			y: (image.height() / imageObj.naturalHeight),
+		};
+
 		rect.position({
-			// old broken
-			// x: (image.x() - si.x()) / si.scaleX(),
-			// y: (image.y() - si.y()) / si.scaleY(),
-
-			x: ((image.x() - si.x()) / si.scaleX()) * (image.width() / imageObj.naturalWidth),
-			y: ((image.y() - si.y()) / si.scaleY()) * (image.height() / imageObj.naturalHeight),
+			x: ((image.x() - si.x()) / si.scaleX()) * imagePixelScaling.x,
+			y: ((image.y() - si.y()) / si.scaleY()) * imagePixelScaling.y,
 		});
 
-		var coords = Utils.stageToUnitCoordinates(image.x(), image.y(), stage);
-		// var coords2 = Utils.unitToImagePixelCoordinates()
 		rect.size({
-			// old, broken
-			// width: si.width() / si.scaleX(),
-			// height: si.height() / si.scaleY(),
-
-			// also working ?
-			width: (stage.width() / si.scaleX()) * (image.width() / imageObj.naturalWidth),
-			height: (stage.height() / si.scaleY()) * (image.height() / imageObj.naturalHeight),
+			width: (stage.width() / si.scaleX()) * imagePixelScaling.x,
+			height: (stage.height() / si.scaleY()) * imagePixelScaling.y,
 		});
-		// console.log(rect.size());
-		// console.log(image.width(), si.scaleX(), image.width(), imageObj.naturalWidth);
 
 		// subregion overlay visibility
 		rect.visible(G_SHOW_SUBREGION_OVERLAY);
