@@ -353,7 +353,19 @@ function drawSpotContent(stage, sImage, sBeam, updateCallback = null) {
 	// zoom/scale so that the spot size starts at 100%
 	var _tempCellWidth = sImage.width() / Utils.getColsInput();
 	var initialSpotScale = sBeam.width() / _tempCellWidth;
-	Utils.scaleOnCenter(stage, image, 1, initialSpotScale);
+	// old broken
+	// Utils.scaleOnCenter(stage, image, 1, initialSpotScale);
+	//new working?
+	var max = G_BOX_SIZE; // or stage.width(); //?
+	var oImg = sImage.image();
+	var doFill = false;
+	var fitSize = Utils.fitImageProportions(oImg.naturalWidth, oImg.naturalHeight, max, doFill);
+	var minScale = {
+		x: fitSize.w / oImg.naturalWidth,
+		y: fitSize.h / oImg.naturalHeight,
+	};
+	// var imgPxScaling = Utils.imagePixelScaling(stage, sImage.image());
+	Utils.scaleOnCenter(stage, image, minScale.x, initialSpotScale);
 
 	layer.draw();
 
