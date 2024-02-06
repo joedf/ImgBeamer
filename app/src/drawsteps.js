@@ -871,9 +871,8 @@ function drawGroundtruthImage(stage, imageObj, subregionImage, maxSize=G_BOX_SIZ
 			// x: (image.x() - si.x()) / si.scaleX(),
 			// y: (image.y() - si.y()) / si.scaleY(),
 
-			// new working ?
-			x: (image.x() - si.x()) / (si.scaleX() / (image.width() / imageObj.naturalWidth)),
-			y: (image.y() - si.y()) / (si.scaleY() / (image.height() / imageObj.naturalHeight)),
+			x: ((image.x() - si.x()) / si.scaleX()) * (image.width() / imageObj.naturalWidth),
+			y: ((image.y() - si.y()) / si.scaleY()) * (image.height() / imageObj.naturalHeight),
 		});
 
 		var coords = Utils.stageToUnitCoordinates(image.x(), image.y(), stage);
@@ -883,17 +882,9 @@ function drawGroundtruthImage(stage, imageObj, subregionImage, maxSize=G_BOX_SIZ
 			// width: si.width() / si.scaleX(),
 			// height: si.height() / si.scaleY(),
 
-			// new working
-			// width: image.width() / (si.scaleX() / (stage.width() / imageObj.naturalWidth)),
-			// height: image.height() / (si.scaleY() / (stage.height() / imageObj.naturalHeight)),
-			
 			// also working ?
-			// width: image.width() / (si.scaleX() / (image.width() / imageObj.naturalWidth)),
-			// height: image.height() / (si.scaleY() / (image.height() / imageObj.naturalHeight)),
-
-			// also working ?
-			width: (image.width() * stage.width()) / (si.scaleX() * imageObj.naturalWidth),
-			height: (image.height() * stage.height()) / (si.scaleY() * imageObj.naturalHeight),
+			width: (stage.width() / si.scaleX()) * (image.width() / imageObj.naturalWidth),
+			height: (stage.height() / si.scaleY()) * (image.height() / imageObj.naturalHeight),
 		});
 		// console.log(rect.size());
 		// console.log(image.width(), si.scaleX(), image.width(), imageObj.naturalWidth);
