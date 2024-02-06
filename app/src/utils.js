@@ -993,10 +993,10 @@ const Utils = {
 		var stepSizeX = rect.width() / cols;
 		var stepSizeY = rect.height() / rows;
 	
-		const xSize= gridLayer.width(), // stage.width(), 
-				ySize= gridLayer.height(), // stage.height(),
-				xSteps = cols, //Math.round(xSize/ stepSizeX), 
-				ySteps = rows; //Math.round(ySize / stepSizeY);
+		const xSize = gridLayer.width(), // stage.width(), 
+			ySize = gridLayer.height(), // stage.height(),
+			xSteps = cols, //Math.round(xSize/ stepSizeX), 
+			ySteps = rows; //Math.round(ySize / stepSizeY);
 
 		// draw vertical lines
 		for (let i = 0; i <= xSteps; i++) {
