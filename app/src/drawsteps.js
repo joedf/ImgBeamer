@@ -739,7 +739,7 @@ function drawResampled(sourceStage, destStage, originalImage, spotScale, sBeam) 
  * @param {Function} updateCallback called when a change is made to the subregion
  * @returns an object with an update function to call for needed redraws and the subregion bounds.
  * @todo remove maxSize if possible?
- * @todo do we really need to return the subregioRect as well?
+ * @todo do we really need to return the subregionRect as well?
  */
 function drawGroundtruthImage(stage, imageObj, subregionImage, maxSize=G_BOX_SIZE, updateCallback = null){
 
@@ -793,6 +793,8 @@ function drawGroundtruthImage(stage, imageObj, subregionImage, maxSize=G_BOX_SIZ
 		if (rect.x() > ss.width - rw) { rect.x(ss.width - rw); }
 		if (rect.y() > ss.height - rh) { rect.y(ss.height - rh); }
 	};
+
+	stage.off('wheel'); // prevent "eventHandler doubling" from subsequent calls
 	stage.on('wheel', function(e) {
 		// code is based on Utils.MakeZoomHandler()
 		e.evt.preventDefault(); // stop default scrolling
