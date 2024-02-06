@@ -453,7 +453,7 @@ function drawProbeLayout(drawStage, baseImage, spotScale, beam) {
 
 	// old broken, was wrong?
 	// var baseGridRect = new Konva.Rect(baseImage.getSelfRect());
-	// new working? should have been stage rect instead of image rect?
+	// new working? maybe should have just used stage rect instead of image rect?
 	var baseGridRect = drawStage;
 	
 	var imageCopy = baseImage.clone();
@@ -571,7 +571,10 @@ function drawProbeLayoutSampling(drawStage, originalImage, spotScale, sBeam) {
 	var drawLayer = drawStage.getLayers()[0];
 	drawLayer.destroyChildren(); // avoid memory leaks
 
-	var baseGridRect = new Konva.Rect(imageCopy.getSelfRect());
+	// old broken, was wrong?
+	// var baseGridRect = new Konva.Rect(imageCopy.getSelfRect());
+	// new working? maybe should have just use stage size
+	var baseGridRect = drawStage;
 
 	// setup "last" values to help optimize for draw performance
 	// similar reason as for drawProbeLayout()
