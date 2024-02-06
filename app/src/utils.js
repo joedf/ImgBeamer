@@ -1321,6 +1321,19 @@ const Utils = {
 	},
 
 	/**
+	 * Gets the image scaling based on the Konva.Image size vs the image's true or 'natural' size.
+	 * @param {*} konvaImage The konva image object
+	 * @param {*} imageObj The actual image's HTML/DOM object
+	 * @returns 
+	 */
+	imagePixelScaling: function(konvaImage, imageObj) {
+		return {
+			x: (konvaImage.width() / imageObj.naturalWidth),
+			y: (konvaImage.height() / imageObj.naturalHeight),
+		};
+	},
+
+	/**
 	 * Convert stage to unit square coordinates
 	 * @param {*} x 
 	 * @param {*} y 

@@ -230,12 +230,6 @@ function drawSubregionImage(stage, oImg, size, doFill = false, updateCallback = 
 	if (G_DEBUG)
 		console.log("img natural size:", oImg.naturalWidth, oImg.naturalHeight);
 	
-	
-	var img_width = oImg.naturalWidth, img_height = oImg.naturalHeight;
-
-
-	var img_width = oImg.naturalWidth, img_height = oImg.naturalHeight;
-
 	// image ratio to "fit" in canvas
 	var fitSize = Utils.fitImageProportions(oImg.naturalWidth, oImg.naturalHeight, max, doFill);
 
@@ -778,6 +772,8 @@ function drawGroundtruthImage(stage, imageObj, subregionImage, maxSize=G_BOX_SIZ
 		strokeScaleEnabled: false,
 	});
 
+	var imagePixelScaling = Utils.imagePixelScaling(image, imageObj);
+
 	// Draggable nav-rect
 	// https://github.com/joedf/ImgBeamer/issues/41
 	rect.on('dragmove', function(){
@@ -842,31 +838,22 @@ function drawGroundtruthImage(stage, imageObj, subregionImage, maxSize=G_BOX_SIZ
 		// update the subregion view to the new position and zoom based on changes
 		// to the nav-rect by the user
 		var si = subregionImage;
-		var imagePixelScaling = {
-			x: (image.width() / imageObj.naturalWidth),
-			y: (image.height() / imageObj.naturalHeight),
-		};
 
 		si.scale({
-			// old broken
-			// x: stage.width() / rect.width(),
-			// y: stage.height() / rect.height(),
 			x: (stage.width() / rect.width()) * imagePixelScaling.x,
 			y: (stage.height() / rect.height()) * imagePixelScaling.y,
 		});
-
+		
 		si.position({
-			// old broken
-			// x: (stage.x() - rect.x()) * si.scaleX(),
-			// y: (stage.y() - rect.y()) * si.scaleY(),
-			x: ((image.x() - rect.x()) / si.scaleX()) * imagePixelScaling.x,
-			y: ((image.y() - rect.y()) / si.scaleY()) * imagePixelScaling.y,
+			x: ((image.x() - rect.x()) * si.scaleX()) / imagePixelScaling.x,
+			y: ((image.y() - rect.y()) * si.scaleY()) / imagePixelScaling.y,
 		});
 
 		// this propagates the changes to the subregion to the rest of the app
-		// if (typeof updateCallback == 'function')
-		// 	return updateCallback();
+		if (typeof updateCallback == 'function')
+			return updateCallback();
 	};
+	
 	// Grab cursor for nav-rectangle overlay
 	// https://konvajs.org/docs/styling/Mouse_Cursor.html
 	layer.listening(true);
@@ -883,10 +870,6 @@ function drawGroundtruthImage(stage, imageObj, subregionImage, maxSize=G_BOX_SIZ
 		// calc location rect from subregionImage
 		// and update bounds drawn rectangle
 		var si = subregionImage;
-		var imagePixelScaling = {
-			x: (image.width() / imageObj.naturalWidth),
-			y: (image.height() / imageObj.naturalHeight),
-		};
 
 		rect.position({
 			x: ((image.x() - si.x()) / si.scaleX()) * imagePixelScaling.x,
