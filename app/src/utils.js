@@ -1350,8 +1350,8 @@ const Utils = {
 	 */
 	unitToImagePixelCoordinates: function(x, y, imageObj) {
 		return {
-			x: x * imageObj.width,
-			y: y * imageObj.height,
+			x: x * imageObj.naturalWidth,
+			y: y * imageObj.naturalHeight,
 		};
 	},
 

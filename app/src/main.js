@@ -115,7 +115,7 @@ const nStages = 9;
 var G_STAGES = [];
 // first create the stages
 for (let i = 0; i < nStages; i++) {
-	var stage = Utils.newStageTemplate(G_MAIN_CONTAINER, G_BOX_SIZE, G_BOX_SIZE);
+	let stage = Utils.newStageTemplate(G_MAIN_CONTAINER, G_BOX_SIZE, G_BOX_SIZE);
 	G_STAGES.push(stage);
 }
 
