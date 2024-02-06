@@ -451,7 +451,10 @@ function drawProbeLayout(drawStage, baseImage, spotScale, beam) {
 	var baseLayer = layers[0];
 	baseLayer.destroyChildren(); // avoid memory leaks
 
-	var baseGridRect = new Konva.Rect(baseImage.getSelfRect());
+	// old broken, was wrong?
+	// var baseGridRect = new Konva.Rect(baseImage.getSelfRect());
+	// new working? should have been stage rect instead of image rect?
+	var baseGridRect = drawStage;
 	
 	var imageCopy = baseImage.clone();
 
