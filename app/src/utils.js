@@ -700,17 +700,22 @@ const Utils = {
 		var gt_stage_size = destStage.size();
 
 		var pxSizeNm = Utils.getPixelSizeNmInput();
-		var subregionSize = {
-			w: (gt_stage_size.width / rect.w) * (imageObj.naturalWidth * pxSizeNm),
-			h: (gt_stage_size.height / rect.h) * (imageObj.naturalHeight * pxSizeNm),
+		var fullImgSize = {
+			w: imageObj.naturalWidth * pxSizeNm,
+			h: imageObj.naturalHeight * pxSizeNm,
+		};
+		// similar formula to the used for the subregion rect in the groundtruth view
+		var subregionSizeNm = {
+			w: (gt_stage_size.width / rect.w) * fullImgSize.w,
+			h: (gt_stage_size.height / rect.h) * fullImgSize.h,
 		};
 
 		// get optimal / formated unit
 		// TODO: maybe use "this." instead of "Utils."
 		// do it for all functions too?
 		var fmtPxSize = Utils.formatUnitNm(
-			subregionSize.w / cols,
-			subregionSize.h / rows
+			subregionSizeNm.w / cols,
+			subregionSizeNm.h / rows
 		);
 
 		// display coords & FOV size
