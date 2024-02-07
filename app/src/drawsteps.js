@@ -123,7 +123,9 @@ function drawSpotProfileEdit(stage, updateCallback = null) {
 	var container = stage.container();
 	// make it focusable
 	container.tabIndex = 2;
-	container.addEventListener('keydown', function(e) {
+	// avoid addEventListener, since this is a simple and we only want one handler
+	// and replace it when a new image is loaded
+	container.onkeydown = function(e) {
 		// don't handle meta-key'd events for now...
 		const metaPressed = e.shiftKey || e.ctrlKey || e.metaKey;
 		if (metaPressed)
@@ -145,7 +147,7 @@ function drawSpotProfileEdit(stage, updateCallback = null) {
 			default: break;
 		}
 		e.preventDefault();
-	});
+	};
 
 	// Replacing userScaledImage / userImage
 	// invisible shape to get scale X/Y as a control for spot size/mag
@@ -300,7 +302,9 @@ function drawSubregionImage(stage, oImg, size, doFill = false, updateCallback = 
 	var container = stage.container();
 	// make it focusable
 	container.tabIndex = 1;
-	container.addEventListener('keydown', function(e) {
+	// avoid addEventListener, since this is a simple and we only want one handler
+	// and replace it when a new image is loaded
+	container.onkeydown = function(e) {
 		// don't handle meta-key'd events for now...
 		const metaPressed = e.shiftKey || e.ctrlKey || e.metaKey;
 		if (metaPressed)
@@ -319,7 +323,7 @@ function drawSubregionImage(stage, oImg, size, doFill = false, updateCallback = 
 			default: break;
 		}
 		e.preventDefault();
-	});
+	};
 
 	return kImage;
 }
