@@ -123,8 +123,8 @@ function drawSpotProfileEdit(stage, updateCallback = null) {
 	var container = stage.container();
 	// make it focusable
 	container.tabIndex = 2;
-	// avoid addEventListener, since this is a simple and we only want one handler
-	// and replace it when a new image is loaded
+	// Avoiding using addEventListener, since we only ever want one handler at time.
+	// This way, we easily replace it when a new image is loaded.
 	container.onkeydown = function(e) {
 		// don't handle meta-key'd events for now...
 		const metaPressed = e.shiftKey || e.ctrlKey || e.metaKey;
@@ -302,8 +302,8 @@ function drawSubregionImage(stage, oImg, size, doFill = false, updateCallback = 
 	var container = stage.container();
 	// make it focusable
 	container.tabIndex = 1;
-	// avoid addEventListener, since this is a simple and we only want one handler
-	// and replace it when a new image is loaded
+	// Avoiding using addEventListener, since we only ever want one handler at time.
+	// This way, we easily replace it when a new image is loaded.
 	container.onkeydown = function(e) {
 		// don't handle meta-key'd events for now...
 		const metaPressed = e.shiftKey || e.ctrlKey || e.metaKey;
