@@ -184,7 +184,7 @@ function OnImageLoaded(eImg, stages){
 
 	var updateInfoDisplays = function(){
 		// update spot/beam info: size, rotation, shape
-		var cellSize = Utils.computeCellSize(subregionImage);
+		var cellSize = Utils.computeCellSize(subregionImage.getStage());
 		Utils.updateDisplayBeamParams(spotProfileStage, layoutBeam, cellSize, spotScaling, promptForSpotWidth);
 		Utils.updateMagInfo(baseImageStage, subregionImage);
 		Utils.updateSubregionPixelSize(resampledStage, subregionImage, eImg);

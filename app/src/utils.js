@@ -504,24 +504,21 @@ const Utils = {
 	},
 
 	/**
-	 * Calculates cell size based on imageRect, rows and cols
-	 * @param {*} image the subregion image object.
-	 * @param {number} rows (optional) the number of rows to split the subregion into.
+	 * Calculates cell size based on given object (eg. rect, stage, or image), rows and cols
+	 * @param {*} rect a Konva object that has a width and height, usually a rect, image, or stage.
+	 * @param {number} rows (optional) the number of rows to split the area into.
 	 * If not is provided, attempts to get it from gui/input.
-	 * @param {number} cols (optional) the number of columns to split the subregion into.
+	 * @param {number} cols (optional) the number of columns to split the area into.
 	 * If not is provided, attempts to get it from gui/input.
 	 * @returns the size (w,h) of a cell in the raster grid.
 	 */
-	computeCellSize: function(image, rows = -1, cols = -1){
+	computeCellSize: function(rect, rows = -1, cols = -1){
 		if (rows <= 0) { rows = this.getRowsInput(); }
 		if (cols <= 0) { cols = this.getColsInput(); }
 
-		var stageSize = image.getStage().size();
-		// sorta fixed? was broken?, now working?
-		// maybe also update function doc / comment
 		var cellSize = {
-			w: (image.width() / cols) / (image.width() / stageSize.width),
-			h: (image.height() / rows) / (image.height() / stageSize.height),
+			w: rect.width() / cols,
+			h: rect.height() / rows,
 		};
 		return cellSize;
 	},
