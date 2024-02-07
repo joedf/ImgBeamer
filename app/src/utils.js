@@ -690,8 +690,8 @@ const Utils = {
 		var rows = Utils.getRowsInput(), cols = Utils.getColsInput();
 
 		var rect = {
-			w: subregionImage.width() / subregionImage.scaleX(),
-			h: subregionImage.height() / subregionImage.scaleY(),
+			w: subregionImage.width() * subregionImage.scaleX(),
+			h: subregionImage.height() * subregionImage.scaleY(),
 		};
 
 		// TODO: maybe get the ground truth image stage for the size info instead,
@@ -700,15 +700,18 @@ const Utils = {
 		var gt_stage_size = destStage.size();
 
 		var pxSizeNm = Utils.getPixelSizeNmInput();
-		var pxSize = {
-			w: ((rect.w / gt_stage_size.width) * (imageObj.width * pxSizeNm)) / cols,
-			h: ((rect.h / gt_stage_size.height) * (imageObj.height * pxSizeNm)) / rows,
+		var subregionSize = {
+			w: (gt_stage_size.width / rect.w) * (imageObj.naturalWidth * pxSizeNm),
+			h: (gt_stage_size.height / rect.h) * (imageObj.naturalHeight * pxSizeNm),
 		};
 
 		// get optimal / formated unit
 		// TODO: maybe use "this." instead of "Utils."
 		// do it for all functions too?
-		var fmtPxSize = Utils.formatUnitNm(pxSize.w, pxSize.h);
+		var fmtPxSize = Utils.formatUnitNm(
+			subregionSize.w / cols,
+			subregionSize.h / rows
+		);
 
 		// display coords & FOV size
 		Utils.updateExtraInfo(destStage,

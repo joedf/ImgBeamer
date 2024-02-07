@@ -1064,11 +1064,10 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 			fullImgWidthNm / cols,
 			fullImgWidthNm / rows,
 		);
-		var displayUnit = fmtPxSize.unit + "/px";
 		Utils.updateExtraInfo(stage, cols + ' x ' + rows
 			+ ' px<br>' + fmtPxSize.value.toFixed(G_MATH_TOFIXED.SHORT)
 			+ " x " + fmtPxSize.value2.toFixed(G_MATH_TOFIXED.SHORT)
-			+ " " + displayUnit);
+			+ " " + fmtPxSize.unit + "/px");
 	};
 	updateConfigValues();
 
