@@ -159,6 +159,11 @@ const Utils = {
 	getSpotLayoutOpacityInput: function(){ return G_GUI_Controller.previewOpacity; },
 	getImageMetricAlgorithm: function(){ return G_GUI_Controller.imageMetricAlgo; },
 	getImageSmoothing: function(){ return G_GUI_Controller.imageSmoothing; },
+	getImageIsFillMode: function(){
+		// TODO: maybe add a GUI option to toggle between fit, fill, stretch modes...
+		// just set as true for now, ie. use "fit" proportions
+		return true;
+	},
 
 	/**
 	 * Creates a Zoom event handler to be used on a stage.

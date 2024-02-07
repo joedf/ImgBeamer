@@ -355,21 +355,14 @@ function drawSpotContent(stage, sImage, sBeam, updateCallback = null) {
 
 	// "pre-zoom" a bit, and start with center position
 	// zoom/scale so that the spot size starts at 100%
-	var _tempCellWidth = sImage.width() / Utils.getColsInput();
-	var initialSpotScale = sBeam.width() / _tempCellWidth;
-	// old broken
-	// Utils.scaleOnCenter(stage, image, 1, initialSpotScale);
-	//new working?
-	var max = G_BOX_SIZE; // or stage.width(); //?
-	var oImg = sImage.image();
-	var doFill = false;
+	var _tempCellSize = Utils.computeCellSize(sImage);
+	var initialSpotScale = sBeam.width() / _tempCellSize.w;
+	// get image proportions once scaled and fitted in the stages
+	var max = G_BOX_SIZE, oImg = sImage.image(), doFill = Utils.getImageIsFillMode();
 	var fitSize = Utils.fitImageProportions(oImg.naturalWidth, oImg.naturalHeight, max, doFill);
-	var minScale = {
-		x: fitSize.w / oImg.naturalWidth,
-		y: fitSize.h / oImg.naturalHeight,
-	};
-	// var imgPxScaling = Utils.imagePixelScaling(stage, sImage.image());
-	Utils.scaleOnCenter(stage, image, minScale.x, initialSpotScale);
+	var minScaleX = fitSize.w / oImg.naturalWidth;
+	// center the image copy based on the calculated center and initial scales
+	Utils.scaleOnCenter(stage, image, minScaleX, initialSpotScale);
 
 	layer.draw();
 
