@@ -231,8 +231,8 @@ function drawSubregionImage(stage, oImg, size, updateCallback = null) {
 		console.log("img natural size:", oImg.naturalWidth, oImg.naturalHeight);
 	
 	// image ratio to "fit" in canvas
-	var doFill = Utils.getImageIsFillMode();
-	var fitSize = Utils.fitImageProportions(oImg.naturalWidth, oImg.naturalHeight, max, doFill);
+	var fillMode = Utils.getImageFillMode();
+	var fitSize = Utils.fitImageProportions(oImg.naturalWidth, oImg.naturalHeight, max, fillMode);
 
 	var minScale = {
 		x: fitSize.w / oImg.naturalWidth,
@@ -357,8 +357,8 @@ function drawSpotContent(stage, sImage, sBeam, updateCallback = null) {
 	var _tempCellSize = Utils.computeCellSize(sImage);
 	var initialSpotScale = sBeam.width() / _tempCellSize.w;
 	// get image proportions once scaled and fitted in the stages
-	var max = G_BOX_SIZE, oImg = sImage.image(), doFill = Utils.getImageIsFillMode();
-	var fitSize = Utils.fitImageProportions(oImg.naturalWidth, oImg.naturalHeight, max, doFill);
+	var max = G_BOX_SIZE, oImg = sImage.image(), fillMode = Utils.getImageFillMode();
+	var fitSize = Utils.fitImageProportions(oImg.naturalWidth, oImg.naturalHeight, max, fillMode);
 	var minScaleX = fitSize.w / oImg.naturalWidth;
 	// center the image copy based on the calculated center and initial scales
 	Utils.scaleOnCenter(stage, image, minScaleX, initialSpotScale);
@@ -760,7 +760,8 @@ function drawResampled(sourceStage, destStage, originalImage, spotScale, sBeam) 
  */
 function drawGroundtruthImage(stage, imageObj, subregionImage, maxSize=G_BOX_SIZE, updateCallback = null){
 
-	var fit = Utils.fitImageProportions(imageObj.naturalWidth, imageObj.naturalHeight, maxSize);
+	var fillMode = Utils.getImageFillMode();
+	var fit = Utils.fitImageProportions(imageObj.naturalWidth, imageObj.naturalHeight, maxSize, fillMode);
 
 	var layer = stage.getLayers()[0];
 	layer.destroyChildren(); // avoid memory leaks

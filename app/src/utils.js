@@ -159,26 +159,27 @@ const Utils = {
 	getSpotLayoutOpacityInput: function(){ return G_GUI_Controller.previewOpacity; },
 	getImageMetricAlgorithm: function(){ return G_GUI_Controller.imageMetricAlgo; },
 	getImageSmoothing: function(){ return G_GUI_Controller.imageSmoothing; },
-	getImageIsFillMode: function(){
+	getImageFillMode: function(){
 		// TODO: maybe add a GUI option to toggle between fit, fill, stretch modes...
-		// just set as true for now, ie. use "fit" proportions
-		return true;
+		// just a default for now, until support for this is implemented
+		// https://github.com/joedf/ImgBeamer/issues/7
+		// return "squish";
+		return "fit";
 	},
 
-	/**
+		/**
 	 * Creates a Zoom event handler to be used on a stage.
 	 * Holding the shift key scales at half the rate.
 	 * @param {object} stage the drawing stage
-	 * @param {*} konvaObj the figure or object on the stage to change.
-	 * @param {*} callback a callback for when the zoom event handler is called.
-	 * @param {*} scaleFactor the scale factor per "tick"
-	 * @param {number|function} scaleMin the scale minimum allowed defined as a number or function.
-	 * @param {number|function} scaleMax the scale maximum allowed defined as a number or function.
+	 * @param {object} konvaObj the figure or object on the stage to change.
+	 * @param {function} callback a callback for when the zoom event handler is called.
+	 * @param {number} scaleFactor the scale factor per "tick"
+	 * @param {number} scaleMin the scale minimum allowed defined as a number or function.
+	 * @param {number} scaleMax the scale maximum allowed defined as a number or function.
 	 * @returns the created event handler
 	 */
 	// eslint-disable-next-line no-magic-numbers
-	MakeZoomHandler: function(stage, konvaObj, callback=null, scaleFactor=1.2, scaleMin=0, scaleMax=Infinity)
-	{
+	MakeZoomHandler: function(stage, konvaObj, callback=null, scaleFactor=1.2, scaleMin=0, scaleMax=Infinity){
 		var _self = this;
 		var handler = function(e){
 			// modified from https://konvajs.org/docs/sandbox/Zooming_Relative_To_Pointer.html 
@@ -843,14 +844,20 @@ const Utils = {
 	 * @param {number} w the original width
 	 * @param {number} h the original height
 	 * @param {number} maxDimension The largest dimension (whether width or height) to fit in.
-	 * @param {boolean} doFill Whether to a fill-in fit or do a stretch fit otherwise.
+	 * @param {boolean} fillMode Whether to a fill-in fit, stretch/squish fit otherwise.
 	 * @returns the new calculated size
+	 * @todo https://github.com/joedf/ImgBeamer/issues/7
 	 */
-	fitImageProportions: function(w, h, maxDimension, doFill=false){
+	fitImageProportions: function(w, h, maxDimension, fillMode="fit"){
+		var mode = fillMode.toLowerCase().trim();
+
 		// image ratio to "fit" in canvas
 		var ratio = (w > h ? (w / maxDimension) : (h / maxDimension)); // fit
-		if (doFill){
+		if (mode == "fill"){
 			ratio = (w > h ? (h / maxDimension) : (w / maxDimension)); // fill
+		}
+		if (mode == "squish") {
+			// do nothing for now...
 		}
 
 		var iw = w/ratio; //, ih = h/ratio;
