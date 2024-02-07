@@ -219,20 +219,19 @@ function drawSpotProfileEdit(stage, updateCallback = null) {
  * @param {*} stage The stage to draw it on.
  * @param {*} oImg The ground truth image.
  * @param {Number} size (to be removed) The max size (width or height) of the image to draw.
- * @param {Boolean} doFill (to be removed?) Fill or letterbox mode to fit the image.
  * @param {Function} updateCallback 
  * @returns a reference to the subregion image object that can be panned and zoomed by the user.
  * 
  * @todo remove 'size' ... confusing and not useful.
- * @todo likely remove 'doFill' ... maybe confusing and not useful.
  */
-function drawSubregionImage(stage, oImg, size, doFill = false, updateCallback = null) {
+function drawSubregionImage(stage, oImg, size, updateCallback = null) {
 	var max = size;
 
 	if (G_DEBUG)
 		console.log("img natural size:", oImg.naturalWidth, oImg.naturalHeight);
 	
 	// image ratio to "fit" in canvas
+	var doFill = Utils.getImageIsFillMode();
 	var fitSize = Utils.fitImageProportions(oImg.naturalWidth, oImg.naturalHeight, max, doFill);
 
 	var minScale = {
