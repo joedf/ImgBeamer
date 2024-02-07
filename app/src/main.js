@@ -218,9 +218,6 @@ function OnImageLoaded(eImg, stages){
 		.css('border-color', 'blue');
 	var subregionImage = drawSubregionImage(baseImageStage, eImg, G_BOX_SIZE, doUpdate);
 
-	// make a clone without copying over the event bindings
-	var image = subregionImage.clone().off();
-
 	// draw Spot Content
 	$(spotContentStage.getContainer())
 		.addClass('advancedMode')
@@ -228,7 +225,9 @@ function OnImageLoaded(eImg, stages){
 		.attr('box_label', 'Spot Content')
 		.attr('note', 'Scroll to adjust spot size\nHold [Shift] for half rate');
 	var spotContentBeam = beam.clone();
-	drawSpotContent(spotContentStage, image, spotContentBeam, doUpdate);
+	// make a clone without copying over the event bindings
+	var imageCopy = subregionImage.clone().off();
+	drawSpotContent(spotContentStage, imageCopy, spotContentBeam, doUpdate);
 
 	/**(temporary) publicly exposed function to set the spot width
 	 * @param {number} spotWidth the spot width in percent (%), ex. use 130 for 130%.

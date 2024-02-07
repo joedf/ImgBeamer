@@ -447,10 +447,8 @@ function drawProbeLayout(drawStage, baseImage, spotScale, beam) {
 	var baseLayer = layers[0];
 	baseLayer.destroyChildren(); // avoid memory leaks
 
-	// old broken, was wrong?
-	// var baseGridRect = new Konva.Rect(baseImage.getSelfRect());
-	// new working? maybe should have just used stage rect instead of image rect?
-	var baseGridRect = drawStage;
+	// The subregion area is based on what is "visible" in the subregion view.
+	var baseGridRect = Utils.getRectFromKonvaObject(baseImage.getStage());
 	
 	var imageCopy = baseImage.clone();
 
@@ -567,10 +565,8 @@ function drawProbeLayoutSampling(drawStage, originalImage, spotScale, sBeam) {
 	var drawLayer = drawStage.getLayers()[0];
 	drawLayer.destroyChildren(); // avoid memory leaks
 
-	// old broken, was wrong?
-	// var baseGridRect = new Konva.Rect(imageCopy.getSelfRect());
-	// new working? maybe should have just use stage size
-	var baseGridRect = drawStage;
+	// The subregion area is based on what is "visible" in the subregion view.
+	var baseGridRect = Utils.getRectFromKonvaObject(originalImage.getStage());
 
 	// setup "last" values to help optimize for draw performance
 	// similar reason as for drawProbeLayout()
@@ -651,10 +647,8 @@ function drawResampled(sourceStage, destStage, originalImage, spotScale, sBeam) 
 	var baseImage = originalImage; //.clone();
 	var beam = sBeam; //.clone();
 
-	// old broken?
-	// var baseGridRect = new Konva.Rect(baseImage.getSelfRect());
-	// new working, maybe should just have used stage size instead?
-	var baseGridRect = destStage;
+	// The subregion area is based on what is "visible" in the subregion view.
+	var baseGridRect = Utils.getRectFromKonvaObject(baseImage.getStage());
 
 	var rows = 0, cols = 0;
 	var probe = null;

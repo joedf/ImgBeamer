@@ -1633,6 +1633,20 @@ const Utils = {
 	},
 
 	/**
+	 * Creates a new Konva.Rect object based on the position and size of a given konva object.
+	 * @param {*} kObject A konva object that has a size and postion, such as a stage, image, or rect.
+	 * @returns a rectable object with x, y, width, and height functions.
+	 */
+	getRectFromKonvaObject: function(kObject){
+		return new Konva.Rect({
+			x: kObject.x(),
+			y: kObject.y(),
+			width: kObject.width(),
+			height: kObject.height(),
+		});
+	},
+
+	/**
 	 * Finds (non-recusrive) the first layer with a matching on a given stage, null if n/a.
 	 * @param {*} stage The stage or element with layers.
 	 * @param {*} layerName The name of the layer.
