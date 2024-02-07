@@ -513,14 +513,15 @@ const Utils = {
 	 * @returns the size (w,h) of a cell in the raster grid.
 	 */
 	computeCellSize: function(image, rows = -1, cols = -1){
-		var subregionRect = image.getSelfRect();
-
 		if (rows <= 0) { rows = this.getRowsInput(); }
 		if (cols <= 0) { cols = this.getColsInput(); }
 
+		var stageSize = image.getStage().size();
+		// sorta fixed? was broken?, now working?
+		// maybe also update function doc / comment
 		var cellSize = {
-			w: subregionRect.width / cols,
-			h: subregionRect.height / rows
+			w: (image.width() / cols) / (image.width() / stageSize.width),
+			h: (image.height() / rows) / (image.height() / stageSize.height),
 		};
 		return cellSize;
 	},
