@@ -655,7 +655,10 @@ function drawResampled(sourceStage, destStage, originalImage, spotScale, sBeam) 
 	var baseImage = originalImage; //.clone();
 	var beam = sBeam; //.clone();
 
-	var baseGridRect = new Konva.Rect(baseImage.getSelfRect());
+	// old broken?
+	// var baseGridRect = new Konva.Rect(baseImage.getSelfRect());
+	// new working, maybe should just have used stage size instead?
+	var baseGridRect = destStage;
 
 	var rows = 0, cols = 0;
 	var probe = null;
