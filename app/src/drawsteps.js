@@ -677,8 +677,6 @@ function drawResampled(sourceStage, destStage, originalImage, spotScale, sBeam) 
 		var layers = destStage.getLayers();
 		if (layers.length < 1) { destStage.add(new Konva.Layer({ listening: false })); }
 
-		// TODO: display pixel size in physical units and use Utils.formatUnitNm()
-
 		changeCount++;
 	};
 	
