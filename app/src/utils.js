@@ -175,8 +175,8 @@ const Utils = {
 	 * @param {object} konvaObj the figure or object on the stage to change.
 	 * @param {function} callback a callback for when the zoom event handler is called.
 	 * @param {number} scaleFactor the scale factor per "tick"
-	 * @param {number} scaleMin the scale minimum allowed defined as a number or function.
-	 * @param {number} scaleMax the scale maximum allowed defined as a number or function.
+	 * @param {number|function} scaleMin the scale minimum allowed defined as a number or function.
+	 * @param {number|function} scaleMax the scale maximum allowed defined as a number or function.
 	 * @returns the created event handler
 	 */
 	// eslint-disable-next-line no-magic-numbers
@@ -845,11 +845,11 @@ const Utils = {
 	 * @param {number} w the original width
 	 * @param {number} h the original height
 	 * @param {number} maxDimension The largest dimension (whether width or height) to fit in.
-	 * @param {boolean} fillMode Whether to a fill-in fit, stretch/squish fit otherwise.
+	 * @param {boolean} fillMode Whether to do a "fill", "fit" / "letterbox", "crop", or "squish" fit.
 	 * @returns the new calculated size
-	 * @todo https://github.com/joedf/ImgBeamer/issues/7
+	 * @todo fillMode is not yet fully supported, see https://github.com/joedf/ImgBeamer/issues/7
 	 */
-	fitImageProportions: function(w, h, maxDimension, fillMode="fit"){
+	fitImageProportions: function(w, h, maxDimension, fillMode="squish"){
 		var mode = fillMode.toLowerCase().trim();
 
 		// image ratio to "fit" in canvas
