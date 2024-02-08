@@ -1343,7 +1343,7 @@ const Utils = {
 	 * Gets the image scaling based on the Konva.Image size vs the image's true or 'natural' size.
 	 * @param {*} konvaImage The konva image object
 	 * @param {*} imageObj The actual image's HTML/DOM object
-	 * @returns 
+	 * @returns an object with the calculated values as properties 'x' and 'y'.
 	 */
 	imagePixelScaling: function(konvaImage, imageObj) {
 		return {

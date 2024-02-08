@@ -195,7 +195,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1428">line 1428</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1460">line 1460</a>
     </li></ul></dd>
     
 
@@ -370,7 +370,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1437">line 1437</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1469">line 1469</a>
     </li></ul></dd>
     
 
@@ -632,7 +632,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line235">line 235</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line242">line 242</a>
     </li></ul></dd>
     
 
@@ -869,7 +869,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1419">line 1419</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1451">line 1451</a>
     </li></ul></dd>
     
 
@@ -988,7 +988,7 @@
             <td class="type">
             
                 
-<span class="param-type">*</span>
+<span class="param-type">object</span>
 
 
             
@@ -1011,7 +1011,7 @@
             <td class="type">
             
                 
-<span class="param-type">*</span>
+<span class="param-type">function</span>
 
 
             
@@ -1034,7 +1034,7 @@
             <td class="type">
             
                 
-<span class="param-type">*</span>
+<span class="param-type">number</span>
 
 
             
@@ -1137,7 +1137,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line175">line 175</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line183">line 183</a>
     </li></ul></dd>
     
 
@@ -1235,7 +1235,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1647">line 1647</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1693">line 1693</a>
     </li></ul></dd>
     
 
@@ -1578,7 +1578,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1540">line 1540</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1572">line 1572</a>
     </li></ul></dd>
     
 
@@ -1738,7 +1738,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line872">line 872</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line891">line 891</a>
     </li></ul></dd>
     
 
@@ -1774,7 +1774,7 @@
     
 
     
-    <h4 class="name" id=".computeCellSize"><span class="type-signature">(static) </span>computeCellSize<span class="signature">(image, rows, cols)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id=".computeCellSize"><span class="type-signature">(static) </span>computeCellSize<span class="signature">(rect, rows, cols)</span><span class="type-signature"></span></h4>
     
 
     
@@ -1782,7 +1782,7 @@
 
 
 <div class="description">
-    Calculates cell size based on imageRect, rows and cols
+    Calculates cell size based on given object (eg. rect, stage, or image), rows and cols
 </div>
 
 
@@ -1818,7 +1818,7 @@
 
         <tr>
             
-                <td class="name"><code>image</code></td>
+                <td class="name"><code>rect</code></td>
             
 
             <td class="type">
@@ -1834,7 +1834,7 @@
 
             
 
-            <td class="description last">the subregion image object.</td>
+            <td class="description last">a Konva object that has a width and height, usually a rect, image, or stage.</td>
         </tr>
 
     
@@ -1857,7 +1857,7 @@
 
             
 
-            <td class="description last">(optional) the number of rows to split the subregion into.If not is provided, attempts to get it from gui/input.</td>
+            <td class="description last">(optional) the number of rows to split the area into.If not is provided, attempts to get it from gui/input.</td>
         </tr>
 
     
@@ -1880,7 +1880,7 @@
 
             
 
-            <td class="description last">(optional) the number of columns to split the subregion into.If not is provided, attempts to get it from gui/input.</td>
+            <td class="description last">(optional) the number of columns to split the area into.If not is provided, attempts to get it from gui/input.</td>
         </tr>
 
     
@@ -1921,7 +1921,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line515">line 515</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line522">line 522</a>
     </li></ul></dd>
     
 
@@ -2091,7 +2091,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line534">line 534</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line539">line 539</a>
     </li></ul></dd>
     
 
@@ -2355,7 +2355,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1105">line 1105</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1124">line 1124</a>
     </li></ul></dd>
     
 
@@ -2614,7 +2614,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1081">line 1081</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1100">line 1100</a>
     </li></ul></dd>
     
 
@@ -3034,7 +3034,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1197">line 1197</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1216">line 1216</a>
     </li></ul></dd>
     
 
@@ -3240,7 +3240,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1317">line 1317</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1336">line 1336</a>
     </li></ul></dd>
     
 
@@ -3410,7 +3410,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line456">line 456</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line463">line 463</a>
     </li></ul></dd>
     
 
@@ -3639,7 +3639,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line985">line 985</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1004">line 1004</a>
     </li></ul></dd>
     
 
@@ -3893,7 +3893,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line795">line 795</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line808">line 808</a>
     </li></ul></dd>
     
 
@@ -3939,7 +3939,7 @@
     
 
     
-    <h4 class="name" id=".fitImageProportions"><span class="type-signature">(static) </span>fitImageProportions<span class="signature">(w, h, maxDimension, doFill)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id=".fitImageProportions"><span class="type-signature">(static) </span>fitImageProportions<span class="signature">(w, h, maxDimension, fillMode)</span><span class="type-signature"></span></h4>
     
 
     
@@ -4052,7 +4052,7 @@
 
         <tr>
             
-                <td class="name"><code>doFill</code></td>
+                <td class="name"><code>fillMode</code></td>
             
 
             <td class="type">
@@ -4068,7 +4068,7 @@
 
             
 
-            <td class="description last">Whether to a fill-in fit or do a stretch fit otherwise.</td>
+            <td class="description last">Whether to do a "fill", "fit" / "letterbox", "crop", or "squish" fit.</td>
         </tr>
 
     
@@ -4109,7 +4109,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line838">line 838</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line852">line 852</a>
     </li></ul></dd>
     
 
@@ -4117,6 +4117,13 @@
 
     
 
+    
+    <dt class="tag-todo">To Do:</dt>
+    <dd class="tag-todo">
+        <ul>
+            <li>fillMode is not yet fully supported, see https://github.com/joedf/ImgBeamer/issues/7</li>
+        </ul>
+    </dd>
     
 </dl>
 
@@ -4279,7 +4286,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1394">line 1394</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1426">line 1426</a>
     </li></ul></dd>
     
 
@@ -4426,7 +4433,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1596">line 1596</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1628">line 1628</a>
     </li></ul></dd>
     
 
@@ -4769,7 +4776,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1638">line 1638</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1684">line 1684</a>
     </li></ul></dd>
     
 
@@ -4939,7 +4946,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1609">line 1609</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1655">line 1655</a>
     </li></ul></dd>
     
 
@@ -5076,7 +5083,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line444">line 444</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line451">line 451</a>
     </li></ul></dd>
     
 
@@ -5106,6 +5113,153 @@
         
 <div class="param-desc">
     a random number.
+</div>
+
+
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id=".getRectFromKonvaObject"><span class="type-signature">(static) </span>getRectFromKonvaObject<span class="signature">(kObject)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Creates a new Konva.Rect object based on the position and size of a given konva object.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>kObject</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">*</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">A konva object that has a size and postion, such as a stage, image, or rect.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1641">line 1641</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    a rectable object with x, y, width, and height functions.
 </div>
 
 
@@ -5223,7 +5377,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1626">line 1626</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1672">line 1672</a>
     </li></ul></dd>
     
 
@@ -5370,7 +5524,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line949">line 949</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line968">line 968</a>
     </li></ul></dd>
     
 
@@ -5517,7 +5671,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line901">line 901</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line920">line 920</a>
     </li></ul></dd>
     
 
@@ -5547,6 +5701,176 @@
         
 <div class="param-desc">
     an array of the average pixel value [R,G,B,A].
+</div>
+
+
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id=".imagePixelScaling"><span class="type-signature">(static) </span>imagePixelScaling<span class="signature">(konvaImage, imageObj)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Gets the image scaling based on the Konva.Image size vs the image's true or 'natural' size.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>konvaImage</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">*</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The konva image object</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>imageObj</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">*</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The actual image's HTML/DOM object</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1348">line 1348</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    an object with the calculated values as properties 'x' and 'y'.
 </div>
 
 
@@ -5733,7 +6057,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1380">line 1380</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1412">line 1412</a>
     </li></ul></dd>
     
 
@@ -6348,7 +6672,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1044">line 1044</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1063">line 1063</a>
     </li></ul></dd>
     
 
@@ -6554,7 +6878,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line883">line 883</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line902">line 902</a>
     </li></ul></dd>
     
 
@@ -6760,7 +7084,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line858">line 858</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line877">line 877</a>
     </li></ul></dd>
     
 
@@ -6929,7 +7253,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1579">line 1579</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1611">line 1611</a>
     </li></ul></dd>
     
 
@@ -7135,7 +7459,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1366">line 1366</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1398">line 1398</a>
     </li></ul></dd>
     
 
@@ -7328,7 +7652,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1330">line 1330</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1362">line 1362</a>
     </li></ul></dd>
     
 
@@ -7475,7 +7799,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1300">line 1300</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1319">line 1319</a>
     </li></ul></dd>
     
 
@@ -7622,7 +7946,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1307">line 1307</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1326">line 1326</a>
     </li></ul></dd>
     
 
@@ -7815,7 +8139,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1351">line 1351</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1383">line 1383</a>
     </li></ul></dd>
     
 
@@ -7913,7 +8237,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line778">line 778</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line791">line 791</a>
     </li></ul></dd>
     
 
@@ -8119,7 +8443,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line473">line 473</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line480">line 480</a>
     </li></ul></dd>
     
 
@@ -8279,7 +8603,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line726">line 726</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line739">line 739</a>
     </li></ul></dd>
     
 
@@ -8439,7 +8763,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line563">line 563</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line568">line 568</a>
     </li></ul></dd>
     
 
@@ -8599,7 +8923,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line544">line 544</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line549">line 549</a>
     </li></ul></dd>
     
 
@@ -8736,7 +9060,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line743">line 743</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line756">line 756</a>
     </li></ul></dd>
     
 
@@ -8795,7 +9119,7 @@
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Mon Feb 05 2024 17:28:53 GMT-0500 (Eastern Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Thu Feb 08 2024 15:20:22 GMT-0500 (Eastern Standard Time)
 </footer>
 
 <a id="backtotop" href="#"><div>&uarr; Top</div></a>
