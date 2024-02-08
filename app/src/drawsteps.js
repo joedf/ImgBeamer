@@ -123,7 +123,9 @@ function drawSpotProfileEdit(stage, updateCallback = null) {
 	var container = stage.container();
 	// make it focusable
 	container.tabIndex = 2;
-	container.addEventListener('keydown', function(e) {
+	// Avoiding using addEventListener, since we only ever want one handler at time.
+	// This way, we easily replace it when a new image is loaded.
+	container.onkeydown = function(e) {
 		// don't handle meta-key'd events for now...
 		const metaPressed = e.shiftKey || e.ctrlKey || e.metaKey;
 		if (metaPressed)
@@ -145,7 +147,7 @@ function drawSpotProfileEdit(stage, updateCallback = null) {
 			default: break;
 		}
 		e.preventDefault();
-	});
+	};
 
 	// Replacing userScaledImage / userImage
 	// invisible shape to get scale X/Y as a control for spot size/mag
@@ -217,31 +219,45 @@ function drawSpotProfileEdit(stage, updateCallback = null) {
  * @param {*} stage The stage to draw it on.
  * @param {*} oImg The ground truth image.
  * @param {Number} size (to be removed) The max size (width or height) of the image to draw.
- * @param {Boolean} doFill (to be removed?) Fill or letterbox mode to fit the image.
  * @param {Function} updateCallback 
  * @returns a reference to the subregion image object that can be panned and zoomed by the user.
  * 
  * @todo remove 'size' ... confusing and not useful.
- * @todo likely remove 'doFill' ... maybe confusing and not useful.
  */
-function drawSubregionImage(stage, oImg, size, doFill = false, updateCallback = null) {
+function drawSubregionImage(stage, oImg, size, updateCallback = null) {
 	var max = size;
+	var imageSize = { w: oImg.naturalWidth, h: oImg.naturalHeight, };
 
 	if (G_DEBUG)
 		console.log("img natural size:", oImg.naturalWidth, oImg.naturalHeight);
 	
-	var img_width = oImg.naturalWidth, img_height = oImg.naturalHeight;
+	// get image ratios to "fit" in canvas
+	var fillMode = Utils.getImageFillMode();
+	var fitSize = Utils.fitImageProportions(oImg.naturalWidth, oImg.naturalHeight, max, fillMode);
+	var fitScale = {
+		x: fitSize.w / oImg.naturalWidth,
+		y: fitSize.h / oImg.naturalHeight,
+	};
 
-	// image ratio to "fit" in canvas
-	var fitSize = Utils.fitImageProportions(img_width, img_height, max, doFill);
-
-	// TODO: this shouldnt be need or it at least duplicate with part of drawGroundtruthImage()
+	// force the image to be square by compressing it to the smallest dimension (w or h),
+	// if we have the 'squish' fill mode.
+	if (fillMode == 'squish') {
+		let maxScale = Math.max(fitScale.x, fitScale.y);
+		fitScale = { x: maxScale, y: maxScale };
+		let minDim = Math.min(oImg.naturalWidth, oImg.naturalHeight);
+		imageSize = { w: minDim, h: minDim };
+	}
+	
+	// TODO: this should be in a helper likely,
+	// since part of it is very similar to drawGroundtruthImage()
 	var kImage = new Konva.Image({
-		x: (max - fitSize.w)/2,
-		y: (max - fitSize.h)/2,
 		image: oImg,
-		width: fitSize.w, 
-		height: fitSize.h,
+		width: imageSize.w,
+		height: imageSize.h,
+		scale: {
+			x: fitScale.x,
+			y: fitScale.y,
+		},
 		draggable: true,
 	});
 
@@ -285,7 +301,7 @@ function drawSubregionImage(stage, oImg, size, doFill = false, updateCallback = 
 
 		// callback here, e.g. doUpdate();
 		doUpdate();
-	}, G_ZOOM_FACTOR_PER_TICK, 1));
+	}, G_ZOOM_FACTOR_PER_TICK, fitScale.x));
 
 	layer.add(kImage);
 
@@ -297,7 +313,9 @@ function drawSubregionImage(stage, oImg, size, doFill = false, updateCallback = 
 	var container = stage.container();
 	// make it focusable
 	container.tabIndex = 1;
-	container.addEventListener('keydown', function(e) {
+	// Avoiding using addEventListener, since we only ever want one handler at time.
+	// This way, we easily replace it when a new image is loaded.
+	container.onkeydown = function(e) {
 		// don't handle meta-key'd events for now...
 		const metaPressed = e.shiftKey || e.ctrlKey || e.metaKey;
 		if (metaPressed)
@@ -305,14 +323,18 @@ function drawSubregionImage(stage, oImg, size, doFill = false, updateCallback = 
 
 		switch (e.keyCode) {
 			case KEYCODE_R: // 'r' key, reset scale & position
-				kImage.setAttrs({scaleX:1,scaleY:1,x:0,y:0});
+				kImage.setAttrs({
+					scaleX: fitScale.x,
+					scaleY: fitScale.y,
+					x:0, y:0
+				});
 				doUpdate();
 				break;
 		
 			default: break;
 		}
 		e.preventDefault();
-	});
+	};
 
 	return kImage;
 }
@@ -344,9 +366,14 @@ function drawSpotContent(stage, sImage, sBeam, updateCallback = null) {
 
 	// "pre-zoom" a bit, and start with center position
 	// zoom/scale so that the spot size starts at 100%
-	var _tempCellWidth = sImage.width() / Utils.getColsInput();
-	var initialSpotScale = sBeam.width() / _tempCellWidth;
-	Utils.scaleOnCenter(stage, image, 1, initialSpotScale);
+	var _tempCellSize = Utils.computeCellSize(sImage);
+	var initialSpotScale = sBeam.width() / _tempCellSize.w;
+	// get image proportions once scaled and fitted in the stages
+	var max = G_BOX_SIZE, oImg = sImage.image(), fillMode = Utils.getImageFillMode();
+	var fitSize = Utils.fitImageProportions(oImg.naturalWidth, oImg.naturalHeight, max, fillMode);
+	var minScaleX = fitSize.w / oImg.naturalWidth;
+	// center the image copy based on the calculated center and initial scales
+	Utils.scaleOnCenter(stage, image, minScaleX, initialSpotScale);
 
 	layer.draw();
 
@@ -432,7 +459,8 @@ function drawProbeLayout(drawStage, baseImage, spotScale, beam) {
 	var baseLayer = layers[0];
 	baseLayer.destroyChildren(); // avoid memory leaks
 
-	var baseGridRect = new Konva.Rect(baseImage.getSelfRect());
+	// The subregion area is based on what is "visible" in the subregion view.
+	var baseGridRect = Utils.getRectFromKonvaObject(baseImage.getStage());
 	
 	var imageCopy = baseImage.clone();
 
@@ -549,7 +577,8 @@ function drawProbeLayoutSampling(drawStage, originalImage, spotScale, sBeam) {
 	var drawLayer = drawStage.getLayers()[0];
 	drawLayer.destroyChildren(); // avoid memory leaks
 
-	var baseGridRect = new Konva.Rect(imageCopy.getSelfRect());
+	// The subregion area is based on what is "visible" in the subregion view.
+	var baseGridRect = Utils.getRectFromKonvaObject(originalImage.getStage());
 
 	// setup "last" values to help optimize for draw performance
 	// similar reason as for drawProbeLayout()
@@ -630,7 +659,8 @@ function drawResampled(sourceStage, destStage, originalImage, spotScale, sBeam) 
 	var baseImage = originalImage; //.clone();
 	var beam = sBeam; //.clone();
 
-	var baseGridRect = new Konva.Rect(baseImage.getSelfRect());
+	// The subregion area is based on what is "visible" in the subregion view.
+	var baseGridRect = Utils.getRectFromKonvaObject(baseImage.getStage());
 
 	var rows = 0, cols = 0;
 	var probe = null;
@@ -658,8 +688,6 @@ function drawResampled(sourceStage, destStage, originalImage, spotScale, sBeam) 
 		// guarantee at least one layer
 		var layers = destStage.getLayers();
 		if (layers.length < 1) { destStage.add(new Konva.Layer({ listening: false })); }
-
-		// TODO: display pixel size in physical units and use Utils.formatUnitNm()
 
 		changeCount++;
 	};
@@ -736,7 +764,8 @@ function drawResampled(sourceStage, destStage, originalImage, spotScale, sBeam) 
  */
 function drawGroundtruthImage(stage, imageObj, subregionImage, maxSize=G_BOX_SIZE, updateCallback = null){
 
-	var fit = Utils.fitImageProportions(imageObj.naturalWidth, imageObj.naturalHeight, maxSize);
+	var fillMode = Utils.getImageFillMode();
+	var fit = Utils.fitImageProportions(imageObj.naturalWidth, imageObj.naturalHeight, maxSize, fillMode);
 
 	var layer = stage.getLayers()[0];
 	layer.destroyChildren(); // avoid memory leaks
@@ -765,6 +794,13 @@ function drawGroundtruthImage(stage, imageObj, subregionImage, maxSize=G_BOX_SIZ
 		strokeScaleEnabled: false,
 	});
 
+	var imagePixelScaling = Utils.imagePixelScaling(image, imageObj);
+
+	if (fillMode == 'squish') {
+		var maxScale = Math.max(imagePixelScaling.x, imagePixelScaling.y);
+		imagePixelScaling = { x: maxScale, y: maxScale };
+	}
+
 	// Draggable nav-rect
 	// https://github.com/joedf/ImgBeamer/issues/41
 	rect.on('dragmove', function(){
@@ -772,8 +808,8 @@ function drawGroundtruthImage(stage, imageObj, subregionImage, maxSize=G_BOX_SIZ
 		applyChangesFromNavRect();
 	});
 	var constrainRect = function(){
-		var rw = rect.width() * rect.scaleX();
-		var rh = rect.height() * rect.scaleY();
+		var rw = rect.width();
+		var rh = rect.height();
 		var ss = stage.size();
 
 		// top left corner limit
@@ -787,7 +823,7 @@ function drawGroundtruthImage(stage, imageObj, subregionImage, maxSize=G_BOX_SIZ
 
 	stage.off('wheel'); // prevent "eventHandler doubling" from subsequent calls
 	stage.on('wheel', function(e) {
-		// code is based on Uitls.MakeZoomHandler()
+		// code is based on Utils.MakeZoomHandler()
 		e.evt.preventDefault(); // stop default scrolling
 
 		const scaleFactor = G_ZOOM_FACTOR_PER_TICK;
@@ -833,19 +869,20 @@ function drawGroundtruthImage(stage, imageObj, subregionImage, maxSize=G_BOX_SIZ
 		var si = subregionImage;
 
 		si.scale({
-			x: stage.width() / rect.width(),
-			y: stage.height() / rect.height(),
+			x: (stage.width() / rect.width()) * imagePixelScaling.x,
+			y: (stage.height() / rect.height()) * imagePixelScaling.y,
 		});
-
+		
 		si.position({
-			x: (stage.x() - rect.x()) * si.scaleX(),
-			y: (stage.y() - rect.y()) * si.scaleY(),
+			x: ((image.x() - rect.x()) * si.scaleX()) / imagePixelScaling.x,
+			y: ((image.y() - rect.y()) * si.scaleY()) / imagePixelScaling.y,
 		});
 
 		// this propagates the changes to the subregion to the rest of the app
 		if (typeof updateCallback == 'function')
 			return updateCallback();
 	};
+	
 	// Grab cursor for nav-rectangle overlay
 	// https://konvajs.org/docs/styling/Mouse_Cursor.html
 	layer.listening(true);
@@ -862,13 +899,15 @@ function drawGroundtruthImage(stage, imageObj, subregionImage, maxSize=G_BOX_SIZ
 		// calc location rect from subregionImage
 		// and update bounds drawn rectangle
 		var si = subregionImage;
+
 		rect.position({
-			x: (image.x() - si.x()) / si.scaleX(),
-			y: (image.y() - si.y()) / si.scaleY(),
+			x: ((image.x() - si.x()) / si.scaleX()) * imagePixelScaling.x,
+			y: ((image.y() - si.y()) / si.scaleY()) * imagePixelScaling.y,
 		});
+
 		rect.size({
-			width: si.width() / si.scaleX(),
-			height: si.height() / si.scaleY(),
+			width: (stage.width() / si.scaleX()) * imagePixelScaling.x,
+			height: (stage.height() / si.scaleY()) * imagePixelScaling.y,
 		});
 
 		// subregion overlay visibility
@@ -897,7 +936,7 @@ function drawGroundtruthImage(stage, imageObj, subregionImage, maxSize=G_BOX_SIZ
 		var fmtMiddle = Utils.formatUnitNm(middle.x, middle.y);
 
 		var sizeFOV = {
-			w: (rect.width() / stage.width()) * imageObj.width * pxSizeNm,
+			w: (rect.width() / stage.width()) * imageObj.naturalWidth * pxSizeNm,
 		};
 		var fmtSizeFOV = Utils.formatUnitNm(sizeFOV.w);
 
@@ -1031,11 +1070,10 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 			fullImgWidthNm / cols,
 			fullImgWidthNm / rows,
 		);
-		var displayUnit = fmtPxSize.unit + "/px";
 		Utils.updateExtraInfo(stage, cols + ' x ' + rows
 			+ ' px<br>' + fmtPxSize.value.toFixed(G_MATH_TOFIXED.SHORT)
 			+ " x " + fmtPxSize.value2.toFixed(G_MATH_TOFIXED.SHORT)
-			+ " " + displayUnit);
+			+ " " + fmtPxSize.unit + "/px");
 	};
 	updateConfigValues();
 

@@ -192,16 +192,16 @@
 
 			// used to auto-name the export files with a counter
 			var G_Export_img_count = 0;
-			var stageFinal = G_STAGES[G_STAGES.length - 1];
 			function exportResultImage(){
 				// Export image as file download
 				// https://konvajs.org/docs/data_and_serialization/High-Quality-Export.html
 
 				// get the image without the row/draw indicator
+				var stageFinal = G_STAGES[G_STAGES.length - 1];
 				var finalImage = Utils.getVirtualSEM_KonvaImage(stageFinal);
 				
 				// export the image
-				var url = finalImage.toDataURL({pixelRatio:2});
+				var url = finalImage.toDataURL({pixelRatio:1});
 				var filename = Utils.GetSuggestedFileName("result_image",++G_Export_img_count);
 				Utils.downloadURI(url, filename);
 			}

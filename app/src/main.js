@@ -184,7 +184,7 @@ function OnImageLoaded(eImg, stages){
 
 	var updateInfoDisplays = function(){
 		// update spot/beam info: size, rotation, shape
-		var cellSize = Utils.computeCellSize(subregionImage);
+		var cellSize = Utils.computeCellSize(subregionImage.getStage());
 		Utils.updateDisplayBeamParams(spotProfileStage, layoutBeam, cellSize, spotScaling, promptForSpotWidth);
 		Utils.updateMagInfo(baseImageStage, subregionImage);
 		Utils.updateSubregionPixelSize(resampledStage, subregionImage, eImg);
@@ -216,10 +216,7 @@ function OnImageLoaded(eImg, stages){
 		.attr('box_label', 'Subregion View / FOV')
 		.attr('note', 'Pan & Zoom: Drag and Scroll\nPress [R] to reset')
 		.css('border-color', 'blue');
-	var subregionImage = drawSubregionImage(baseImageStage, eImg, G_BOX_SIZE, false, doUpdate);
-
-	// make a clone without copying over the event bindings
-	var image = subregionImage.clone().off();
+	var subregionImage = drawSubregionImage(baseImageStage, eImg, G_BOX_SIZE, doUpdate);
 
 	// draw Spot Content
 	$(spotContentStage.getContainer())
@@ -228,7 +225,9 @@ function OnImageLoaded(eImg, stages){
 		.attr('box_label', 'Spot Content')
 		.attr('note', 'Scroll to adjust spot size\nHold [Shift] for half rate');
 	var spotContentBeam = beam.clone();
-	drawSpotContent(spotContentStage, image, spotContentBeam, doUpdate);
+	// make a clone without copying over the event bindings
+	var imageCopy = subregionImage.clone().off();
+	drawSpotContent(spotContentStage, imageCopy, spotContentBeam, doUpdate);
 
 	/**(temporary) publicly exposed function to set the spot width
 	 * @param {number} spotWidth the spot width in percent (%), ex. use 130 for 130%.

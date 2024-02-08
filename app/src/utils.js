@@ -159,21 +159,28 @@ const Utils = {
 	getSpotLayoutOpacityInput: function(){ return G_GUI_Controller.previewOpacity; },
 	getImageMetricAlgorithm: function(){ return G_GUI_Controller.imageMetricAlgo; },
 	getImageSmoothing: function(){ return G_GUI_Controller.imageSmoothing; },
+	getImageFillMode: function(){
+		// TODO: maybe add a GUI option to toggle between fit, fill, stretch modes...
+		// just a default for now, until support for this is implemented
+		// https://github.com/joedf/ImgBeamer/issues/7
+		
+		// return "fit";
+		return "squish";
+	},
 
-	/**
+		/**
 	 * Creates a Zoom event handler to be used on a stage.
 	 * Holding the shift key scales at half the rate.
 	 * @param {object} stage the drawing stage
-	 * @param {*} konvaObj the figure or object on the stage to change.
-	 * @param {*} callback a callback for when the zoom event handler is called.
-	 * @param {*} scaleFactor the scale factor per "tick"
+	 * @param {object} konvaObj the figure or object on the stage to change.
+	 * @param {function} callback a callback for when the zoom event handler is called.
+	 * @param {number} scaleFactor the scale factor per "tick"
 	 * @param {number|function} scaleMin the scale minimum allowed defined as a number or function.
 	 * @param {number|function} scaleMax the scale maximum allowed defined as a number or function.
 	 * @returns the created event handler
 	 */
 	// eslint-disable-next-line no-magic-numbers
-	MakeZoomHandler: function(stage, konvaObj, callback=null, scaleFactor=1.2, scaleMin=0, scaleMax=Infinity)
-	{
+	MakeZoomHandler: function(stage, konvaObj, callback=null, scaleFactor=1.2, scaleMin=0, scaleMax=Infinity){
 		var _self = this;
 		var handler = function(e){
 			// modified from https://konvajs.org/docs/sandbox/Zooming_Relative_To_Pointer.html 
@@ -504,23 +511,21 @@ const Utils = {
 	},
 
 	/**
-	 * Calculates cell size based on imageRect, rows and cols
-	 * @param {*} image the subregion image object.
-	 * @param {number} rows (optional) the number of rows to split the subregion into.
+	 * Calculates cell size based on given object (eg. rect, stage, or image), rows and cols
+	 * @param {*} rect a Konva object that has a width and height, usually a rect, image, or stage.
+	 * @param {number} rows (optional) the number of rows to split the area into.
 	 * If not is provided, attempts to get it from gui/input.
-	 * @param {number} cols (optional) the number of columns to split the subregion into.
+	 * @param {number} cols (optional) the number of columns to split the area into.
 	 * If not is provided, attempts to get it from gui/input.
 	 * @returns the size (w,h) of a cell in the raster grid.
 	 */
-	computeCellSize: function(image, rows = -1, cols = -1){
-		var subregionRect = image.getSelfRect();
-
+	computeCellSize: function(rect, rows = -1, cols = -1){
 		if (rows <= 0) { rows = this.getRowsInput(); }
 		if (cols <= 0) { cols = this.getColsInput(); }
 
 		var cellSize = {
-			w: subregionRect.width / cols,
-			h: subregionRect.height / rows
+			w: rect.width() / cols,
+			h: rect.height() / rows,
 		};
 		return cellSize;
 	},
@@ -690,8 +695,8 @@ const Utils = {
 		var rows = Utils.getRowsInput(), cols = Utils.getColsInput();
 
 		var rect = {
-			w: subregionImage.width() / subregionImage.scaleX(),
-			h: subregionImage.height() / subregionImage.scaleY(),
+			w: subregionImage.width() * subregionImage.scaleX(),
+			h: subregionImage.height() * subregionImage.scaleY(),
 		};
 
 		// TODO: maybe get the ground truth image stage for the size info instead,
@@ -700,15 +705,23 @@ const Utils = {
 		var gt_stage_size = destStage.size();
 
 		var pxSizeNm = Utils.getPixelSizeNmInput();
-		var pxSize = {
-			w: ((rect.w / gt_stage_size.width) * (imageObj.width * pxSizeNm)) / cols,
-			h: ((rect.h / gt_stage_size.height) * (imageObj.height * pxSizeNm)) / rows,
+		var fullImgSize = {
+			w: imageObj.naturalWidth * pxSizeNm,
+			h: imageObj.naturalHeight * pxSizeNm,
+		};
+		// similar formula to the used for the subregion rect in the groundtruth view
+		var subregionSizeNm = {
+			w: (gt_stage_size.width / rect.w) * fullImgSize.w,
+			h: (gt_stage_size.height / rect.h) * fullImgSize.h,
 		};
 
 		// get optimal / formated unit
 		// TODO: maybe use "this." instead of "Utils."
 		// do it for all functions too?
-		var fmtPxSize = Utils.formatUnitNm(pxSize.w, pxSize.h);
+		var fmtPxSize = Utils.formatUnitNm(
+			subregionSizeNm.w / cols,
+			subregionSizeNm.h / rows
+		);
 
 		// display coords & FOV size
 		Utils.updateExtraInfo(destStage,
@@ -832,14 +845,20 @@ const Utils = {
 	 * @param {number} w the original width
 	 * @param {number} h the original height
 	 * @param {number} maxDimension The largest dimension (whether width or height) to fit in.
-	 * @param {boolean} doFill Whether to a fill-in fit or do a stretch fit otherwise.
+	 * @param {boolean} fillMode Whether to do a "fill", "fit" / "letterbox", "crop", or "squish" fit.
 	 * @returns the new calculated size
+	 * @todo fillMode is not yet fully supported, see https://github.com/joedf/ImgBeamer/issues/7
 	 */
-	fitImageProportions: function(w, h, maxDimension, doFill=false){
+	fitImageProportions: function(w, h, maxDimension, fillMode="squish"){
+		var mode = fillMode.toLowerCase().trim();
+
 		// image ratio to "fit" in canvas
 		var ratio = (w > h ? (w / maxDimension) : (h / maxDimension)); // fit
-		if (doFill){
+		if (mode == "fill"){
 			ratio = (w > h ? (h / maxDimension) : (w / maxDimension)); // fill
+		}
+		if (mode == "squish") {
+			// do nothing for now...
 		}
 
 		var iw = w/ratio; //, ih = h/ratio;
@@ -993,10 +1012,10 @@ const Utils = {
 		var stepSizeX = rect.width() / cols;
 		var stepSizeY = rect.height() / rows;
 	
-		const xSize= gridLayer.width(), // stage.width(), 
-				ySize= gridLayer.height(), // stage.height(),
-				xSteps = cols, //Math.round(xSize/ stepSizeX), 
-				ySteps = rows; //Math.round(ySize / stepSizeY);
+		const xSize = gridLayer.width(), // stage.width(), 
+			ySize = gridLayer.height(), // stage.height(),
+			xSteps = cols, //Math.round(xSize/ stepSizeX), 
+			ySteps = rows; //Math.round(ySize / stepSizeY);
 
 		// draw vertical lines
 		for (let i = 0; i <= xSteps; i++) {
@@ -1321,6 +1340,19 @@ const Utils = {
 	},
 
 	/**
+	 * Gets the image scaling based on the Konva.Image size vs the image's true or 'natural' size.
+	 * @param {*} konvaImage The konva image object
+	 * @param {*} imageObj The actual image's HTML/DOM object
+	 * @returns 
+	 */
+	imagePixelScaling: function(konvaImage, imageObj) {
+		return {
+			x: (konvaImage.width() / imageObj.naturalWidth),
+			y: (konvaImage.height() / imageObj.naturalHeight),
+		};
+	},
+
+	/**
 	 * Convert stage to unit square coordinates
 	 * @param {*} x 
 	 * @param {*} y 
@@ -1350,8 +1382,8 @@ const Utils = {
 	 */
 	unitToImagePixelCoordinates: function(x, y, imageObj) {
 		return {
-			x: x * imageObj.width,
-			y: y * imageObj.height,
+			x: x * imageObj.naturalWidth,
+			y: y * imageObj.naturalHeight,
 		};
 	},
 
@@ -1599,6 +1631,20 @@ const Utils = {
 		})[0];
 
 		return image;
+	},
+
+	/**
+	 * Creates a new Konva.Rect object based on the position and size of a given konva object.
+	 * @param {*} kObject A konva object that has a size and postion, such as a stage, image, or rect.
+	 * @returns a rectable object with x, y, width, and height functions.
+	 */
+	getRectFromKonvaObject: function(kObject){
+		return new Konva.Rect({
+			x: kObject.x(),
+			y: kObject.y(),
+			width: kObject.width(),
+			height: kObject.height(),
+		});
 	},
 
 	/**
