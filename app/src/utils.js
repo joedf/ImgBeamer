@@ -858,7 +858,7 @@ const Utils = {
 			ratio = (w > h ? (h / maxDimension) : (w / maxDimension)); // fill
 		}
 		if (mode == "squish") {
-			ratio = Math.min(w, h) / maxDimension;
+			return {w: maxDimension, h: maxDimension};
 		}
 
 		var iw = w/ratio; //, ih = h/ratio;
