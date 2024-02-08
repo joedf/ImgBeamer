@@ -201,7 +201,7 @@
 				var finalImage = Utils.getVirtualSEM_KonvaImage(stageFinal);
 				
 				// export the image
-				var url = finalImage.toDataURL({pixelRatio:2});
+				var url = finalImage.toDataURL({pixelRatio:1});
 				var filename = Utils.GetSuggestedFileName("result_image",++G_Export_img_count);
 				Utils.downloadURI(url, filename);
 			}
