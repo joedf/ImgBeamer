@@ -163,8 +163,9 @@ const Utils = {
 		// TODO: maybe add a GUI option to toggle between fit, fill, stretch modes...
 		// just a default for now, until support for this is implemented
 		// https://github.com/joedf/ImgBeamer/issues/7
-		// return "squish";
-		return "fit";
+		
+		// return "fit";
+		return "squish";
 	},
 
 		/**

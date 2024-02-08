@@ -226,25 +226,37 @@ function drawSpotProfileEdit(stage, updateCallback = null) {
  */
 function drawSubregionImage(stage, oImg, size, updateCallback = null) {
 	var max = size;
+	var imageSize = { w: oImg.naturalWidth, h: oImg.naturalHeight, };
 
 	if (G_DEBUG)
 		console.log("img natural size:", oImg.naturalWidth, oImg.naturalHeight);
 	
-	// image ratio to "fit" in canvas
+	// get image ratios to "fit" in canvas
 	var fillMode = Utils.getImageFillMode();
 	var fitSize = Utils.fitImageProportions(oImg.naturalWidth, oImg.naturalHeight, max, fillMode);
-
-	var minScale = {
+	var fitScale = {
 		x: fitSize.w / oImg.naturalWidth,
 		y: fitSize.h / oImg.naturalHeight,
 	};
 
-	// TODO: this shouldnt be need or it at least duplicate with part of drawGroundtruthImage()
+	// force the image to be square by compressing it to the smallest dimension (w or h),
+	// if we have the 'squish' fill mode.
+	if (fillMode == 'squish') {
+		let maxScale = Math.max(fitScale.x, fitScale.y);
+		fitScale = { x: maxScale, y: maxScale };
+		let minDim = Math.min(oImg.naturalWidth, oImg.naturalHeight);
+		imageSize = { w: minDim, h: minDim };
+	}
+	
+	// TODO: this should be in a helper likely,
+	// since part of it is very similar to drawGroundtruthImage()
 	var kImage = new Konva.Image({
 		image: oImg,
+		width: imageSize.w,
+		height: imageSize.h,
 		scale: {
-			x: minScale.x,
-			y: minScale.y,
+			x: fitScale.x,
+			y: fitScale.y,
 		},
 		draggable: true,
 	});
@@ -289,7 +301,7 @@ function drawSubregionImage(stage, oImg, size, updateCallback = null) {
 
 		// callback here, e.g. doUpdate();
 		doUpdate();
-	}, G_ZOOM_FACTOR_PER_TICK, minScale.x));
+	}, G_ZOOM_FACTOR_PER_TICK, fitScale.x));
 
 	layer.add(kImage);
 
@@ -312,8 +324,8 @@ function drawSubregionImage(stage, oImg, size, updateCallback = null) {
 		switch (e.keyCode) {
 			case KEYCODE_R: // 'r' key, reset scale & position
 				kImage.setAttrs({
-					scaleX: minScale.x,
-					scaleY: minScale.y,
+					scaleX: fitScale.x,
+					scaleY: fitScale.y,
 					x:0, y:0
 				});
 				doUpdate();
@@ -783,6 +795,11 @@ function drawGroundtruthImage(stage, imageObj, subregionImage, maxSize=G_BOX_SIZ
 	});
 
 	var imagePixelScaling = Utils.imagePixelScaling(image, imageObj);
+
+	if (fillMode == 'squish') {
+		var maxScale = Math.max(imagePixelScaling.x, imagePixelScaling.y);
+		imagePixelScaling = { x: maxScale, y: maxScale };
+	}
 
 	// Draggable nav-rect
 	// https://github.com/joedf/ImgBeamer/issues/41
