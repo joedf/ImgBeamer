@@ -2,32 +2,32 @@
 
 // global functions from drawsteps.js
 /* globals
- drawSpotProfileEdit, drawSubregionImage, drawSpotContent, drawSpotSignal,
- drawProbeLayout, drawProbeLayoutSampling, drawResampled, drawGroundtruthImage,
- drawVirtualSEM
- */
+drawSpotProfileEdit, drawSubregionImage, drawSpotContent, drawSpotSignal,
+drawProbeLayout, drawProbeLayoutSampling, drawResampled, drawGroundtruthImage,
+drawVirtualSEM
+*/
 
 /* exported
- * G_UpdateResampled,
- * G_UpdateVirtualSEMConfig,
- * ResampleFullImage,
- * G_Update_GroundTruth
- * G_Update_InfoDisplays
- * G_update_ImgMetrics
- * G_UpdateRuler
- * G_UpdateFilters
- * G_UpdateStageSettings
- * G_AUTO_PREVIEW_LIMIT
- * G_VSEM_PAUSED
- * G_SHOW_SUBREGION_OVERLAY
- * G_IMG_METRIC_ENABLED
- * G_APP_NAME
- * G_INPUT_IMAGE
- * G_PRELOADED_IMAGES
- * G_PRELOADED_IMAGES_ROOT
- * G_IMG_METRICS
- * G_STAGES
- */
+G_UpdateResampled,
+G_UpdateVirtualSEMConfig,
+ResampleFullImage,
+G_Update_GroundTruth
+G_Update_InfoDisplays
+G_update_ImgMetrics
+G_UpdateRuler
+G_UpdateFilters
+G_UpdateStageSettings
+G_AUTO_PREVIEW_LIMIT
+G_VSEM_PAUSED
+G_SHOW_SUBREGION_OVERLAY
+G_IMG_METRIC_ENABLED
+G_APP_NAME
+G_INPUT_IMAGE
+G_PRELOADED_IMAGES
+G_PRELOADED_IMAGES_ROOT
+G_IMG_METRICS
+G_STAGES
+*/
 
 /** Name of the application */
 const G_APP_NAME = "ImgBeamer";
@@ -66,6 +66,24 @@ const G_PRELOADED_IMAGES = [
 	'tephra_200nm.png',
 ];
 
+/** global variable to set the input ground truth image */
+// var G_INPUT_IMAGE = Utils.getGroundtruthImage();
+var G_INPUT_IMAGE = G_PRELOADED_IMAGES_ROOT + 'grains2tl.png';
+
+// Preload the larger image files in the background
+// without blocking the UI for improved responsiveness
+window.addEventListener('load', function(){
+	// https://stackoverflow.com/a/59861857/883015
+	// var images = G_PRELOADED_IMAGES;
+	var images = ['grains2full.png', 'APT_needle.png', 'tephra_448nm.png', 'tephra_200nm.png'];
+	var preload = '';
+	for(let i = 0; i < images.length; i++) {
+		preload += '<link rel="preload" href="' + G_PRELOADED_IMAGES_ROOT
+		+ images[i] + '" as="image">\n';
+	}
+	$('head').append(preload);
+});
+
 /** The list of image quality metrics supported by the application. */
 const G_IMG_METRICS = [
 	'SSIM',
@@ -75,10 +93,6 @@ const G_IMG_METRICS = [
 	'iNRMSE',
 	'iNMSE',
 ];
-
-/** global variable to set the input ground truth image */
-// var G_INPUT_IMAGE = Utils.getGroundtruthImage();
-var G_INPUT_IMAGE = G_PRELOADED_IMAGES_ROOT + 'grains2tl.png';
 
 /** global reference to update the resampling steps (spot layout,
  * sampled subregion, resulting subregion) displays,
