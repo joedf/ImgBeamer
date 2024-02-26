@@ -51,6 +51,10 @@ $('#generateFull').click(function(){
 // Setup the main UI and settings/options GUI controller
 const G_INPUT_IMG_CTRL_SELECTOR = '#_fileImgInput';
 const gui = new dat.GUI({autoPlace: false});
+
+/**
+ * The main GUI controller
+ */
 const G_GUI_Controller = new function() {
 	this.pixelCountX = 8;
 	this.pixelCountY = 8;
