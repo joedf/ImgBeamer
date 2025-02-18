@@ -170,7 +170,7 @@ const Utils = {
 		return "squish";
 	},
 
-		/**
+	/**
 	 * Creates a Zoom event handler to be used on a stage.
 	 * Holding the shift key scales at half the rate.
 	 * @param {object} stage the drawing stage
@@ -223,6 +223,58 @@ const Utils = {
 		};
 
 		return handler;
+	},
+
+	/**
+	 * Creates and adds a pinch-Zoom (multi-touch touchscreens) event handler to be used on a shape.
+	 * for more info, see https://konvajs.org/docs/sandbox/Multi-touch_Scale_Shape.html
+	 * @param {*} activeShape the shape or object to scale.
+	 * @param {*} callback a callback for when the zoom event handler is called.
+	 * @param {number} scaleMin the scale minimum allowed.
+	 * @param {number} scaleMax the scale maximum allowed.
+	 */
+	AddPinchScaleHandlers: function(stage, activeShape, callback=null, scaleMin=0, scaleMax=Infinity){
+		var lastDist = 0;
+		stage.getContent().addEventListener('touchmove', function(evt){
+			// ensure we have valid event object with at least 2 touch points
+			if (evt == null || evt.touches == null || evt.touches.length < 2)
+				return null;
+
+			// e.preventDefault(); // stop default events
+			
+			// get the touch points
+			var touch1 = evt.touches[0];
+			var touch2 = evt.touches[1];
+
+			if (touch1 && touch2) {
+				var dist = Utils.distance(touch1.clientX, touch1.clientY, touch2.clientX, touch2.clientY);
+		
+				if (!lastDist) {
+					lastDist = dist;
+				}
+
+				// calculate scaling amount
+				var currentScale = activeShape.scaleX();
+				var scaleBy = (currentScale * dist) / lastDist;
+				// Limit scale based on given bounds
+				var finalScale = Math.min(scaleMax, Math.max(scaleMin, scaleBy));
+
+				// do the scale
+				// TODO: this seems to be skidding, jumps in the shape.x() and .y() values
+				// possibly due to race conditions between events?
+				Utils.scaleOnCenter(stage, activeShape, currentScale, finalScale);
+				// Utils.scaleCenteredOnPoint(stage.getPointerPosition(), activeShape, currentScale, finalScale);
+
+				lastDist = dist;
+	
+				if (typeof callback == 'function')
+					callback(e);
+			}
+		});
+		
+		stage.getContent().addEventListener('touchend', function(){
+			lastDist = 0;
+		});
 	},
 
 	/**

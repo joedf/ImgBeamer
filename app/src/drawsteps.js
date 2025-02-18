@@ -303,6 +303,15 @@ function drawSubregionImage(stage, oImg, size, updateCallback = null) {
 		doUpdate();
 	}, G_ZOOM_FACTOR_PER_TICK, fitScale.x));
 
+	// touchscreen / multi-touch handlers, e.g. pinch-zoom
+	Utils.AddPinchScaleHandlers(stage, kImage, function(){
+		// bounds check for zooming out
+		constrainBounds();
+
+		// callback here, e.g. doUpdate();
+		doUpdate();
+	}, fitScale.x);
+
 	layer.add(kImage);
 
 	stage.draw();
