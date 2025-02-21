@@ -12,18 +12,15 @@
 /* exported GetOptimalBoxWidth */
 
 /**
- * Used for display, for number.toFixed() rounding.
- * @namespace G_MATH_TOFIXED
+ * @global
+ * @description Used for display, for `number.toFixed()` rounding.
+ * @prop {number} MIN The minimum number of decimal digits.
+ * @prop {number} SHORT The short or standard number of decimal digits.
+ * @prop {number} LONG The maximum or "longest" number of decimal digits.
  */
 const G_MATH_TOFIXED = {
-	/**
-	 * @type {number}
-	 * @description The minimum number of decimal digits.
-	 */
 	MIN: 1,
-	/** The short or standard number of decimal digits. */
 	SHORT: 2,
-	/** The maximum or "longest" number of decimal digits. */
 	LONG: 4
 };
 
@@ -128,6 +125,35 @@ const Utils = {
 				// load the image once again as usual...
 				Utils.loadImage(decoded_as_rgba8_url, callback, false);
 			}); 
+	},
+
+	/**
+	 * Generates a blob from the given pixel data array with a callback when the blob is ready.
+	 * @param {Uint8ClampedArray} imageDataArray The image pixel data as a flat RGBA array.
+	 * @param {number} width The width of the image.
+	 * @param {function} callback The callback to call with the blob when it is ready.
+	 */
+	ImageDataArrayToBlob: function(imageDataArray, width, callback) {
+		// generate image from ImageData array (Uint8ClampedArray)
+		// https://developer.mozilla.org/en-US/docs/Web/API/ImageData/ImageData
+		// len = RGBA * width * height
+		const height = (imageDataArray.length / 4) / width;
+		const canvas = new OffscreenCanvas(width, height);
+		const ctx = canvas.getContext("2d");
+
+		// push data into an offscreen canvas
+		let imageData = new ImageData(imageDataArray, width, height);
+		ctx.putImageData(imageData, 0, 0);
+
+		// generate PNG blob with callback when ready
+		canvas.convertToBlob({
+			type: 'image/png',
+			quality: 1
+		}).then((blob) => {
+			console.log('New PNG image blob generated (' + width + ' x ' + height + ').');
+			if (typeof callback == 'function')
+				callback(blob);
+		});
 	},
 
 	/**
