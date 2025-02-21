@@ -3,15 +3,27 @@
  * G_BOX_SIZE, G_DEBUG, G_AUTO_PREVIEW_LIMIT,
  * G_VSEM_PAUSED, G_MATH_TOFIXED,
  * G_SHOW_SUBREGION_OVERLAY,
- * G_update_ImgMetrics,
- * G_VSEM_IMAGE_CACHE
+ * G_update_ImgMetrics
  */
 
 /* exported
  * drawSpotProfileEdit, drawSubregionImage, drawSpotContent, drawSpotSignal,
  * drawProbeLayout, drawProbeLayoutSampling, drawResampled, drawGroundtruthImage,
  * drawVirtualSEM
+ * G_VSEM_IMAGE_CACHE
  */
+
+/** 
+ * @global
+ * @description ImageData cache object of the resulting VSEM image
+ * @property {Uint8ClampedArray} data The image pixel data as a flat RGBA array
+ * @property {number} width The width of the image
+ */
+var G_VSEM_IMAGE_CACHE = {
+	// data length = width * height * bytes-per-pixel (RGBA)
+	data: new Uint8ClampedArray(100 * 100 * 4),
+	width: 100 // width of the image
+};
 
 // used by "Resulting Image" box / drawVirtualSEM()
 // to reduce artifacts from drawing pixel-by-pixel in canvas
