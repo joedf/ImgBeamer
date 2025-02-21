@@ -16,6 +16,7 @@ G_DEBUG
 G_STAGES
 G_INPUT_IMAGE
 G_VSEM_PAUSED
+G_VSEM_IMAGE_CACHE
 G_IMG_METRICS
 G_IMG_METRIC_ENABLED
 G_PRELOADED_IMAGES
@@ -83,6 +84,7 @@ const G_GUI_Controller = new function() {
 	this.subregionOverlay = G_SHOW_SUBREGION_OVERLAY;
 	this.imageMetricAlgo = 'iNRMSE';
 	this.exportResultImg = function(){ exportResultImage(); };
+	this.exportResultTrueImage = function(){ exportResultTrueImage(); };
 	this.importImage = function(){
 		// getInputImage();
 		$(G_INPUT_IMG_CTRL_SELECTOR).click();
@@ -153,6 +155,7 @@ gui_io.add(G_GUI_Controller, 'groundTruthImg', G_PRELOADED_IMAGES).listen().onCh
 });
 gui_io.add(G_GUI_Controller, 'importImage');
 gui_io.add(G_GUI_Controller, 'exportResultImg');
+gui_io.add(G_GUI_Controller, 'exportResultTrueImage').name('exportResultImg (actual size)');
 var aboutBtn = gui.add(G_GUI_Controller, 'aboutMessage');
 aboutBtn.name("About " + G_APP_NAME + " / Credits");
 gui_io.open();
@@ -167,17 +170,34 @@ $("#options").append(gui.domElement)
 // used to auto-name the export files with a counter
 var G_Export_img_count = 0;
 function exportResultImage(){
-	// Export image as file download
+	// Export image (as displayed) as file download
 	// https://konvajs.org/docs/data_and_serialization/High-Quality-Export.html
 
 	// get the image without the row/draw indicator
 	var stageFinal = G_STAGES[G_STAGES.length - 1];
 	var finalImage = Utils.getVirtualSEM_KonvaImage(stageFinal);
-	
+
 	// export the image
 	var url = finalImage.toDataURL({pixelRatio:1});
 	var filename = Utils.GetSuggestedFileName("result_image",++G_Export_img_count);
 	Utils.downloadURI(url, filename);
+}
+
+function exportResultTrueImage(){
+	// Export the actual as generated image as file download
+	// this image may be smaller or larger than what is displayed on screen
+
+	// export the image
+	var filename = Utils.GetSuggestedFileName("result_image",++G_Export_img_count);
+
+	Utils.ImageDataArrayToBlob(
+		G_VSEM_IMAGE_CACHE.data, // raw pixel data cache
+		G_VSEM_IMAGE_CACHE.width, // image width (px), height is auto calculated
+		function(blob) { // callback for when the blob is ready
+			const url = URL.createObjectURL(blob);
+			Utils.downloadURI(url, filename);
+		}
+	);
 }
 
 

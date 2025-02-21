@@ -130,6 +130,29 @@ const Utils = {
 			}); 
 	},
 
+	ImageDataArrayToBlob: function(gsImageDataArray, width, callback) {
+		// generate image from ImageData array (Uint8ClampedArray)
+		// https://developer.mozilla.org/en-US/docs/Web/API/ImageData/ImageData
+		// len = RGBA * width * height
+		const height = (gsImageDataArray.length / 4) / width;
+		const canvas = new OffscreenCanvas(width, height);
+		const ctx = canvas.getContext("2d");
+
+		// push data into an offscreen canvas
+		let imageData = new ImageData(gsImageDataArray, width, height);
+		ctx.putImageData(imageData, 0, 0);
+
+		// generate PNG blob with callback when ready
+		canvas.convertToBlob({
+			type: 'image/png',
+			quality: 1
+		}).then((blob) => {
+			console.log("gsImageDataArrayToPNG image generated.");
+			if (typeof callback == 'function')
+				callback(blob);
+		});
+	},
+
 	/**
 	 * Attempts to get the value or text within a given element/control.
 	 * @param {object|jQuery} $e the jquery wrapped DOM element.

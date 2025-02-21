@@ -3,7 +3,8 @@
  * G_BOX_SIZE, G_DEBUG, G_AUTO_PREVIEW_LIMIT,
  * G_VSEM_PAUSED, G_MATH_TOFIXED,
  * G_SHOW_SUBREGION_OVERLAY,
- * G_update_ImgMetrics
+ * G_update_ImgMetrics,
+ * G_VSEM_IMAGE_CACHE
  */
 
 /* exported
@@ -1045,6 +1046,14 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 		// the total number of "pixels" (cells) that will drawn
 		pixelCount = rows * cols;
 
+		// resize ImageData cache buffer if needed
+		if (G_VSEM_IMAGE_CACHE.data.length != pixelCount) {
+			// eslint-disable-next-line no-global-assign
+			G_VSEM_IMAGE_CACHE.width = cols;
+			// eslint-disable-next-line no-global-assign
+			G_VSEM_IMAGE_CACHE.data = new Uint8ClampedArray(pixelCount * 4); // RGBA pixels
+		}
+
 		// save last value, to detect significant change
 		var lastCellW = cellW, lastCellH = cellH;
 
@@ -1142,6 +1151,17 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 				} else {
 					ctx.fillRect(cellX, cellY, cellW, cellH);
 				}
+
+				// save pixel to ImageData cache
+				// https://github.com/joedf/ImgBeamer/issues/50
+				// -> pixel id in a flat array should be = cols * current row + current col
+				let pixelIndex = (cols * row) + i;
+				// pixel need to be stored as RGBA
+				// https://developer.mozilla.org/en-US/docs/Web/API/ImageData/ImageData
+				G_VSEM_IMAGE_CACHE.data[pixelIndex * 4 + 0] = gsValue; // R value
+				G_VSEM_IMAGE_CACHE.data[pixelIndex * 4 + 1] = gsValue; // G value
+				G_VSEM_IMAGE_CACHE.data[pixelIndex * 4 + 2] = gsValue; // B value
+				G_VSEM_IMAGE_CACHE.data[pixelIndex * 4 + 3] = 255; // A value
 			}
 
 			// if the last drawn was essentially completely black
