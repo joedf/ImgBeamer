@@ -153,11 +153,10 @@ gui_io.add(G_GUI_Controller, 'groundTruthImg', G_PRELOADED_IMAGES).listen().onCh
 		$(document.body).trigger('OnGroundtruthImageChange');
 	}
 });
-gui_io.add(G_GUI_Controller, 'importImage');
-gui_io.add(G_GUI_Controller, 'exportResultImg');
-gui_io.add(G_GUI_Controller, 'exportResultTrueImage').name('exportResultImg (actual size)');
-var aboutBtn = gui.add(G_GUI_Controller, 'aboutMessage');
-aboutBtn.name("About " + G_APP_NAME + " / Credits");
+gui_io.add(G_GUI_Controller, 'importImage').name('Import image');
+gui_io.add(G_GUI_Controller, 'exportResultImg').name('Export image (as displayed)');
+gui_io.add(G_GUI_Controller, 'exportResultTrueImage').name('Export image (actual size)');
+gui.add(G_GUI_Controller, 'aboutMessage').name("About " + G_APP_NAME + " / Credits");
 gui_io.open();
 
 
