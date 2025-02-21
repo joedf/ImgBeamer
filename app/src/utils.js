@@ -294,7 +294,7 @@ const Utils = {
 				lastDist = dist;
 	
 				if (typeof callback == 'function')
-					callback(e);
+					callback(evt);
 			}
 		});
 		
