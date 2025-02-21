@@ -1152,11 +1152,11 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 					ctx.fillRect(cellX, cellY, cellW, cellH);
 				}
 
-				// save pixel to ImageData cache
+				// Save pixel to ImageData cache
 				// https://github.com/joedf/ImgBeamer/issues/50
 				// -> pixel id in a flat array should be = cols * current row + current col
 				let pixelIndex = (cols * row) + i;
-				// pixel need to be stored as RGBA
+				// pixels need to be stored as RGBA
 				// https://developer.mozilla.org/en-US/docs/Web/API/ImageData/ImageData
 				G_VSEM_IMAGE_CACHE.data[pixelIndex * 4 + 0] = gsValue; // R value
 				G_VSEM_IMAGE_CACHE.data[pixelIndex * 4 + 1] = gsValue; // G value

@@ -44,7 +44,12 @@ var G_AUTO_PREVIEW_LIMIT = 16 * 16;
 /** Toggle value to pause the continously draw the Resulting Image / Virtual SEM view */
 var G_VSEM_PAUSED = false;
 
-/** ImageData cache object of the resulting VSEM image */
+/** 
+ * @global
+ * @description ImageData cache object of the resulting VSEM image
+ * @property {Uint8ClampedArray} data The image pixel data as a flat RGBA array
+ * @property {number} width The width of the image
+ */
 var G_VSEM_IMAGE_CACHE = {
 	// data length = width * height * bytes-per-pixel (RGBA)
 	data: new Uint8ClampedArray(100 * 100 * 4),
