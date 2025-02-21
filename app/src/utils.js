@@ -127,6 +127,12 @@ const Utils = {
 			}); 
 	},
 
+	/**
+	 * Generates a blob from the given pixel data array with a callback when the blob is ready.
+	 * @param {Uint8ClampedArray} imageDataArray The image pixel data as a flat RGBA array.
+	 * @param {number} width The width of the image.
+	 * @param {function} callback The callback to call with the blob when it is ready.
+	 */
 	ImageDataArrayToBlob: function(imageDataArray, width, callback) {
 		// generate image from ImageData array (Uint8ClampedArray)
 		// https://developer.mozilla.org/en-US/docs/Web/API/ImageData/ImageData
