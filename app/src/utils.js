@@ -12,18 +12,15 @@
 /* exported GetOptimalBoxWidth */
 
 /**
- * Used for display, for number.toFixed() rounding.
- * @namespace G_MATH_TOFIXED
+ * @global
+ * @description Used for display, for `number.toFixed()` rounding.
+ * @prop {number} MIN The minimum number of decimal digits.
+ * @prop {number} SHORT The short or standard number of decimal digits.
+ * @prop {number} LONG The maximum or "longest" number of decimal digits.
  */
 const G_MATH_TOFIXED = {
-	/**
-	 * @type {number}
-	 * @description The minimum number of decimal digits.
-	 */
 	MIN: 1,
-	/** The short or standard number of decimal digits. */
 	SHORT: 2,
-	/** The maximum or "longest" number of decimal digits. */
 	LONG: 4
 };
 
