@@ -15,7 +15,7 @@
 
 /** 
  * @global
- * @description ImageData cache object of the resulting VSEM image
+ * @description ImageData cache object of the resulting live VSEM image
  * @property {Uint8ClampedArray} data The image pixel data as a flat RGBA array
  * @property {number} width The width of the image
  */
