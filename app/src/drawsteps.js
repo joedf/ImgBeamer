@@ -289,8 +289,6 @@ function drawSubregionImage(stage, oImg, size, updateCallback = null) {
 		if (x < (sx - w + sw) ) { kImage.x(sx - w + sw); }
 		if (y > sy) { kImage.y(sy); }
 		if (y < (sy - h + sh) ) { kImage.y(sy - h + sh); }
-
-		stage.draw();
 	};
 
 	// optional event callback
@@ -408,6 +406,7 @@ function drawSpotContent(stage, sImage, sBeam, updateCallback = null) {
 	image.on('mouseup', function() { doUpdate(); });
 	image.on('dragmove', function() { stage.draw(); });
 	image.on('wheel', Utils.MakeZoomHandler(stage, image, function(){
+		stage.draw(); // this is needed to avoid an "off-by-one" draw update
 		doUpdate();
 	}, G_ZOOM_FACTOR_PER_TICK, 0, function(oldScale,newScale){
 		// limit the max zoom from scrolling, to prevent blank pixel data

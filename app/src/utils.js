@@ -242,8 +242,6 @@ const Utils = {
 				}
 			}
 
-			stage.draw();
-
 			if (typeof callback == 'function')
 				callback(e);
 		};
