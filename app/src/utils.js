@@ -1808,7 +1808,7 @@ const Utils = {
 			</details>
 			
 			<details>
-			<summary><b>Image Contributions</b></p></summary>
+			<summary><b>Image Contributions</b></summary>
 			<ul>
 			<li>Bavley Guerguis for the APT needle image <q>APT_needle.png</q></li>
 			<li>Joachim de Fourestier for the <q>El Laco tephra (EL-JM-P4)</q> images
@@ -1820,7 +1820,7 @@ const Utils = {
 			</details>
 
 			<details>
-			<summary><b>Open-Source Libraries</b></p></summary>
+			<summary><b>Open-Source Libraries</b></summary>
 			<ul>
 			<li><a href="https://konvajs.org">Konva.js</a> - HTML5 2d canvas js library</li>
 			<li><a href="https://jquery.com/">jQuery</a>
@@ -1830,6 +1830,9 @@ const Utils = {
 			<li><a href="https://github.com/darosh/image-ms-ssim-js">image-ms-ssim.js</a> - Image multi-scale structural similarity (MS-SSIM)</li>
 			</ul>
 			</details>
+
+			<p><b>Bugs Reports and Feedback</b></p>
+			<p>Please share your comments or report any issues here:<br/><a href="https://github.com/joedf/ImgBeamer/issues">https://github.com/joedf/ImgBeamer/issues</a></p>
 
 			</div>
 			`).appendTo('body');
