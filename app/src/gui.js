@@ -57,8 +57,8 @@ const gui = new dat.GUI({autoPlace: false});
  * The main GUI controller
  */
 const G_GUI_Controller = new function() {
-	this.pixelCountX = 8;
-	this.pixelCountY = 8;
+	this.pixelCountX = 16;
+	this.pixelCountY = 16;
 	this.brightness = 0;
 	this.contrast = 0;
 	this.digitalMag = "1.00x";

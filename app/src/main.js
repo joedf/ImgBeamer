@@ -38,7 +38,7 @@ Konva.autoDrawEnabled = true;
 
 /** The number of cells in the raster grid at which auto-preview stops, for responsiveness */
 // eslint-disable-next-line no-magic-numbers
-var G_AUTO_PREVIEW_LIMIT = 16 * 16;
+var G_AUTO_PREVIEW_LIMIT = 18 ** 2;
 
 /** Toggle value to pause the continously draw the Resulting Image / Virtual SEM view */
 var G_VSEM_PAUSED = false;
