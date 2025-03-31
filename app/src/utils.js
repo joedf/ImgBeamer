@@ -31,7 +31,7 @@ const G_MATH_TOFIXED = {
  */
 function GetOptimalBoxWidth(){
 	// Values used to calculate the size of each box/stage
-	var boxesPerPageWidth = 5;
+	var boxesPerPageWidth = 4.5;
 	// count-in the width of the borders of the boxes
 	var boxBorderW = 2 * (parseInt($('.box:first').css('border-width')) || 1);
 	var scrollBarW = 15; // scroll bar width

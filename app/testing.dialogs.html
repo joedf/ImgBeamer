@@ -14,6 +14,7 @@
 		<script src="src/3rd-party/jquery-3.6.1.min.js"></script>
 		<script src="src/3rd-party/jquery-ui-1.13.2.custom/jquery-ui.min.js"></script>
 		<script src="src/3rd-party/jquery-dialogextend/jquery.dialogextend.v2.0.4.dev.js"></script>
+		<script src="src/utils.js"></script>
 	</head>
 	<body>
 		<div class="layout" id="main-container">
@@ -22,6 +23,7 @@
 			<div class="stage" title="stage 3"><div class="stageContainer">Lorem ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus corporis id nulla repudiandae recusandae culpa aut delectus ratione magni illo quaerat odit consectetur labore, maxime repellat, reiciendis est ex doloremque?</div></div>
 			<div class="stage" title="stage 4"><div class="stageContainer">Lorem ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus corporis id nulla repudiandae recusandae culpa aut delectus ratione magni illo quaerat odit consectetur labore, maxime repellat, reiciendis est ex doloremque?</div></div>
 			<div class="stage" title="stage 5"><div class="stageContainer">Lorem ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus corporis id nulla repudiandae recusandae culpa aut delectus ratione magni illo quaerat odit consectetur labore, maxime repellat, reiciendis est ex doloremque?</div></div>
+			<div class="stage" title="stage 6"><div class="stageContainer">Lorem ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus corporis id nulla repudiandae recusandae culpa aut delectus ratione magni illo quaerat odit consectetur labore, maxime repellat, reiciendis est ex doloremque?</div></div>
 		</div>
 
 		<style>
@@ -52,23 +54,24 @@
 		</style>
 
 		<script>
+			const G_STAGE_SIZE = GetOptimalBoxWidth();
 			$(".stage").dialog({
 				maxHeight: 800,
 				maxWidth: 800,
 				minHeight: 200,
 				minWidth: 200,
-				width: 300,
-				height: 300 + 27.6333 - 3.767,
+				width: G_STAGE_SIZE,
+				height: G_STAGE_SIZE + 27.6333 - 3.767,
 				resizable: false,
 				classes: {
 					"ui-dialog": "stage-dialog",
 				},
 				drag: function( event, ui ) {
 					// https://stackoverflow.com/a/20712561/883015
-					var snapTolerance = (300/10) + 0.2; //$(this).draggable('option', 'snapTolerance');
+					var snapTolerance = (G_STAGE_SIZE/10) + 0.2; //$(this).draggable('option', 'snapTolerance');
 					var grid = {
-						x: (300/10) + 0.2,
-						y: (300 + 27.6333 - 3.767) / 10,
+						x: (G_STAGE_SIZE/10) + 0.2,
+						y: (G_STAGE_SIZE + 27.6333 - 3.767) / 10,
 					};
 
 					var topRemainder = ui.position.top % grid.y;
@@ -115,7 +118,7 @@
 
 			// tile dialogs
 			var bw = document.body.offsetWidth;
-			let cols = Math.floor(bw / 300);
+			let cols = Math.floor(bw / G_STAGE_SIZE);
 
 			// postion first one
 			// $($(".stage")[0]).dialog({position: {my:"left top", at:"left top", of:"body"}});
