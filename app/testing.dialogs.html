@@ -25,12 +25,11 @@
 		</div>
 
 		<style>
-			.stageContainer {
-				width: 100%;
-				height: 100%;
-				background: #022;
+			.stage-dialog {
+				padding: 0;
+				overflow: hidden;
 			}
-			.ui-dialog .ui-dialog-titlebar {
+			.stage-dialog .ui-dialog-titlebar {
 				padding-top: .2em;
 				padding-bottom: .3em;
 				padding-left: 0.6em;
@@ -39,19 +38,17 @@
 				overflow: hidden;
 				font-size: .9em;
 			}
-			.stage.ui-widget-content {
-				padding: 0;
-			}
-			.ui-dialog {
-				padding: 0;
-			}
-			.ui-widget.ui-widget-content {
-				overflow: hidden;
-			}
-			.ui-dialog-titlebar-buttonpane > a {
+			.stage-dialog .ui-dialog-titlebar-buttonpane > a {
 				width: 18px !important;
 			}
-
+			.stage-dialog .ui-widget-content {
+				padding: 0;
+			}
+			.stage-dialog .stageContainer {
+				width: 100%;
+				height: 100%;
+				background: #000;
+			}
 		</style>
 
 		<script>
@@ -63,6 +60,9 @@
 				width: 300,
 				height: 300 + 27.6333 - 3.767,
 				resizable: false,
+				classes: {
+					"ui-dialog": "stage-dialog",
+				},
 				drag: function( event, ui ) {
 					// https://stackoverflow.com/a/20712561/883015
 					var snapTolerance = (300/10) + 0.2; //$(this).draggable('option', 'snapTolerance');
