@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta http-equiv="X-UA-Compatible" content="ie=edge">
+		<title>ImgBeamer dialog test</title>
+
+		<link rel="icon" href="src/img/favicon.ico" type="image/x-icon" />
+
+		<link rel="stylesheet" href="src/3rd-party/jquery-ui-1.13.2.custom/jquery-ui.min.css">
+
+		<link rel="stylesheet" href="src/css/style.css">
+		<script src="src/3rd-party/jquery-3.6.1.min.js"></script>
+		<script src="src/3rd-party/jquery-ui-1.13.2.custom/jquery-ui.min.js"></script>
+		<script src="src/3rd-party/jquery-dialogextend/jquery.dialogextend.v2.0.4.dev.js"></script>
+	</head>
+	<body>
+		<div class="layout" id="main-container">
+			<div class="stage" title="stage 1"><p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus corporis id nulla repudiandae recusandae culpa aut delectus ratione magni illo quaerat odit consectetur labore, maxime repellat, reiciendis est ex doloremque?</p></div>
+			<div class="stage" title="stage 2"><p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus corporis id nulla repudiandae recusandae culpa aut delectus ratione magni illo quaerat odit consectetur labore, maxime repellat, reiciendis est ex doloremque?</p></div>
+			<div class="stage" title="stage 3"><p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus corporis id nulla repudiandae recusandae culpa aut delectus ratione magni illo quaerat odit consectetur labore, maxime repellat, reiciendis est ex doloremque?</p></div>
+			<div class="stage" title="stage 4"><p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus corporis id nulla repudiandae recusandae culpa aut delectus ratione magni illo quaerat odit consectetur labore, maxime repellat, reiciendis est ex doloremque?</p></div>
+			<div class="stage" title="stage 5"><p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus corporis id nulla repudiandae recusandae culpa aut delectus ratione magni illo quaerat odit consectetur labore, maxime repellat, reiciendis est ex doloremque?</p></div>
+		</div>
+
+		<style>
+			.ui-dialog .ui-dialog-titlebar {
+				padding-top: .2em;
+				padding-bottom: .2em;
+				margin: -0.2em;
+				border-radius: 0;
+			}
+			.stage.ui-widget-content {
+				padding: 0;
+			}
+		</style>
+
+		<script>
+			$(".stage").dialog({
+				maxHeight: 800,
+				maxWidth: 800,
+				minHeight: 200,
+				minWidth: 200,
+				width: 300,
+				height: 300,
+				resizable: false,
+				drag: function( event, ui ) {
+					// https://stackoverflow.com/a/20712561/883015
+					var snapTolerance = 20; //$(this).draggable('option', 'snapTolerance');
+					var grid = {
+						x: 20,
+						y: 20,
+					};
+
+					var topRemainder = ui.position.top % grid.x;
+					var leftRemainder = ui.position.left % grid.y;
+
+					if (topRemainder <= snapTolerance) {
+						ui.position.top = ui.position.top - topRemainder;
+					}
+
+					if (leftRemainder <= snapTolerance) {
+						ui.position.left = ui.position.left - leftRemainder;
+					}
+				},
+				resize: function( event, ui ) {
+					// https://stackoverflow.com/a/20712561/883015
+					var snapTolerance = 80; //$(this).draggable('option', 'snapTolerance');
+					var grid = {
+						x: 20,
+						y: 20,
+					};
+
+					var widthRemainder = ui.size.width % grid.x;
+					var heightRemainder = ui.size.height % grid.y;
+					
+					if (widthRemainder <= snapTolerance) {
+						ui.size.width = ui.size.width - widthRemainder;
+					}
+
+					if (heightRemainder <= snapTolerance) {
+						ui.size.height = ui.size.height - heightRemainder;
+					}
+				}
+			}).dialogExtend({
+				"closable" : false,
+				"maximizable" : false,
+				"minimizable" : true,
+				"collapsable" : true,
+				"dblclick" : "collapse",
+				"minimizeLocation" : "right",
+			});
+
+			// tile dialogs
+			var bw = document.body.offsetWidth;
+			let cols = Math.floor(bw / 300);
+
+			// postion first one
+			// $($(".stage")[0]).dialog({position: {my:"left top", at:"left top", of:"body"}});
+			$($(".stage")[0]).dialog('widget').css({top:0, left:0});
+
+			let dialogs = $(".stage").dialog();
+			for (let i = 1; i < dialogs.length; i++) {
+				const dialog = dialogs.eq(i);
+				const prev = dialogs.eq(i-1).dialog('widget');
+
+				if (i % cols == 0) {
+					const prev = dialogs.eq(i-cols).dialog('widget');
+					// dialog.dialog({position: {my:"left top", at:"bottom right", of:$(prev)}});
+					var eDialog = prev.get(0);
+					var newPos = {
+						x: parseInt(prev.css('left')), //eDialog.offsetWidth + parseInt(prev.css('left')),
+						y: eDialog.offsetHeight + parseInt(prev.css('top')),
+					};
+					dialog.dialog('widget').css({top:newPos.y, left:newPos.x})
+				} else {
+					dialog.dialog({position: {my:"left top", at:"right top", of:$(prev)}});
+				}
+			}
+		</script>
+	</body>
+</html>
