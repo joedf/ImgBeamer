@@ -373,9 +373,6 @@ function drawSpotContent(stage, sImage, sBeam, updateCallback = null) {
 	layer.destroyChildren();  // avoid memory leaks
 	layer.listening(true);
 
-	// Give yellow box border to indicate interactive
-	$(stage.getContainer()).css('border-color','yellow');
-
 	var image = sImage.clone();
 	image.draggable(true);
 	

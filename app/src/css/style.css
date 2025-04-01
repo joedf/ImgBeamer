@@ -23,7 +23,6 @@ summary {
 }
 
 .box {
-	border: 1px solid #fff;
 	background-color: #000;
 	position: relative;
 }
@@ -39,8 +38,6 @@ summary {
 	padding: 2px 4px;
 	user-select: none;
 }
-
-.box:before { content: attr(box_label); }
 
 .box[note]::after {
 	content: attr(note);
@@ -104,9 +101,9 @@ summary {
 #options-anchor {
 	display: inline-block;
 	position: fixed;
-	bottom: 0;
+	bottom: 230px;
 	right: 0;
-	z-index: 69;
+	z-index: 11000;
 	user-select: none;
 	cursor: move;
 	width: 0;
@@ -130,4 +127,34 @@ summary {
 
 #status {
 	font-size: 10px;
+}
+
+/* ---------------------------------------------------------- */
+/* Dialog styling */
+.stage-dialog {
+	padding: 0;
+	overflow: hidden;
+	border-color: #033151 !important;
+}
+.stage-dialog .ui-dialog-titlebar {
+	padding-top: .2em;
+	padding-bottom: .3em;
+	padding-left: 0.6em;
+	margin: -0.2em;
+	border-radius: 0;
+	overflow: hidden;
+	font-size: .9em;
+	background-color: #033151;
+}
+.stage-dialog .ui-dialog-titlebar-buttonpane > a {
+	width: 18px !important;
+}
+.stage-dialog .ui-widget-content {
+	padding: 0;
+}
+.stage-dialog .stageContainer {
+	width: 100%;
+	height: 100%;
+	background: #000;
+	overflow: hidden;
 }

@@ -11,6 +11,7 @@
 		<link rel="stylesheet" href="src/3rd-party/jquery-ui-1.13.2.custom/jquery-ui.min.css">
 
 		<link rel="stylesheet" href="src/css/style.css">
+		<script src="src/3rd-party/konva/v9.3.2/konva.min.js"></script>
 		<script src="src/3rd-party/jquery-3.6.1.min.js"></script>
 		<script src="src/3rd-party/jquery-ui-1.13.2.custom/jquery-ui.min.js"></script>
 		<script src="src/3rd-party/jquery-dialogextend/jquery.dialogextend.v2.0.4.dev.js"></script>
@@ -22,79 +23,79 @@
 	</head>
 	<body>
 		<div class="layout" id="main-container">
-			<div class="stage" title="Sample Ground Truth"><div class="stageContainer">Lorem ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus corporis id nulla repudiandae recusandae culpa aut delectus ratione magni illo quaerat odit consectetur labore, maxime repellat, reiciendis est ex doloremque?</div></div>
-			<div class="stage" title="Subregion View / FOV"><div class="stageContainer">Lorem ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus corporis id nulla repudiandae recusandae culpa aut delectus ratione magni illo quaerat odit consectetur labore, maxime repellat, reiciendis est ex doloremque?</div></div>
-			<div class="stage" title="Spot Profile"><div class="stageContainer">Lorem ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus corporis id nulla repudiandae recusandae culpa aut delectus ratione magni illo quaerat odit consectetur labore, maxime repellat, reiciendis est ex doloremque?</div></div>
-			<div class="stage" title="Resulting Image"><div class="stageContainer">Lorem ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus corporis id nulla repudiandae recusandae culpa aut delectus ratione magni illo quaerat odit consectetur labore, maxime repellat, reiciendis est ex doloremque?</div></div>
-			<div class="stage" title="Resulting Subregion"><div class="stageContainer">Lorem ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus corporis id nulla repudiandae recusandae culpa aut delectus ratione magni illo quaerat odit consectetur labore, maxime repellat, reiciendis est ex doloremque?</div></div>
-			<div class="stage" title="Spot Layout"><div class="stageContainer">Lorem ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus corporis id nulla repudiandae recusandae culpa aut delectus ratione magni illo quaerat odit consectetur labore, maxime repellat, reiciendis est ex doloremque?</div></div>
+			<div class="stage-dlg"><div class="stageContainer"></div></div>
+			<div class="stage-dlg"><div class="stageContainer"></div></div>
+			<div class="stage-dlg"><div class="stageContainer"></div></div>
+			<div class="stage-dlg"><div class="stageContainer"></div></div>
+			<div class="stage-dlg"><div class="stageContainer"></div></div>
+			<div class="stage-dlg"><div class="stageContainer"></div></div>
+			<div class="stage-dlg dlg-start-minimized"><div class="stageContainer"></div></div>
+			<div class="stage-dlg dlg-start-minimized"><div class="stageContainer"></div></div>
+			<div class="stage-dlg dlg-start-minimized"><div class="stageContainer"></div></div>
 		</div>
 
-		<style>
-			.stage-dialog {
-				padding: 0;
-				overflow: hidden;
-			}
-			.stage-dialog .ui-dialog-titlebar {
-				padding-top: .2em;
-				padding-bottom: .3em;
-				padding-left: 0.6em;
-				margin: -0.2em;
-				border-radius: 0;
-				overflow: hidden;
-				font-size: .9em;
-			}
-			.stage-dialog .ui-dialog-titlebar-buttonpane > a {
-				width: 18px !important;
-			}
-			.stage-dialog .ui-widget-content {
-				padding: 0;
-			}
-			.stage-dialog .stageContainer {
-				width: 100%;
-				height: 100%;
-				background: #000;
-			}
-		</style>
-
-		<!-- Copied START - included to preview with the app's dat.gui window -->
-		<div id="options-anchor" style="z-index: 10000;">
+		<div id="options-anchor">
 			<div id="options">
 				<div id="options-handle">&#9776;</div>
 				<input type="file" id="_fileImgInput" accept="image/*" style="display: none;" />
 			</div>
 		</div>
-		<script>
-			var G_DEBUG = false;
-			var G_VSEM_PAUSED = false;
-			var G_IMG_METRIC_ENABLED = false;
-			var G_SHOW_SUBREGION_OVERLAY = false;
-			const G_IMG_METRICS = [
-				'SSIM',
-				'MS-SSIM',
-				'MSE',
-				'PSNR',
-				'iNRMSE',
-				'iNMSE',
-			];
-			const G_PRELOADED_IMAGES = [
-				'grains1.png',
-				'grains2full.png',
-				'grains2tl.png',
-				'grains2nc.png',
-				'APT_needle.png',
-				'tephra_448nm.png',
-				'tephra_200nm.png',
-			];
-			const G_APP_NAME = "ImgBeamer";
-		</script>
-		<!-- Copied END -->
+
+		<div id="options-full-resample-anchor" style="display: none;">
+			<div id="options-full-resample">
+				<details>
+					<summary>Full Resample Panel</summary>
+					<table>
+						<tr>
+							<td>Cell Width</td>
+							<td><input type="number" id="iCellW" placeholder="10"> px</td>
+						</tr>
+						<tr>
+							<td>Cell Height</td>
+							<td><input type="number" id="iCellH" placeholder="10"> px</td>
+						</tr>
+						<tr>
+							<td>Spot Size X</td>
+							<td><input type="number" id="iSpotX" placeholder="60"> %</td>
+						</tr>
+						<tr>
+							<td>Spot Size Y</td>
+							<td><input type="number" id="iSpotY" placeholder="60"> %</td>
+						</tr>
+						<tr>
+							<td>Spot Angle (clockwise)</td>
+							<td><input type="number" id="iSpotAngle" placeholder="0"> deg.</td>
+						</tr>
+						<tr>
+							<td>Resample Fully</td>
+							<td>
+								<button id="generateFull">Generate</button>
+								<svg id="loadspinner_full" class="load_spinner_svg"
+									style="display:none"
+									xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid" viewBox="0 0 16 16">
+									<circle fill="none" stroke="#00d8ff" stroke-dasharray="28.274333882308138 11.42477796076938" cx="8" cy="8" r="6" stroke-width="2">
+									<animateTransform attributeName="transform" type="rotate" repeatCount="indefinite" keyTimes="0;1" values="0 8 8;360 8 8" dur="1s"></animateTransform>
+									</circle>
+								</svg>
+							</td>
+						</tr>
+						<tr>
+							<td>Status</td>
+							<td>
+								<pre id="status">-</pre>
+							</td>
+						</tr>
+					</table>
+				</details>
+			</div>
+		</div>
 
 		<script>
 			const G_STAGE_SIZE = GetOptimalBoxWidth();
-			// const G_BOXES_PER_ROW = Math.floor(document.body.offsetWidth / G_STAGE_SIZE);
 			const G_BOXES_PER_ROW = 3;
-			$(".stage").dialog({
+			let g_dlg_selector = '.stage-dlg';
+
+			$(g_dlg_selector).dialog({
 				maxHeight: 800,
 				maxWidth: 800,
 				minHeight: 200,
@@ -153,24 +154,30 @@
 				"icons": {
 					"collapse": "ui-icon-arrowthickstop-1-n"
 				},
+				"load": function(evt, dlg){
+					var e = $(this);
+					if (e.hasClass('dlg-start-minimized')) {
+						e.dialogExtend('minimize');
+					}
+				}
 			});
 
 			// tile dialogs
-			// postion first one
-			// $($(".stage")[0]).dialog({position: {my:"left top", at:"left top", of:"body"}});
-			$($(".stage")[0]).dialog('widget').css({top:0, left:0});
+			// position first one
+			$(g_dlg_selector).dialog('widget').eq(0).css({top:0, left:0});
 
-			let dialogs = $(".stage").dialog();
-			for (let i = 1; i < dialogs.length; i++) {
+			// tile the first 6 dialogs
+			let dialogs = $(g_dlg_selector).dialog();
+			let dialogs_count = 6; // dialogs.length;
+			for (let i = 1; i < dialogs_count; i++) {
 				const dialog = dialogs.eq(i);
 				const prev = dialogs.eq(i-1).dialog('widget');
 
 				if (i % G_BOXES_PER_ROW == 0) {
 					const prev = dialogs.eq(i-G_BOXES_PER_ROW).dialog('widget');
-					// dialog.dialog({position: {my:"left top", at:"bottom right", of:$(prev)}});
 					var eDialog = prev.get(0);
 					var newPos = {
-						x: parseInt(prev.css('left')), //eDialog.offsetWidth + parseInt(prev.css('left')),
+						x: parseInt(prev.css('left')),
 						y: eDialog.offsetHeight + parseInt(prev.css('top')),
 					};
 					dialog.dialog('widget').css({top:newPos.y, left:newPos.x})
@@ -178,11 +185,24 @@
 					dialog.dialog({position: {my:"left top", at:"right top", of:$(prev)}});
 				}
 			}
+
+			// cascade the last 3 dialogs
+			let cascade_start = 6;
+			$(g_dlg_selector).eq(cascade_start).dialog({position: {my:"right top", at:"right top", of:'body'}});
+			for (let i = 7; i < dialogs.length; i++) {
+				const dialog = dialogs.eq(i);
+				const prev = dialogs.eq(i-1).dialog('widget');
+				const n = i - cascade_start;
+				dialog.dialog('widget').css({
+					top:80*n, right:80*n, left:'auto',
+					'z-index':parseInt(prev.css('z-index'))+1
+				});
+			}
 		</script>
 
-		<!-- <script src="src/drawsteps.js"></script>
+		<script src="src/drawsteps.js"></script>
 		<script src="src/img_metrics.js"></script>
-		<script src="src/main.js"></script> -->
+		<script src="src/main.js"></script>
 		<script src="src/gui.js"></script>
 	</body>
 </html>
