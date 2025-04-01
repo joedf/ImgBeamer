@@ -48,7 +48,7 @@ for (let i = 0; i < nStages; i++) {
 var _em_ = 12.96; //px
 var _border_w_ = (2/3);
 // var _titlebar_h_offset_ = 27.6333 - 3.767;
-var _titlebar_h_offset_ = 14 + 0.2*_em_ + 0.3*_em_ + 2*_border_w_;
+var _titlebar_h_offset_ = 16 + 0.2*_em_ + 0.3*_em_ + 2*_border_w_;
 
 $(g_dlg_selector).dialog({
 	maxHeight: 800,
