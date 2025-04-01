@@ -1,6 +1,49 @@
+/** a global reference to the main body container that holds the boxes/stages.
+ * @todo do we still need this? Maybe remove... */
+var G_MAIN_CONTAINER = $('#main-container');
+
+/** The number of stages to create */
+const nStages = 9;
+
 const G_STAGE_SIZE = GetOptimalBoxWidth();
-const G_BOXES_PER_ROW = 3;
-let g_dlg_selector = '.stage-dlg';
+const G_BOXES_PER_ROW = 3; // TODO: maybe define in GetOptimalBoxWidth()?
+// TODO: maybe move GetOptimalBoxWidth() here or into Utils?
+
+// TODO: fix eslint errors and warnings
+
+const G_STAGE_DLG = "stage-dlg";
+let g_dlg_selector = '.' + G_STAGE_DLG;
+
+function newStageDialog(parentContainer, startMinimized = false){
+	$('<div class="' + G_STAGE_DLG + '"/>')
+		.attr('dlg-start-minimized', startMinimized)
+		.appendTo(parentContainer)
+		.append('<div class="stageContainer"/>');
+}
+
+function SetStageDialogTitle(stage, title){
+	let e = stage.getContainer();
+	let dlgCnt = e.closest('.ui-dialog-content');
+	if (dlgCnt != null) {
+		let dlg = $(dlgCnt).dialog();
+		// set jquery-ui dialog title
+		dlg.dialog('option', 'title', title);
+		// support for minimized dialogExtend dialogs
+		if (typeof dlg.dialogExtend == 'function') {
+			const dlgExtCntr = $('#dialog-extend-fixed-container');
+			let dlg_id = dlg.dialog('widget').find('.ui-dialog-title').attr('id');
+			let dlgExt = dlgExtCntr.find('#'+dlg_id);
+			if (dlgExt.length) {
+				dlgExt.text(title);
+			}
+		}
+	}
+}
+
+for (let i = 0; i < nStages; i++) {
+	let startMinimized = (i > 5);
+	newStageDialog(G_MAIN_CONTAINER, startMinimized);
+}
 
 $(g_dlg_selector).dialog({
 	maxHeight: 800,
@@ -61,9 +104,9 @@ $(g_dlg_selector).dialog({
 	"icons": {
 		"collapse": "ui-icon-arrowthickstop-1-n"
 	},
-	"load": function(evt, dlg){
+	"load": function(){
 		var e = $(this);
-		if (e.hasClass('dlg-start-minimized')) {
+		if (e.attr('dlg-start-minimized') == 'true') {
 			e.dialogExtend('minimize');
 		}
 	}
@@ -87,7 +130,7 @@ for (let i = 1; i < dialogs_count; i++) {
 			x: parseInt(prev.css('left')),
 			y: eDialog.offsetHeight + parseInt(prev.css('top')),
 		};
-		dialog.dialog('widget').css({top:newPos.y, left:newPos.x})
+		dialog.dialog('widget').css({top:newPos.y, left:newPos.x});
 	} else {
 		dialog.dialog({position: {my:"left top", at:"right top", of:$(prev)}});
 	}

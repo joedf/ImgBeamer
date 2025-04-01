@@ -81,25 +81,6 @@ const Utils = {
 		return stage;
 	},
 
-	SetStageDialogTitle: function(stage, title){
-		let e = stage.getContainer();
-		let dlgCnt = e.closest('.ui-dialog-content');
-		if (dlgCnt != null) {
-			let dlg = $(dlgCnt).dialog();
-			// set jquery-ui dialog title
-			dlg.dialog('option', 'title', title);
-			// support for minimized dialogExtend dialogs
-			if (typeof dlg.dialogExtend == 'function') {
-				const dlgExtCntr = $('#dialog-extend-fixed-container');
-				let dlg_id = dlg.dialog('widget').find('.ui-dialog-title').attr('id');
-				let dlgExt = dlgExtCntr.find('#'+dlg_id);
-				if (dlgExt.length) {
-					dlgExt.text(title);
-				}
-			}
-		}
-	},
-
 	/**
 	 * Initiates the image resource load with a callback once the image is loaded.
 	 * @param {string} url The url pointing to the image to load.
