@@ -114,6 +114,9 @@ var G_UpdateFilters = null;
 /** global reference to update stage related settings */
 var G_UpdateStageSettings = null;
 
+// TODO: document this global
+var G_VSEM_STAGE = null;
+
 /** The calculated size of each box/stage */
 var G_BOX_SIZE = GetOptimalBoxWidth();
 
@@ -169,6 +172,9 @@ function OnImageLoaded(eImg, stages){
 	var spotSignalStage = stages[7];
 	var layoutSampledStage = stages[8];
 	/* eslint-enable no-magic-numbers */
+
+	// Update global reference to this stage, so that the GUI's image export button works...
+	G_VSEM_STAGE = virtualSEMStage;
 
 	/** called when a change occurs in the spot profile, subregion, or spot content */
 	function doUpdate(){

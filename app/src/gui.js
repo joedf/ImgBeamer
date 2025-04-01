@@ -14,6 +14,7 @@ ResampleFullImage
 G_APP_NAME
 G_DEBUG
 G_STAGES
+G_VSEM_STAGE
 G_INPUT_IMAGE
 G_VSEM_PAUSED
 G_VSEM_IMAGE_CACHE
@@ -173,8 +174,7 @@ function exportResultImage(){
 	// https://konvajs.org/docs/data_and_serialization/High-Quality-Export.html
 
 	// get the image without the row/draw indicator
-	var stageFinal = G_STAGES[G_STAGES.length - 1];
-	var finalImage = Utils.getVirtualSEM_KonvaImage(stageFinal);
+	var finalImage = Utils.getVirtualSEM_KonvaImage(G_VSEM_STAGE);
 
 	// export the image
 	var url = finalImage.toDataURL({pixelRatio:1});
