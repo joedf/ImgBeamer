@@ -39,6 +39,98 @@ const LayoutManager = {
 	},
 
 	/**
+	 * Sets the title on the dialog window of a given stage.
+	 * @param {object} stage the stage.
+	 * @param {string} title the title to set.
+	 */
+	SetStageDialogTitle: function (stage, title){
+		let e = stage.getContainer();
+		let dlgCnt = e.closest('.ui-dialog-content');
+		if (dlgCnt != null) {
+			let dlg = $(dlgCnt).dialog();
+			// set jquery-ui dialog title
+			dlg.dialog('option', 'title', title);
+			// support for minimized dialogExtend dialogs
+			if (typeof dlg.dialogExtend == 'function') {
+				const dlgExtCntr = $('#dialog-extend-fixed-container');
+				let dlg_id = dlg.dialog('widget').find('.ui-dialog-title').attr('id');
+				let dlgExt = dlgExtCntr.find('#'+dlg_id);
+				if (dlgExt.length) {
+					dlgExt.text(title);
+				}
+			}
+		}
+	},
+
+	/**
+	 * Positions dialogs in a tiled layout.
+	 * All dialogs by default, otherwise for a given range.
+	 * @param {*} tile_start the dialog to start tiling with.
+	 * @param {*} tile_end the last dialog to tile.
+	 */
+	TileDialogs: function(tile_start=0, tile_end=null){
+		let g_dlg_selector = '.' + this._stage_dialog_class;
+		let dialogs = $(g_dlg_selector).dialog();
+
+		tile_end = (tile_end==null) ? dialogs.length : tile_end;
+		
+		// position first one
+		$(g_dlg_selector).dialog('widget').eq(tile_start).css({top:0, left:0});
+
+		// position the rest
+		for (let i = tile_start + 1; i < tile_end; i++) {
+			const dialog = dialogs.eq(i);
+			const prev = dialogs.eq(i-1).dialog('widget');
+
+			if (i % this._stages_per_row == 0) {
+				const prev = dialogs.eq(i-this._stages_per_row).dialog('widget');
+				var eDialog = prev.get(0);
+				var newPos = {
+					x: parseInt(prev.css('left')),
+					y: eDialog.offsetHeight + parseInt(prev.css('top')),
+				};
+
+				dialog.dialog('widget').css({top:newPos.y, left:newPos.x});
+			} else {
+				dialog.dialog({position: {my:"left top", at:"right top", of:$(prev)}});
+			}
+		}
+	},
+
+	/**
+	 * Positions dialogs in a cascaded layout from the top right to the bottom left.
+	 * All dialogs by default, otherwise for a given range.
+	 * @param {*} cascade_start the dialog to start cascading with.
+	 * @param {*} cascade_end the last dialog to cascade.
+	 * @param {*} cascade_offset the distance between each cascaded dialog in x and y.
+	 */
+	// eslint-disable-next-line no-magic-numbers
+	CascadeDialogs: function(cascade_start=0, cascade_end=null, cascade_offset=80){
+		// cascade the last n dialogs
+		let g_dlg_selector = '.' + this._stage_dialog_class;
+		let dialogs = $(g_dlg_selector).dialog();
+
+		cascade_end = (cascade_end==null) ? dialogs.length : cascade_end;
+
+		// position first one
+		$(g_dlg_selector).eq(cascade_start).dialog({position: {my:"right top", at:"right top", of:'body'}});
+
+		// position the rest
+		for (let i = cascade_start + 1; i < cascade_end; i++) {
+			const dialog = dialogs.eq(i);
+			const prev = dialogs.eq(i-1).dialog('widget');
+			const nDiaglog = i - cascade_start;
+			
+			dialog.dialog('widget').css({
+				top: cascade_offset*nDiaglog,
+				right: cascade_offset*nDiaglog,
+				left: 'auto',
+				'z-index': parseInt(prev.css('z-index'))+this._cascade_dialog_base_z_index + 1
+			});
+		}
+	},
+
+	/**
 	 * Calculated the size to use for each drawing box/stage.
 	 * Edit the values in the functions to change the box sizing.
 	 * @returns The size to use.
@@ -66,30 +158,6 @@ const LayoutManager = {
 		calculatedBoxSize = Utils.clampValue(calculatedBoxSize, this.minSize, this.maxSize);
 		
 		return calculatedBoxSize;
-	},
-
-	/**
-	 * Sets the title on the dialog window of a given stage.
-	 * @param {object} stage the stage.
-	 * @param {string} title the title to set.
-	 */
-	SetStageDialogTitle: function (stage, title){
-		let e = stage.getContainer();
-		let dlgCnt = e.closest('.ui-dialog-content');
-		if (dlgCnt != null) {
-			let dlg = $(dlgCnt).dialog();
-			// set jquery-ui dialog title
-			dlg.dialog('option', 'title', title);
-			// support for minimized dialogExtend dialogs
-			if (typeof dlg.dialogExtend == 'function') {
-				const dlgExtCntr = $('#dialog-extend-fixed-container');
-				let dlg_id = dlg.dialog('widget').find('.ui-dialog-title').attr('id');
-				let dlgExt = dlgExtCntr.find('#'+dlg_id);
-				if (dlgExt.length) {
-					dlgExt.text(title);
-				}
-			}
-		}
 	},
 
 	/**
@@ -197,74 +265,6 @@ const LayoutManager = {
 				}
 			}
 		});
-	},
-
-	/**
-	 * Positions dialogs in a tiled layout.
-	 * All dialogs by default, otherwise for a given range.
-	 * @param {*} tile_start the dialog to start tiling with.
-	 * @param {*} tile_end the last dialog to tile.
-	 */
-	TileDialogs: function(tile_start=0, tile_end=null){
-		let g_dlg_selector = '.' + this._stage_dialog_class;
-		let dialogs = $(g_dlg_selector).dialog();
-
-		tile_end = (tile_end==null) ? dialogs.length : tile_end;
-		
-		// position first one
-		$(g_dlg_selector).dialog('widget').eq(tile_start).css({top:0, left:0});
-
-		// position the rest
-		for (let i = tile_start + 1; i < tile_end; i++) {
-			const dialog = dialogs.eq(i);
-			const prev = dialogs.eq(i-1).dialog('widget');
-
-			if (i % this._stages_per_row == 0) {
-				const prev = dialogs.eq(i-this._stages_per_row).dialog('widget');
-				var eDialog = prev.get(0);
-				var newPos = {
-					x: parseInt(prev.css('left')),
-					y: eDialog.offsetHeight + parseInt(prev.css('top')),
-				};
-
-				dialog.dialog('widget').css({top:newPos.y, left:newPos.x});
-			} else {
-				dialog.dialog({position: {my:"left top", at:"right top", of:$(prev)}});
-			}
-		}
-	},
-
-	/**
-	 * Positions dialogs in a cascaded layout from the top right to the bottom left.
-	 * All dialogs by default, otherwise for a given range.
-	 * @param {*} cascade_start the dialog to start cascading with.
-	 * @param {*} cascade_end the last dialog to cascade.
-	 * @param {*} cascade_offset the distance between each cascaded dialog in x and y.
-	 */
-	// eslint-disable-next-line no-magic-numbers
-	CascadeDialogs: function(cascade_start=0, cascade_end=null, cascade_offset=80){
-		// cascade the last n dialogs
-		let g_dlg_selector = '.' + this._stage_dialog_class;
-		let dialogs = $(g_dlg_selector).dialog();
-
-		cascade_end = (cascade_end==null) ? dialogs.length : cascade_end;
-
-		// position first one
-		$(g_dlg_selector).eq(cascade_start).dialog({position: {my:"right top", at:"right top", of:'body'}});
-
-		// position the rest
-		for (let i = cascade_start + 1; i < cascade_end; i++) {
-			const dialog = dialogs.eq(i);
-			const prev = dialogs.eq(i-1).dialog('widget');
-			const nDiaglog = i - cascade_start;
-			
-			dialog.dialog('widget').css({
-				top: cascade_offset*nDiaglog,
-				right: cascade_offset*nDiaglog,
-				left: 'auto',
-				'z-index': parseInt(prev.css('z-index'))+this._cascade_dialog_base_z_index + 1
-			});
-		}
 	},
 
 	__SetupStages: function(layoutDialogs=true){
