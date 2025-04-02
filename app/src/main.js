@@ -1,4 +1,9 @@
-/* globals Utils */
+/* globals
+G_BOX_SIZE
+G_STAGES_COUNT
+G_MAIN_CONTAINER
+Utils
+*/
 
 // global functions from drawsteps.js
 /* globals
@@ -122,7 +127,7 @@ var G_VSEM_STAGE = null;
 var G_STAGES = [];
 let g_stage_containers = $('.stageContainer');
 // first create the stages
-for (let i = 0; i < nStages; i++) {
+for (let i = 0; i < G_STAGES_COUNT; i++) {
 	let stage = Utils.newStageTemplate(g_stage_containers[i], G_BOX_SIZE, G_BOX_SIZE);
 	G_STAGES.push(stage);
 }

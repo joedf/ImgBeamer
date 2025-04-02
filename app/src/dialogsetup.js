@@ -3,7 +3,7 @@
 var G_MAIN_CONTAINER = $('#main-container');
 
 /** The number of stages to create */
-const nStages = 9;
+const G_STAGE_COUNT = 9;
 
 /** The calculated size of each box/stage */
 const G_BOX_SIZE = GetOptimalBoxWidth(true, 30);
@@ -47,7 +47,7 @@ function SetStageDialogTitle(stage, title){
 	}
 }
 
-for (let i = 0; i < nStages; i++) {
+for (let i = 0; i < G_STAGE_COUNT; i++) {
 	let startMinimized = (i > 5);
 	newStageDialog(G_MAIN_CONTAINER, startMinimized);
 }
