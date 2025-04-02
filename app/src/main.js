@@ -1,7 +1,7 @@
 /* globals
 G_BOX_SIZE
-G_STAGES_COUNT
 G_MAIN_CONTAINER
+G_STAGES_COUNT
 Utils
 */
 
@@ -125,6 +125,7 @@ var G_VSEM_STAGE = null;
 
 /** The array/list of all the stages. */
 var G_STAGES = [];
+
 let g_stage_containers = $('.stageContainer');
 // first create the stages
 for (let i = 0; i < G_STAGES_COUNT; i++) {

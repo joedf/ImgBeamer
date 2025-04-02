@@ -1,9 +1,17 @@
+/* globals
+
+*/
+
+/* exported
+SetStageDialogTitle
+*/
+
+/** The number of stages to create */
+const G_STAGES_COUNT = 9;
+
 /** a global reference to the main body container that holds the boxes/stages.
  * @todo do we still need this? Maybe remove... */
 var G_MAIN_CONTAINER = $('#main-container');
-
-/** The number of stages to create */
-const G_STAGE_COUNT = 9;
 
 /** The calculated size of each box/stage */
 const G_BOX_SIZE = GetOptimalBoxWidth(true, 30);
@@ -47,7 +55,7 @@ function SetStageDialogTitle(stage, title){
 	}
 }
 
-for (let i = 0; i < G_STAGE_COUNT; i++) {
+for (let i = 0; i < G_STAGES_COUNT; i++) {
 	let startMinimized = (i > 5);
 	newStageDialog(G_MAIN_CONTAINER, startMinimized);
 }
