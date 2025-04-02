@@ -200,13 +200,13 @@ const LayoutManager = {
 	},
 
 	TileDialogs: function(){
-		let g_dlg_selector = '.' + this._stage_dialog_class;
-		
 		// tile the first n dialogs
+		let g_dlg_selector = '.' + this._stage_dialog_class;
+		let dialogs = $(g_dlg_selector).dialog();
+		
 		let tile_end = 6;
 		// position first one
 		$(g_dlg_selector).dialog('widget').eq(0).css({top:0, left:0});
-		let dialogs = $(g_dlg_selector).dialog();
 		for (let i = 1; i < tile_end; i++) {
 			const dialog = dialogs.eq(i);
 			const prev = dialogs.eq(i-1).dialog('widget');
@@ -223,8 +223,13 @@ const LayoutManager = {
 				dialog.dialog({position: {my:"left top", at:"right top", of:$(prev)}});
 			}
 		}
+	},
 
+	CascadeDialogs: function(){
 		// cascade the last n dialogs
+		let g_dlg_selector = '.' + this._stage_dialog_class;
+		let dialogs = $(g_dlg_selector).dialog();
+		
 		let cascade_start = 6;
 		let cascade_offset = 80;
 		// position first one
@@ -247,7 +252,10 @@ const LayoutManager = {
 		this.__SetupDialogs(this.stages_count);
 
 		// optionally, tile the dialogs
-		if (layoutDialogs) { this.TileDialogs(); }
+		if (layoutDialogs) {
+			this.TileDialogs();
+			this.CascadeDialogs();
+		}
 		
 		// then create the stages and plug them in
 		let stages = [];
