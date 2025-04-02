@@ -1,8 +1,7 @@
 /* globals
-G_BOX_SIZE
 G_MAIN_CONTAINER
 G_STAGES_COUNT
-
+G_BOX_SIZE
 LayoutManager
 Utils
 */
@@ -127,6 +126,9 @@ var G_VSEM_STAGE = null;
 
 /** The array/list of all the stages. */
 var G_STAGES = [];
+
+LayoutManager.SetupDialogs(G_STAGES_COUNT);
+LayoutManager.TileDialogs();
 
 let g_stage_containers = $('.stageContainer');
 // first create the stages
@@ -318,7 +320,7 @@ function OnImageLoaded(eImg, stages){
 
 	// draw Sample Ground Truth
 	LayoutManager.SetStageDialogTitle(groundtruthMapStage, 'Sample Ground Truth');
-	var groundtruthMap = drawGroundtruthImage(groundtruthMapStage, eImg, subregionImage, G_BOX_SIZE, doUpdate);
+	var groundtruthMap = drawGroundtruthImage(groundtruthMapStage, eImg, subregionImage, doUpdate);
 	var updateGroundtruthMap = groundtruthMap.updateFunc;
 	G_Update_GroundTruth = updateGroundtruthMap;
 

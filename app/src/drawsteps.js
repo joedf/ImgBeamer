@@ -1,6 +1,6 @@
 /* globals
  * Utils,
- * G_BOX_SIZE, G_DEBUG, G_AUTO_PREVIEW_LIMIT,
+ * G_DEBUG, G_AUTO_PREVIEW_LIMIT,
  * G_VSEM_PAUSED, G_MATH_TOFIXED,
  * G_SHOW_SUBREGION_OVERLAY,
  * G_update_ImgMetrics
@@ -386,7 +386,7 @@ function drawSpotContent(stage, sImage, sBeam, updateCallback = null) {
 	var _tempCellSize = Utils.computeCellSize(sImage);
 	var initialSpotScale = sBeam.width() / _tempCellSize.w;
 	// get image proportions once scaled and fitted in the stages
-	var max = G_BOX_SIZE, oImg = sImage.image(), fillMode = Utils.getImageFillMode();
+	var max = Math.min(stage.width(), stage.height()), oImg = sImage.image(), fillMode = Utils.getImageFillMode();
 	var fitSize = Utils.fitImageProportions(oImg.naturalWidth, oImg.naturalHeight, max, fillMode);
 	var minScaleX = fitSize.w / oImg.naturalWidth;
 	// center the image copy based on the calculated center and initial scales
@@ -774,13 +774,15 @@ function drawResampled(sourceStage, destStage, originalImage, spotScale, sBeam) 
  * @param {*} stage the stage to draw on.
  * @param {*} imageObj the original/full-size image to draw
  * @param {*} subregionImage the subregion image (to get the bounds from)
- * @param {number} maxSize (to be removed) the maximum size (width or height) of the stage to fit the image?
  * @param {Function} updateCallback called when a change is made to the subregion
  * @returns an object with an update function to call for needed redraws and the subregion bounds.
  * @todo remove maxSize if possible?
  * @todo do we really need to return the subregionRect as well?
  */
-function drawGroundtruthImage(stage, imageObj, subregionImage, maxSize=G_BOX_SIZE, updateCallback = null){
+function drawGroundtruthImage(stage, imageObj, subregionImage, updateCallback = null){
+
+	// the maximum size (width or height) of the stage to fit the image
+	let maxSize = Math.min(stage.width(), stage.height());
 
 	var fillMode = Utils.getImageFillMode();
 	var fit = Utils.fitImageProportions(imageObj.naturalWidth, imageObj.naturalHeight, maxSize, fillMode);
