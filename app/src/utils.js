@@ -9,8 +9,6 @@
  G_APP_NAME
  */
 
-/* exported GetOptimalBoxWidth */
-
 /**
  * @global
  * @description Used for display, for `number.toFixed()` rounding.
@@ -23,32 +21,6 @@ const G_MATH_TOFIXED = {
 	SHORT: 2,
 	LONG: 4
 };
-
-/**
- * Calculated the size to use for each drawing box/stage.
- * Edit the values in the functions to change the box sizing.
- * @returns The size to use.
- */
-function GetOptimalBoxWidth(considerViewportHeight=false, titlebarHeight=0){
-	// Values used to calculate the size of each box/stage
-	var boxesPerPageWidth = 3.5;
-	// count-in the width of the borders of the boxes
-	var boxBorderW = 2 * (parseInt($('.box:first').css('border-width')) || 1);
-	var scrollBarW = 15; // scroll bar width
-	var boxSizeMax = 450; //max width for the boxes
-
-	// make sure to have an integer value to prevent slight sizing differences between each box
-	var calculatedBoxSize = Math.ceil(Math.min(
-		(document.body.clientWidth / boxesPerPageWidth) - boxBorderW - scrollBarW,
-		boxSizeMax));
-
-	if (considerViewportHeight) {
-		let boxMaxH = Math.floor((window.innerHeight / 2) - titlebarHeight);
-		calculatedBoxSize = Math.min(calculatedBoxSize, boxMaxH);
-	}
-	
-	return calculatedBoxSize;
-}
 
 /**
  * Various utility and helper functions

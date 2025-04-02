@@ -3,7 +3,7 @@
 */
 
 /* exported
-SetStageDialogTitle
+LayoutManager
 */
 
 /** The number of stages to create */
@@ -13,10 +13,6 @@ const G_STAGES_COUNT = 9;
  * @todo do we still need this? Maybe remove... */
 var G_MAIN_CONTAINER = $('#main-container');
 
-/** The calculated size of each box/stage */
-const G_BOX_SIZE = GetOptimalBoxWidth(true, 30);
-const G_BOXES_PER_ROW = 3; // TODO: maybe define in GetOptimalBoxWidth()?
-// TODO: maybe move GetOptimalBoxWidth() here or into Utils?
 
 // TODO: fix eslint errors and warnings
 
@@ -29,35 +25,86 @@ var _titlebar_h_offset_ = 15 + 0.2*_em_ + 0.3*_em_ + 2*_border_w_;
 const G_STAGE_DLG = "stage-dlg";
 let g_dlg_selector = '.' + G_STAGE_DLG;
 
-function newStageDialog(parentContainer, startMinimized = false){
-	$('<div class="' + G_STAGE_DLG + '"/>')
-		.attr('dlg-start-minimized', startMinimized)
-		.appendTo(parentContainer)
-		.append('<div class="stageContainer"/>');
-}
 
-function SetStageDialogTitle(stage, title){
-	let e = stage.getContainer();
-	let dlgCnt = e.closest('.ui-dialog-content');
-	if (dlgCnt != null) {
-		let dlg = $(dlgCnt).dialog();
-		// set jquery-ui dialog title
-		dlg.dialog('option', 'title', title);
-		// support for minimized dialogExtend dialogs
-		if (typeof dlg.dialogExtend == 'function') {
-			const dlgExtCntr = $('#dialog-extend-fixed-container');
-			let dlg_id = dlg.dialog('widget').find('.ui-dialog-title').attr('id');
-			let dlgExt = dlgExtCntr.find('#'+dlg_id);
-			if (dlgExt.length) {
-				dlgExt.text(title);
+
+/**
+ * Dialog and layout setup and helper functions
+ * @namespace LayoutManager
+ */
+const LayoutManager = {
+	/**
+	 * Calculated the size to use for each drawing box/stage.
+	 * Edit the values in the functions to change the box sizing.
+	 * @returns The size to use.
+	 */
+	GetOptimalBoxWidth: function(considerViewportHeight=false, titlebarHeight=0){
+		// Values used to calculate the size of each box/stage
+		var boxesPerPageWidth = 3.5;
+		// count-in the width of the borders of the boxes
+		var boxBorderW = 2 * (parseInt($('.box:first').css('border-width')) || 1);
+		var scrollBarW = 15; // scroll bar width
+		var boxSizeMax = 450; //max width for the boxes
+
+		// make sure to have an integer value to prevent slight sizing differences between each box
+		var calculatedBoxSize = Math.ceil(Math.min(
+			(document.body.clientWidth / boxesPerPageWidth) - boxBorderW - scrollBarW,
+			boxSizeMax));
+
+		if (considerViewportHeight) {
+			let boxMaxH = Math.floor((window.innerHeight / 2) - titlebarHeight);
+			calculatedBoxSize = Math.min(calculatedBoxSize, boxMaxH);
+		}
+		
+		return calculatedBoxSize;
+	},
+
+	/**
+	 * Creates a DOM element to be used for a stage dialog.
+	 * @param {*} parentContainer the DOM element of the parent container in which to add a stage dialog.
+	 * @param {*} startMinimized Whether or not the dialog should start minimized.
+	 */
+	newStageDialog: function(parentContainer, startMinimized = false){
+		$('<div class="' + G_STAGE_DLG + '"/>')
+			.attr('dlg-start-minimized', startMinimized)
+			.appendTo(parentContainer)
+			.append('<div class="stageContainer"/>');
+	},
+
+	/**
+	 * Sets the title on the dialog window of a given stage.
+	 * @param {object} stage the stage.
+	 * @param {string} title the title to set.
+	 */
+	SetStageDialogTitle: function (stage, title){
+		let e = stage.getContainer();
+		let dlgCnt = e.closest('.ui-dialog-content');
+		if (dlgCnt != null) {
+			let dlg = $(dlgCnt).dialog();
+			// set jquery-ui dialog title
+			dlg.dialog('option', 'title', title);
+			// support for minimized dialogExtend dialogs
+			if (typeof dlg.dialogExtend == 'function') {
+				const dlgExtCntr = $('#dialog-extend-fixed-container');
+				let dlg_id = dlg.dialog('widget').find('.ui-dialog-title').attr('id');
+				let dlgExt = dlgExtCntr.find('#'+dlg_id);
+				if (dlgExt.length) {
+					dlgExt.text(title);
+				}
 			}
 		}
-	}
-}
+	},
+};
+
+
+/** The calculated size of each box/stage */
+const G_BOX_SIZE = LayoutManager.GetOptimalBoxWidth(true, 30);
+const G_BOXES_PER_ROW = 3; // TODO: maybe define in GetOptimalBoxWidth()?
+
+
 
 for (let i = 0; i < G_STAGES_COUNT; i++) {
 	let startMinimized = (i > 5);
-	newStageDialog(G_MAIN_CONTAINER, startMinimized);
+	LayoutManager.newStageDialog(G_MAIN_CONTAINER, startMinimized);
 }
 
 $(g_dlg_selector).dialog({

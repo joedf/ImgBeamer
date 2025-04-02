@@ -2,6 +2,8 @@
 G_BOX_SIZE
 G_MAIN_CONTAINER
 G_STAGES_COUNT
+
+LayoutManager
 Utils
 */
 
@@ -220,7 +222,7 @@ function OnImageLoaded(eImg, stages){
 	// draw Spot Profile
 	$(spotProfileStage.getContainer())
 		.attr('note', 'Press [R] to reset shape\nScroll to change size');
-	SetStageDialogTitle(spotProfileStage, 'Spot Profile');
+	LayoutManager.SetStageDialogTitle(spotProfileStage, 'Spot Profile');
 	var _spotProfileInfo = drawSpotProfileEdit(spotProfileStage, doUpdate);
 	var beam = _spotProfileInfo.beam;
 	var spotScaling = _spotProfileInfo.spotSize;
@@ -230,7 +232,7 @@ function OnImageLoaded(eImg, stages){
 	$(baseImageStage.getContainer())
 		.addClass('grabCursor')
 		.attr('note', 'Pan & Zoom: Drag and Scroll\nPress [R] to reset');
-	SetStageDialogTitle(baseImageStage, 'Subregion View / FOV');
+	LayoutManager.SetStageDialogTitle(baseImageStage, 'Subregion View / FOV');
 	var subregionImage = drawSubregionImage(baseImageStage, eImg, G_BOX_SIZE, doUpdate);
 
 	// draw Spot Content
@@ -238,7 +240,7 @@ function OnImageLoaded(eImg, stages){
 		.addClass('advancedMode')
 		.addClass('grabCursor')
 		.attr('note', 'Scroll to adjust spot size\nHold [Shift] for half rate');
-	SetStageDialogTitle(spotContentStage, 'Spot Content');
+	LayoutManager.SetStageDialogTitle(spotContentStage, 'Spot Content');
 	var spotContentBeam = beam.clone();
 	// make a clone without copying over the event bindings
 	var imageCopy = subregionImage.clone().off();
@@ -268,12 +270,12 @@ function OnImageLoaded(eImg, stages){
 	$(spotSignalStage.getContainer())
 		.addClass('advancedMode')
 		.addClass('note_colored');
-	SetStageDialogTitle(spotSignalStage, 'Spot Signal (Integrated)');
+	LayoutManager.SetStageDialogTitle(spotSignalStage, 'Spot Signal (Integrated)');
 	var spotSignalBeam = beam.clone();
 	var updateSpotSignal = drawSpotSignal(spotContentStage, spotSignalStage, spotSignalBeam);
 
 	// draw Spot Layout
-	SetStageDialogTitle(probeLayoutStage, 'Spot Layout');
+	LayoutManager.SetStageDialogTitle(probeLayoutStage, 'Spot Layout');
 	var layoutBeam = beam.clone();
 	var updateProbeLayout = drawProbeLayout(probeLayoutStage, subregionImage, spotScaling, layoutBeam);
 	
@@ -281,7 +283,7 @@ function OnImageLoaded(eImg, stages){
 	// compute resampled image
 	$(layoutSampledStage.getContainer())
 		.addClass('advancedMode');
-	SetStageDialogTitle(layoutSampledStage, 'Sampled Subregion');
+	LayoutManager.SetStageDialogTitle(layoutSampledStage, 'Sampled Subregion');
 	var layoutSampledBeam = beam.clone();
 	var updateProbeLayoutSamplingPreview = drawProbeLayoutSampling(
 		layoutSampledStage,
@@ -291,7 +293,7 @@ function OnImageLoaded(eImg, stages){
 	);
 
 	// draw Resulting Subregion
-	SetStageDialogTitle(resampledStage, 'Resulting Subregion');
+	LayoutManager.SetStageDialogTitle(resampledStage, 'Resulting Subregion');
 	var resampledBeam = beam.clone();
 	var updateResampled = drawResampled(
 		layoutSampledStage,
@@ -315,7 +317,7 @@ function OnImageLoaded(eImg, stages){
 	G_UpdateResampled = updateResamplingSteps;
 
 	// draw Sample Ground Truth
-	SetStageDialogTitle(groundtruthMapStage, 'Sample Ground Truth');
+	LayoutManager.SetStageDialogTitle(groundtruthMapStage, 'Sample Ground Truth');
 	var groundtruthMap = drawGroundtruthImage(groundtruthMapStage, eImg, subregionImage, G_BOX_SIZE, doUpdate);
 	var updateGroundtruthMap = groundtruthMap.updateFunc;
 	G_Update_GroundTruth = updateGroundtruthMap;
@@ -357,7 +359,7 @@ function OnImageLoaded(eImg, stages){
 	G_UpdateRuler();
 	
 	// draw Resulting Image
-	SetStageDialogTitle(virtualSEMStage, 'Resulting Image');
+	LayoutManager.SetStageDialogTitle(virtualSEMStage, 'Resulting Image');
 	var vitualSEMBeam = beam.clone();
 	var updateVirtualSEM_Config = drawVirtualSEM(
 		virtualSEMStage,
