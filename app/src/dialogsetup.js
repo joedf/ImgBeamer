@@ -25,8 +25,7 @@ const LayoutManager = {
 	stageContainer_class: "stageContainer",
 	_stages_per_row: 3,
 	
-	/** a global reference to the main body container that holds the boxes/stages.
-	* @todo do we still need this? Maybe remove... */
+	/** a reference to the main body container that holds the boxes/stages. */
 	_main_container: $('#main-container'),
 
 	Initialize: function(){
