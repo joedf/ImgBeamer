@@ -1,6 +1,4 @@
 /* globals
-G_MAIN_CONTAINER
-G_STAGES_COUNT
 G_BOX_SIZE
 LayoutManager
 Utils
@@ -124,18 +122,12 @@ var G_UpdateStageSettings = null;
 /** global reference to the resulting image stage */
 var G_VSEM_STAGE = null;
 
-/** The array/list of all the stages. */
-var G_STAGES = [];
-
-LayoutManager.SetupDialogs(G_STAGES_COUNT);
+// setup UI, then create and plug in the stages
+LayoutManager.SetupDialogs();
 LayoutManager.TileDialogs();
 
-let g_stage_containers = $('.stageContainer');
-// first create the stages
-for (let i = 0; i < G_STAGES_COUNT; i++) {
-	let stage = Utils.newStageTemplate(g_stage_containers[i], G_BOX_SIZE, G_BOX_SIZE);
-	G_STAGES.push(stage);
-}
+/** The array/list of all the stages. */
+var G_STAGES = LayoutManager.SetupStages();
 
 /////////////////////
 
@@ -499,7 +491,7 @@ function ResampleFullImage() {
 		cv = document.createElement('canvas');
 		cv.id = 'finalCanvas';
 		cv.width = cols; cv.height = rows;
-		var cc = $('<div/>').addClass('box final').appendTo(G_MAIN_CONTAINER); cc.append(cv);
+		var cc = $('<div/>').addClass('box final').appendTo("#main-container"); cc.append(cv);
 	}
 
 	cv.width = cols;

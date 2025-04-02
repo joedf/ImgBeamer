@@ -1,16 +1,14 @@
 /* globals
+Utils
 */
 
 /* exported
+G_STAGES_COUNT
 LayoutManager
 */
 
 /** The number of stages to create */
 const G_STAGES_COUNT = 9;
-
-/** a global reference to the main body container that holds the boxes/stages.
- * @todo do we still need this? Maybe remove... */
-var G_MAIN_CONTAINER = $('#main-container');
 
 /**
  * Dialog and layout setup and helper functions
@@ -23,6 +21,21 @@ const LayoutManager = {
 	_stage_dialog_class: "stage-dlg",
 	stageContainer_class: "stageContainer",
 	_stages_per_row: 3,
+	
+	/** a global reference to the main body container that holds the boxes/stages.
+	* @todo do we still need this? Maybe remove... */
+	_main_container: $('#main-container'),
+
+	SetupStages: function(){
+		let stages = [];
+		let g_stage_containers = $('.'+this.stageContainer_class);
+		// first create the stages
+		for (let i = 0; i < G_STAGES_COUNT; i++) {
+			let stage = Utils.newStageTemplate(g_stage_containers[i], G_BOX_SIZE, G_BOX_SIZE);
+			stages.push(stage);
+		}
+		return stages;
+	},
 
 	/**
 	 * Calculated the size to use for each drawing box/stage.
@@ -92,9 +105,9 @@ const LayoutManager = {
 		return (i > 5);
 	},
 
-	SetupDialogs: function(stages_count){
+	SetupDialogs: function(stages_count=G_STAGES_COUNT){
 		let g_dlg_selector = '.' + this._stage_dialog_class;
-		let parentContainer = G_MAIN_CONTAINER;
+		let parentContainer = this._main_container;
 		let box_size = G_BOX_SIZE;
 		
 		var _em_ = 12.96; //px
