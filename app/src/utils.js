@@ -1372,7 +1372,7 @@ const Utils = {
 	 * @param {*} value The number to limit.
 	 * @param {*} min The minimum value.
 	 * @param {*} max The maximum value.
-	 * @returns 
+	 * @returns A number within the defined range.
 	 */
 	clampValue: function(value, min, max) {
 		return Math.min(Math.max(value, min), max);
