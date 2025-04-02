@@ -29,7 +29,7 @@ const G_MATH_TOFIXED = {
  * Edit the values in the functions to change the box sizing.
  * @returns The size to use.
  */
-function GetOptimalBoxWidth(){
+function GetOptimalBoxWidth(considerViewportHeight=false, titlebarHeight=0){
 	// Values used to calculate the size of each box/stage
 	var boxesPerPageWidth = 3.5;
 	// count-in the width of the borders of the boxes
@@ -41,6 +41,11 @@ function GetOptimalBoxWidth(){
 	var calculatedBoxSize = Math.ceil(Math.min(
 		(document.body.clientWidth / boxesPerPageWidth) - boxBorderW - scrollBarW,
 		boxSizeMax));
+
+	if (considerViewportHeight) {
+		let boxMaxH = Math.floor((window.innerHeight / 2) - titlebarHeight);
+		calculatedBoxSize = Math.min(calculatedBoxSize, boxMaxH);
+	}
 	
 	return calculatedBoxSize;
 }

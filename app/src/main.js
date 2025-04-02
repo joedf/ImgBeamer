@@ -1,4 +1,4 @@
-/* globals Utils, GetOptimalBoxWidth */
+/* globals Utils */
 
 // global functions from drawsteps.js
 /* globals
@@ -19,6 +19,7 @@ G_UpdateFilters
 G_UpdateStageSettings
 G_AUTO_PREVIEW_LIMIT
 G_VSEM_PAUSED
+G_VSEM_STAGE
 G_SHOW_SUBREGION_OVERLAY
 G_IMG_METRIC_ENABLED
 G_APP_NAME
@@ -114,11 +115,8 @@ var G_UpdateFilters = null;
 /** global reference to update stage related settings */
 var G_UpdateStageSettings = null;
 
-// TODO: document this global
+/** global reference to the resulting image stage */
 var G_VSEM_STAGE = null;
-
-/** The calculated size of each box/stage */
-var G_BOX_SIZE = GetOptimalBoxWidth();
 
 /** The array/list of all the stages. */
 var G_STAGES = [];

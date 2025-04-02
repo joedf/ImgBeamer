@@ -5,11 +5,18 @@ var G_MAIN_CONTAINER = $('#main-container');
 /** The number of stages to create */
 const nStages = 9;
 
-const G_STAGE_SIZE = GetOptimalBoxWidth();
+/** The calculated size of each box/stage */
+const G_BOX_SIZE = GetOptimalBoxWidth(true, 30);
 const G_BOXES_PER_ROW = 3; // TODO: maybe define in GetOptimalBoxWidth()?
 // TODO: maybe move GetOptimalBoxWidth() here or into Utils?
 
 // TODO: fix eslint errors and warnings
+
+var _em_ = 12.96; //px
+var _border_w_ = (2/3);
+// var _titlebar_h_offset_ = 27.6333 - 3.767;
+var _titlebar_h_offset_ = 15 + 0.2*_em_ + 0.3*_em_ + 2*_border_w_;
+
 
 const G_STAGE_DLG = "stage-dlg";
 let g_dlg_selector = '.' + G_STAGE_DLG;
@@ -45,28 +52,23 @@ for (let i = 0; i < nStages; i++) {
 	newStageDialog(G_MAIN_CONTAINER, startMinimized);
 }
 
-var _em_ = 12.96; //px
-var _border_w_ = (2/3);
-// var _titlebar_h_offset_ = 27.6333 - 3.767;
-var _titlebar_h_offset_ = 16 + 0.2*_em_ + 0.3*_em_ + 2*_border_w_;
-
 $(g_dlg_selector).dialog({
 	maxHeight: 800,
 	maxWidth: 800,
 	minHeight: 200,
 	minWidth: 200,
-	width: G_STAGE_SIZE,
-	height: G_STAGE_SIZE + _titlebar_h_offset_,
+	width: G_BOX_SIZE,
+	height: G_BOX_SIZE + _titlebar_h_offset_,
 	resizable: false,
 	classes: {
 		"ui-dialog": "stage-dialog",
 	},
 	drag: function( event, ui ) {
 		// https://stackoverflow.com/a/20712561/883015
-		var snapTolerance = (G_STAGE_SIZE/10) + 0.2; //$(this).draggable('option', 'snapTolerance');
+		var snapTolerance = (G_BOX_SIZE/10) + 0.2; //$(this).draggable('option', 'snapTolerance');
 		var grid = {
-			x: (G_STAGE_SIZE/10) + 0.2,
-			y: (G_STAGE_SIZE + _titlebar_h_offset_) / 10,
+			x: (G_BOX_SIZE/10) + 0.2,
+			y: (G_BOX_SIZE + _titlebar_h_offset_) / 10,
 		};
 
 		var topRemainder = ui.position.top % grid.y;
