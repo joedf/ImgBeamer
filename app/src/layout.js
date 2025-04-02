@@ -199,15 +199,18 @@ const LayoutManager = {
 		});
 	},
 
-	TileDialogs: function(){
+	TileDialogs: function(tile_start=0, tile_end=null){
 		// tile the first n dialogs
 		let g_dlg_selector = '.' + this._stage_dialog_class;
 		let dialogs = $(g_dlg_selector).dialog();
+
+		tile_end = (tile_end==null) ? dialogs.length : tile_end;
 		
-		let tile_end = 6;
 		// position first one
-		$(g_dlg_selector).dialog('widget').eq(0).css({top:0, left:0});
-		for (let i = 1; i < tile_end; i++) {
+		$(g_dlg_selector).dialog('widget').eq(tile_start).css({top:0, left:0});
+
+		// position the rest
+		for (let i = tile_start + 1; i < tile_end; i++) {
 			const dialog = dialogs.eq(i);
 			const prev = dialogs.eq(i-1).dialog('widget');
 
@@ -218,6 +221,7 @@ const LayoutManager = {
 					x: parseInt(prev.css('left')),
 					y: eDialog.offsetHeight + parseInt(prev.css('top')),
 				};
+				
 				dialog.dialog('widget').css({top:newPos.y, left:newPos.x});
 			} else {
 				dialog.dialog({position: {my:"left top", at:"right top", of:$(prev)}});
@@ -225,19 +229,22 @@ const LayoutManager = {
 		}
 	},
 
-	CascadeDialogs: function(){
+	CascadeDialogs: function(cascade_start=0, cascade_end=null, cascade_offset=80){
 		// cascade the last n dialogs
 		let g_dlg_selector = '.' + this._stage_dialog_class;
 		let dialogs = $(g_dlg_selector).dialog();
-		
-		let cascade_start = 6;
-		let cascade_offset = 80;
+
+		cascade_end = (cascade_end==null) ? dialogs.length : cascade_end;
+
 		// position first one
 		$(g_dlg_selector).eq(cascade_start).dialog({position: {my:"right top", at:"right top", of:'body'}});
-		for (let i = cascade_start + 1; i < dialogs.length; i++) {
+
+		// position the rest
+		for (let i = cascade_start + 1; i < cascade_end; i++) {
 			const dialog = dialogs.eq(i);
 			const prev = dialogs.eq(i-1).dialog('widget');
 			const nDiaglog = i - cascade_start;
+			
 			dialog.dialog('widget').css({
 				top: cascade_offset*nDiaglog,
 				right: cascade_offset*nDiaglog,
@@ -253,8 +260,9 @@ const LayoutManager = {
 
 		// optionally, tile the dialogs
 		if (layoutDialogs) {
-			this.TileDialogs();
-			this.CascadeDialogs();
+			let advanced_dialogs_start = 6;
+			this.TileDialogs(0, advanced_dialogs_start);
+			this.CascadeDialogs(advanced_dialogs_start, this.stages_count);
 		}
 		
 		// then create the stages and plug them in
