@@ -43,7 +43,7 @@ const LayoutManager = {
 	 * @param {object} stage the stage.
 	 * @param {string} title the title to set.
 	 */
-	SetStageDialogTitle: function (stage, title){
+	SetDialogTitle: function (stage, title){
 		let e = stage.getContainer();
 		let dlgCnt = e.closest('.ui-dialog-content');
 		if (dlgCnt != null) {
