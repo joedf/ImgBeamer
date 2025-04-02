@@ -1368,6 +1368,17 @@ const Utils = {
 	},
 
 	/**
+	 * Limits the given number to the given range.
+	 * @param {*} value The number to limit.
+	 * @param {*} min The minimum value.
+	 * @param {*} max The maximum value.
+	 * @returns 
+	 */
+	clampValue: function(value, min, max) {
+		return Math.min(Math.max(this, min), max);
+	},
+
+	/**
 	 * Converts an angle in radians to degrees
 	 * @param {number} angle the angle in radians.
 	 * @returns the angle in degrees

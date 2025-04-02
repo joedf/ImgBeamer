@@ -13,17 +13,25 @@ const LayoutManager = {
 	/** The number of stages to create */
 	stages_count: 9,
 
-	/** The calculated size of each box/stage */
+	/** The calculated size of each box/stage, changes when .Initialize() is called. */
 	box_size: 300, // default value
 
+	/** The minimum size of a stage */
 	minSize: 200,
+
+	/** The maximum size of a stage */
 	maxSize: 800,
+	
+	// UI and layout related values
 	_stage_dialog_class: "stage-dlg",
-	stageContainer_class: "stageContainer",
+	_stageContainer_class: "stageContainer",
 	_stages_per_row: 3,
 	
 	/** a reference to the main body container that holds the boxes/stages. */
 	_main_container: $('#main-container'),
+
+	/** The base z-index to use for cascading dialogs */
+	_cascade_dialog_base_z_index: 1000,
 
 	Initialize: function(){
 		this.box_size = this.__GetOptimalBoxWidth(true);
@@ -53,6 +61,9 @@ const LayoutManager = {
 			let boxMaxH = Math.floor((window.innerHeight / 2) - titlebarHeight);
 			calculatedBoxSize = Math.min(calculatedBoxSize, boxMaxH);
 		}
+
+		// bound/clamp the number to the size limits
+		calculatedBoxSize = Utils.clampValue(calculatedBoxSize, this.minSize, this.maxSize);
 		
 		return calculatedBoxSize;
 	},
@@ -90,7 +101,7 @@ const LayoutManager = {
 		$('<div class="' + this._stage_dialog_class + '"/>')
 			.attr('dlg-start-minimized', startMinimized)
 			.appendTo(parentContainer)
-			.append('<div class="' + this.stageContainer_class + '"/>');
+			.append('<div class="' + this._stageContainer_class + '"/>');
 	},
 
 	__ShouldStageDialogStartMinimized: function(i){
@@ -190,7 +201,6 @@ const LayoutManager = {
 
 	TileDialogs: function(){
 		let g_dlg_selector = '.' + this._stage_dialog_class;
-		const base_z_index = 1000;
 		
 		// tile the first n dialogs
 		let tile_end = 6;
@@ -227,7 +237,7 @@ const LayoutManager = {
 				top: cascade_offset*nDiaglog,
 				right: cascade_offset*nDiaglog,
 				left: 'auto',
-				'z-index': parseInt(prev.css('z-index'))+base_z_index + 1
+				'z-index': parseInt(prev.css('z-index'))+this._cascade_dialog_base_z_index + 1
 			});
 		}
 	},
@@ -241,7 +251,7 @@ const LayoutManager = {
 		
 		// then create the stages and plug them in
 		let stages = [];
-		let g_stage_containers = $('.'+this.stageContainer_class);
+		let g_stage_containers = $('.'+this._stageContainer_class);
 		for (let i = 0; i < this.stages_count; i++) {
 			let stage = Utils.newStageTemplate(g_stage_containers[i], this.box_size, this.box_size);
 			stages.push(stage);
