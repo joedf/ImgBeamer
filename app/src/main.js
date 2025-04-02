@@ -1,5 +1,5 @@
 /* globals
-G_BOX_SIZE
+G_STAGES
 LayoutManager
 Utils
 */
@@ -31,7 +31,6 @@ G_INPUT_IMAGE
 G_PRELOADED_IMAGES
 G_PRELOADED_IMAGES_ROOT
 G_IMG_METRICS
-G_STAGES
 */
 
 /** Name of the application */
@@ -118,16 +117,8 @@ var G_UpdateRuler = null;
 var G_UpdateFilters = null;
 /** global reference to update stage related settings */
 var G_UpdateStageSettings = null;
-
 /** global reference to the resulting image stage */
 var G_VSEM_STAGE = null;
-
-// setup UI, then create and plug in the stages
-LayoutManager.SetupDialogs();
-LayoutManager.TileDialogs();
-
-/** The array/list of all the stages. */
-var G_STAGES = LayoutManager.SetupStages();
 
 /////////////////////
 
@@ -227,7 +218,7 @@ function OnImageLoaded(eImg, stages){
 		.addClass('grabCursor')
 		.attr('note', 'Pan & Zoom: Drag and Scroll\nPress [R] to reset');
 	LayoutManager.SetStageDialogTitle(baseImageStage, 'Subregion View / FOV');
-	var subregionImage = drawSubregionImage(baseImageStage, eImg, G_BOX_SIZE, doUpdate);
+	var subregionImage = drawSubregionImage(baseImageStage, eImg, doUpdate);
 
 	// draw Spot Content
 	$(spotContentStage.getContainer())

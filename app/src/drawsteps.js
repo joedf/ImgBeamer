@@ -231,14 +231,15 @@ function drawSpotProfileEdit(stage, updateCallback = null) {
  * Draws the subregion image display.
  * @param {*} stage The stage to draw it on.
  * @param {*} oImg The ground truth image.
- * @param {Number} size (to be removed) The max size (width or height) of the image to draw.
  * @param {Function} updateCallback 
  * @returns a reference to the subregion image object that can be panned and zoomed by the user.
  * 
  * @todo remove 'size' ... confusing and not useful.
  */
-function drawSubregionImage(stage, oImg, size, updateCallback = null) {
-	var max = size;
+function drawSubregionImage(stage, oImg, updateCallback = null) {
+	// The max size (width or height) of the image to draw.
+	var max = Math.min(stage.width(), stage.height());
+	
 	var imageSize = { w: oImg.naturalWidth, h: oImg.naturalHeight, };
 
 	if (G_DEBUG)

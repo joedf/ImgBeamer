@@ -3,18 +3,21 @@ Utils
 */
 
 /* exported
-G_STAGES_COUNT
+G_STAGES
 LayoutManager
 */
-
-/** The number of stages to create */
-const G_STAGES_COUNT = 9;
 
 /**
  * Dialog and layout setup and helper functions
  * @namespace LayoutManager
  */
 const LayoutManager = {
+
+	/** The number of stages to create */
+	stages_count: 9,
+
+	/** The calculated size of each box/stage */
+	box_size: 300, // default value
 
 	minSize: 200,
 	maxSize: 800,
@@ -26,15 +29,8 @@ const LayoutManager = {
 	* @todo do we still need this? Maybe remove... */
 	_main_container: $('#main-container'),
 
-	SetupStages: function(){
-		let stages = [];
-		let g_stage_containers = $('.'+this.stageContainer_class);
-		// first create the stages
-		for (let i = 0; i < G_STAGES_COUNT; i++) {
-			let stage = Utils.newStageTemplate(g_stage_containers[i], G_BOX_SIZE, G_BOX_SIZE);
-			stages.push(stage);
-		}
-		return stages;
+	Initialize: function(){
+		this.box_size = this.__GetOptimalBoxWidth(true);
 	},
 
 	/**
@@ -43,7 +39,7 @@ const LayoutManager = {
 	 * @returns The size to use.
 	 */
 	// eslint-disable-next-line no-magic-numbers
-	GetOptimalBoxWidth: function(considerViewportHeight=false, titlebarHeight=30){
+	__GetOptimalBoxWidth: function(considerViewportHeight=false, titlebarHeight=30){
 		// Values used to calculate the size of each box/stage
 		var boxesPerPageWidth = this._stages_per_row;
 		// count-in the width of the borders of the boxes
@@ -62,18 +58,6 @@ const LayoutManager = {
 		}
 		
 		return calculatedBoxSize;
-	},
-
-	/**
-	 * Creates a DOM element to be used for a stage dialog.
-	 * @param {*} parentContainer the DOM element of the parent container in which to add a stage dialog.
-	 * @param {*} startMinimized Whether or not the dialog should start minimized.
-	 */
-	newStageDialog: function(parentContainer, startMinimized = false){
-		$('<div class="' + this._stage_dialog_class + '"/>')
-			.attr('dlg-start-minimized', startMinimized)
-			.appendTo(parentContainer)
-			.append('<div class="' + this.stageContainer_class + '"/>');
 	},
 
 	/**
@@ -100,15 +84,27 @@ const LayoutManager = {
 		}
 	},
 
+	/**
+	 * [Private] Creates a DOM element to be used for a stage dialog.
+	 * @param {*} parentContainer the DOM element of the parent container in which to add a stage dialog.
+	 * @param {*} startMinimized Whether or not the dialog should start minimized.
+	 */
+	__newStageDialog: function(parentContainer, startMinimized = false){
+		$('<div class="' + this._stage_dialog_class + '"/>')
+			.attr('dlg-start-minimized', startMinimized)
+			.appendTo(parentContainer)
+			.append('<div class="' + this.stageContainer_class + '"/>');
+	},
+
 	__ShouldStageDialogStartMinimized: function(i){
 		// eslint-disable-next-line no-magic-numbers
 		return (i > 5);
 	},
 
-	SetupDialogs: function(stages_count=G_STAGES_COUNT){
+	__SetupDialogs: function(stages_count){
+		var me = this;
 		let g_dlg_selector = '.' + this._stage_dialog_class;
 		let parentContainer = this._main_container;
-		let box_size = G_BOX_SIZE;
 		
 		var _em_ = 12.96; //px
 		var _border_w_ = (2/3);
@@ -117,25 +113,23 @@ const LayoutManager = {
 		
 		let drag_snap = {
 			// eslint-disable-next-line no-magic-numbers
-			x: (box_size/10) + 0.2,
+			x: (me.box_size/10) + 0.2,
 			// eslint-disable-next-line no-magic-numbers
-			y: (box_size + _titlebar_h_offset_) / 10,
+			y: (me.box_size + _titlebar_h_offset_) / 10,
 		};
 
 		for (let i = 0; i < stages_count; i++) {
 			let startMinimized = this.__ShouldStageDialogStartMinimized(i);
-			LayoutManager.newStageDialog(parentContainer, startMinimized);
+			LayoutManager.__newStageDialog(parentContainer, startMinimized);
 		}
 
-		var me = this;
-		
 		$(g_dlg_selector).dialog({
 			maxHeight: me.maxSize,
 			maxWidth: me.maxSize,
 			minHeight: me.minSize,
 			minWidth: me.minSize,
-			width: box_size,
-			height: box_size + _titlebar_h_offset_,
+			width: me.box_size,
+			height: me.box_size + _titlebar_h_offset_,
 			resizable: false,
 			classes: { "ui-dialog": "stage-dialog" },
 			drag: function( event, ui ) {
@@ -238,8 +232,28 @@ const LayoutManager = {
 			});
 		}
 	},
+
+	SetupStages: function(tileDialogs=true){
+		// first, set up the dialogs
+		this.__SetupDialogs(this.stages_count);
+
+		// optionally, tile the dialogs
+		if (tileDialogs) { this.TileDialogs(); }
+		
+		// then create the stages and plug them in
+		let stages = [];
+		let g_stage_containers = $('.'+this.stageContainer_class);
+		for (let i = 0; i < this.stages_count; i++) {
+			let stage = Utils.newStageTemplate(g_stage_containers[i], this.box_size, this.box_size);
+			stages.push(stage);
+		}
+		return stages;
+	},
 };
 
-/** The calculated size of each box/stage
- * @todo do we still need this? Maybe remove... */
-const G_BOX_SIZE = LayoutManager.GetOptimalBoxWidth(true);
+// initialize and do some calculations
+LayoutManager.Initialize();
+
+// setup UI and create the stages
+/** The array/list of all the stages. */
+var G_STAGES = LayoutManager.SetupStages();
