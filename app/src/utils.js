@@ -257,6 +257,7 @@ const Utils = {
 	/**
 	 * Creates and adds a pinch-Zoom (multi-touch touchscreens) event handler to be used on a shape.
 	 * for more info, see https://konvajs.org/docs/sandbox/Multi-touch_Scale_Shape.html
+	 * @param {*} stage the stage to the event handlers to.
 	 * @param {*} activeShape the shape or object to scale.
 	 * @param {function} callback a callback for when the zoom event handler is called.
 	 * @param {number} scaleMin the scale minimum allowed.
