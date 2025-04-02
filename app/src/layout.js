@@ -288,6 +288,3 @@ const LayoutManager = {
 		return stages;
 	},
 };
-
-// initialize, do calculations, create the stages, and setup UI
-LayoutManager.Initialize();

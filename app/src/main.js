@@ -121,6 +121,9 @@ var G_VSEM_STAGE = null;
 
 /////////////////////
 
+// initialize, do calculations, create the stages, and setup UI
+LayoutManager.Initialize();
+
 /**Currently only used by {@link ResampleFullImage}
  * @todo Possibly, to be removed along with it. */
 var G_MAIN_IMAGE_OBJ = null;
@@ -130,6 +133,8 @@ UpdateBaseImage();
 
 // update event for ground truth image change
 $(document.body).on('OnGroundtruthImageChange', UpdateBaseImage);
+
+/////////////////////
 
 /** Updates everything needed assuming that {@link G_INPUT_IMAGE} has changed,
  * updates/draws all the stages/boxes once. */
