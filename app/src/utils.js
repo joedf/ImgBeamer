@@ -1375,7 +1375,7 @@ const Utils = {
 	 * @returns 
 	 */
 	clampValue: function(value, min, max) {
-		return Math.min(Math.max(this, min), max);
+		return Math.min(Math.max(value, min), max);
 	},
 
 	/**
