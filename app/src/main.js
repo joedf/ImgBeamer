@@ -1,5 +1,4 @@
 /* globals
-G_STAGES
 LayoutManager
 Utils
 */
@@ -140,7 +139,7 @@ function UpdateBaseImage(){
 		var imageObj = event.target;
 		G_MAIN_IMAGE_OBJ = imageObj;
 		
-		OnImageLoaded(imageObj, G_STAGES);
+		OnImageLoaded(imageObj, LayoutManager.Stages);
 	});
 }
 

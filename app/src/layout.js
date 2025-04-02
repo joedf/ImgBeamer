@@ -1,17 +1,14 @@
-/* globals
-Utils
-*/
-
-/* exported
-G_STAGES
-LayoutManager
-*/
+/* globals Utils */
+/* exported LayoutManager */
 
 /**
  * Dialog and layout setup and helper functions
  * @namespace LayoutManager
  */
 const LayoutManager = {
+
+	/** The array/list of all the stages. */
+	Stages: [],
 
 	/** The number of stages to create */
 	stages_count: 9,
@@ -30,6 +27,7 @@ const LayoutManager = {
 
 	Initialize: function(){
 		this.box_size = this.__GetOptimalBoxWidth(true);
+		this.Stages = this.__SetupStages();
 	},
 
 	/**
@@ -117,11 +115,13 @@ const LayoutManager = {
 			y: (me.box_size + _titlebar_h_offset_) / 10,
 		};
 
+		// create the containers for the dialogs
 		for (let i = 0; i < stages_count; i++) {
 			let startMinimized = this.__ShouldStageDialogStartMinimized(i);
 			LayoutManager.__newStageDialog(parentContainer, startMinimized);
 		}
 
+		// transform them into jquery-ui extented dialogs with options
 		$(g_dlg_selector).dialog({
 			maxHeight: me.maxSize,
 			maxWidth: me.maxSize,
@@ -232,12 +232,12 @@ const LayoutManager = {
 		}
 	},
 
-	SetupStages: function(tileDialogs=true){
+	__SetupStages: function(layoutDialogs=true){
 		// first, set up the dialogs
 		this.__SetupDialogs(this.stages_count);
 
 		// optionally, tile the dialogs
-		if (tileDialogs) { this.TileDialogs(); }
+		if (layoutDialogs) { this.TileDialogs(); }
 		
 		// then create the stages and plug them in
 		let stages = [];
@@ -250,9 +250,5 @@ const LayoutManager = {
 	},
 };
 
-// initialize and do some calculations
+// initialize, do calculations, create the stages, and setup UI
 LayoutManager.Initialize();
-
-// setup UI and create the stages
-/** The array/list of all the stages. */
-var G_STAGES = LayoutManager.SetupStages();
