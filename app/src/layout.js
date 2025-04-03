@@ -160,6 +160,19 @@ const LayoutManager = {
 		return calculatedBoxSize;
 	},
 
+	// debugging func
+	/**
+	 * Prints whether each stage is visible or not to the user in the web console.
+	 * Useful for debugging.
+	 */
+	__visible_stages: function() {
+		let gg = LayoutManager.Stages;
+		for(let i = 0; i < gg.length; i++) {
+			let vis = $(gg[i].getContainer()).is(':visible');
+			console.log("stage #"+i+" visibility = " + vis);
+		}
+	},
+
 	/**
 	 * [Private] Creates a DOM element to be used for a stage dialog.
 	 * @param {*} parentContainer the DOM element of the parent container in which to add a stage dialog.
