@@ -185,7 +185,7 @@ function OnImageLoaded(eImg, stages){
 	/** called when a change occurs in the spot profile, subregion, or spot content */
 	function doUpdate(){
 		// don't update spot signal if not shown
-		if ($(spotSignalStage.getContainer()).is(':visible')) {
+		if (LayoutManager.IsStageVisible(spotSignalStage)) {
 			updateSpotSignal();
 		}
 		updateProbeLayout();
@@ -297,10 +297,10 @@ function OnImageLoaded(eImg, stages){
 
 	var updateResamplingSteps = function(){
 		updateProbeLayout();
-		if ($(layoutSampledStage.getContainer()).is(':visible')) {
+		if (LayoutManager.IsStageVisible(layoutSampledStage)) {
 			updateProbeLayoutSamplingPreview();
 		}
-		if ($(resampledStage.getContainer()).is(':visible')) {
+		if (LayoutManager.IsStageVisible(resampledStage)) {
 			updateResampled();
 		}
 
