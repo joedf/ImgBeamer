@@ -160,15 +160,26 @@ const LayoutManager = {
 		return calculatedBoxSize;
 	},
 
-	// debugging func
+	/**
+	 * Determines if a given stage is visible to the user (as defined by
+	 * https://api.jquery.com/visible-selector/)
+	 * @param {*} stage the (konva) stage to test visibility
+	 * @returns true if visible, false otherwise
+	 */
+	IsStageVisible: function(stage) {
+		let container = stage.getContainer();
+		let visible = $(container).is(':visible');
+		return visible;
+	},
+
 	/**
 	 * Prints whether each stage is visible or not to the user in the web console.
 	 * Useful for debugging.
 	 */
 	__visible_stages: function() {
-		let gg = LayoutManager.Stages;
-		for(let i = 0; i < gg.length; i++) {
-			let vis = $(gg[i].getContainer()).is(':visible');
+		let stages = this.Stages;
+		for(let i = 0; i < stages.length; i++) {
+			let vis = this.IsStageVisible(stages[i]);
 			console.log("stage #"+i+" visibility = " + vis);
 		}
 	},
@@ -210,7 +221,7 @@ const LayoutManager = {
 		// create the containers for the dialogs
 		for (let i = 0; i < stages_count; i++) {
 			let startMinimized = this.__ShouldStageDialogStartMinimized(i);
-			LayoutManager.__newStageDialog(parentContainer, startMinimized);
+			this.__newStageDialog(parentContainer, startMinimized);
 		}
 
 		// transform them into jquery-ui extented dialogs with options
