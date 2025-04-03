@@ -532,6 +532,7 @@ const Utils = {
 	 * @param {*} beam the beam used for the spot layout and sampling of the image (after scaling).
 	 * @param {*} cellSize the size of a cell in the raster grid of the resulting image.
 	 * @param {*} userImage the scaled image by the user (in spot content) used to size the beam.
+	 * @param {function} onDblClick callback for the doubleclick event
 	 */
 	updateDisplayBeamParams: function(stage, beam, cellSize, userImage, onDblClick) {
 		// calculate and display the values
