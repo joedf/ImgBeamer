@@ -174,6 +174,29 @@ const Utils = {
 	},
 
 	/**
+	 * Set the spot width used for sampling for the entire application
+	 * @param {number} spotWidth the spot width in percent (%), ex. use 130 for 130%.
+	 * @param {*} beam a reference to the beam/spot object to get the elliptical shape (relative to a unit circle).
+	 * @param {*} spotScaler a reference to the spot profile's (invisble) rectangle object that represents the image
+	 * being scaled the user inside the Spot Profile stage. This is used to calculate the scale of the spot.
+	 * @param {*} updateCallback a function to call when spotScaler has been updated and calculations are done.
+	 */
+	_SetSpotWidth: function(spotWidth, beam, spotScaler, updateCallback){
+		// calculate the new scale for spot-content image, based on the given spot width
+		var cellSize = Utils.computeCellSize(spotScaler);
+		var maxScale = Math.max(beam.scaleX(), beam.scaleY());
+		var eccScaled = beam.scaleX() / maxScale;
+		var newScale = ((beam.width() * eccScaled) / (spotWidth/100)) / cellSize.w;
+
+		Utils.centeredScale(spotScaler, newScale);
+
+		// propagate changes and update stages
+		if (typeof updateCallback == 'function') {
+			updateCallback();
+		}
+	},
+
+	/**
 	 * Creates a Zoom event handler to be used on a stage.
 	 * Holding the shift key scales at half the rate.
 	 * @param {object} stage the drawing stage

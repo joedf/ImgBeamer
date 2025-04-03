@@ -215,7 +215,12 @@ function OnImageLoaded(eImg, stages){
 	function promptForSpotWidth(){
 		var spotWidth = prompt("Spot width (%) - Default is 100%", 100);
 		if (spotWidth > 0) {
-			Utils_SetSpotWidth(spotWidth);
+			// we can use 'beam' or 'spotContentBeam' here, they both work...
+			// TODO: maybe just use 'beam' here or a clone?
+			Utils._SetSpotWidth(spotWidth, spotContentBeam, spotScaling, function(){
+				updateBeams();
+				doUpdate();
+			});
 		}
 	}
 
@@ -248,26 +253,6 @@ function OnImageLoaded(eImg, stages){
 	// make a clone without copying over the event bindings
 	var imageCopy = subregionImage.clone().off();
 	drawSpotContent(spotContentStage, imageCopy, spotContentBeam, doUpdate);
-
-	/**(temporary) publicly exposed function to set the spot width
-	 * @param {number} spotWidth the spot width in percent (%), ex. use 130 for 130%.
-	 * @todo move into separate file if possible */
-	function Utils_SetSpotWidth(spotWidth=100){
-		var beam = spotContentBeam;
-		var spotScaler = spotScaling;
-		
-		// calculate the new scale for spot-content image, based on the given spot width
-		var cellSize = Utils.computeCellSize(spotScaler);
-		var maxScale = Math.max(beam.scaleX(), beam.scaleY());
-		var eccScaled = beam.scaleX() / maxScale;
-		var newScale = ((beam.width() * eccScaled) / (spotWidth/100)) / cellSize.w;
-
-		Utils.centeredScale(spotScaler, newScale);
-
-		// propagate changes and update stages
-		updateBeams();
-		doUpdate();
-	}
 
 	// -----------------------------------------------------------
 	// draw Spot Signal
@@ -412,6 +397,7 @@ function OnImageLoaded(eImg, stages){
 		doUpdate();
 	});
 
+	// TODO: can this go into Utils?
 	function updateFilters(){
 		var doBC = Utils.getGlobalBCInput();
 		if (doBC) {	
