@@ -20,6 +20,7 @@ G_update_ImgMetrics
 G_UpdateRuler
 G_UpdateFilters
 G_UpdateStageSettings
+G_Update_Stages_Global
 G_AUTO_PREVIEW_LIMIT
 G_VSEM_PAUSED
 G_VSEM_STAGE
@@ -116,6 +117,8 @@ var G_UpdateRuler = null;
 var G_UpdateFilters = null;
 /** global reference to update stage related settings */
 var G_UpdateStageSettings = null;
+/** global reference to call main update routine (used for most stages, updates stage if visible) */
+var G_Update_Stages_Global = null;
 /** global reference to the resulting image stage */
 var G_VSEM_STAGE = null;
 
@@ -188,13 +191,17 @@ function OnImageLoaded(eImg, stages){
 		if (LayoutManager.IsStageVisible(spotSignalStage)) {
 			updateSpotSignal();
 		}
-		updateProbeLayout();
-		updateResamplingSteps();
-		updateGroundtruthMap();
-		updateVirtualSEM_Config();
 
+		updateResamplingSteps();
+
+		if (LayoutManager.IsStageVisible(groundtruthMapStage)) {
+			updateGroundtruthMap();
+		}
+
+		updateVirtualSEM_Config();
 		updateInfoDisplays();
 	}
+	G_Update_Stages_Global = doUpdate;
 
 	var updateImgMetrics = function(){
 		Utils.updateImageMetricsInfo(groundtruthMapStage, virtualSEMStage);
@@ -296,7 +303,9 @@ function OnImageLoaded(eImg, stages){
 	);
 
 	var updateResamplingSteps = function(){
-		updateProbeLayout();
+		if (LayoutManager.IsStageVisible(probeLayoutStage)) {
+			updateProbeLayout();
+		}
 		if (LayoutManager.IsStageVisible(layoutSampledStage)) {
 			updateProbeLayoutSamplingPreview();
 		}

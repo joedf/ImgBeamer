@@ -1,5 +1,12 @@
-/* globals Utils */
-/* exported LayoutManager */
+/* globals
+Utils
+G_Update_Stages_Global
+G_VSEM_STAGE
+G_VSEM_PAUSED
+G_GUI_Controller
+*/
+
+/* exported LayoutManager, G_VSEM_PAUSED */
 
 /**
  * Dialog and layout setup and helper functions
@@ -287,8 +294,64 @@ const LayoutManager = {
 				if (e.attr('dlg-start-minimized') == 'true') {
 					e.dialogExtend('minimize');
 				}
-			}
+			},
+			"restore": me.__onDialogShow.bind(me),
+			"maximize": me.__onDialogShow.bind(me),
+			"collapse": me.__onDialogHide.bind(me),
+			"minimize": me.__onDialogHide.bind(me),
 		});
+	},
+
+	__onDialogShow: function(evt) {
+		// called when a dialog has been restored or maximized,
+		// i.e. content is made visible to the user
+		if (typeof G_Update_Stages_Global == 'function') {
+			G_Update_Stages_Global();
+		}
+
+		// check if we should "un-pause" / resume the VSEM stage rendering
+		if (G_VSEM_STAGE != null && typeof G_GUI_Controller != 'undefined')
+		{
+			let isVSemStageDialog = this.__isDialogForStage(evt.target, G_VSEM_STAGE);
+			if (isVSemStageDialog) {
+				// if the dialog is the VSEM stage, then we can restore the rendering / drawing flag
+				// Yes, the user could potentially unpause while it was collapsed, but that is not critical
+				
+				// since collapse/minimize, restore the value from the GUI checkbox
+				// eslint-disable-next-line no-global-assign
+				G_VSEM_PAUSED = G_GUI_Controller.pause_vSEM;
+			}
+		}
+	},
+
+	__onDialogHide: function(evt) {
+		// called when a dialog has been collapse or minimized,
+		// i.e. content is being made hidden to the user
+		
+		if (G_VSEM_STAGE != null) {
+			let isVSemStageDialog = this.__isDialogForStage(evt.target, G_VSEM_STAGE);
+			if (isVSemStageDialog) {
+				// if the dialog is the VSEM stage, then we can pause the rendering / drawing
+				
+				// we explicitly pause the VSEM rendering, whether it was already paused or not
+				// eslint-disable-next-line no-global-assign
+				G_VSEM_PAUSED = true;
+			}
+		}
+	},
+
+	/**
+	 * Determines whether the given dialog is associated with the given stage.
+	 * @param {*} dialogElement The dialog.
+	 * @param {*} stage The stage.
+	 * @returns True if they are associated, false otherwise.
+	 */
+	__isDialogForStage: function(dialogElement, stage) {
+		let $dialog = $(dialogElement);
+		let dlg_stageContainer = $dialog.find('.stageContainer > .box:first').get(0);
+		let stageContainer = stage.getContainer();
+		let isMatch = (stageContainer == dlg_stageContainer);
+		return isMatch;
 	},
 
 	__SetupStages: function(layoutDialogs=true){
