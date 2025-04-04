@@ -98,6 +98,13 @@ summary {
 	background-color: #172542;
 }
 
+/* Ensure jQuery modals appear above all */
+.ui-front[aria-modal="true"],
+.ui-widget-overlay.ui-front
+{
+	z-index: 11100 !important;
+}
+
 #options-anchor {
 	display: inline-block;
 	position: fixed;
