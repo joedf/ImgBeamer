@@ -178,7 +178,7 @@ const LayoutManager = {
 		// count-in the width of the borders of the boxes
 		var boxBorderW = 2 * (parseInt($('.box:first').css('border-width')) || 1);
 		var scrollBarW = 15; // scroll bar width
-		var boxSizeMax = 450; //max width for the boxes
+		var boxSizeMax = this.maxSize - titlebarHeight; //max width for the boxes
 
 		// make sure to have an integer value to prevent slight sizing differences between each box
 		var calculatedBoxSize = Math.ceil(Math.min(
