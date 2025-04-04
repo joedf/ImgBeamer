@@ -140,10 +140,11 @@ const LayoutManager = {
 	 * All dialogs by default, otherwise for a given range.
 	 * @param {integer} cascade_start the dialog to start cascading with.
 	 * @param {integer} cascade_end the last dialog to cascade.
-	 * @param {Number} cascade_offset the distance between each cascaded dialog in x and y.
+	 * @param {Number} offset_x the distance between each cascaded dialog in x.
+	 * @param {Number} offset_y the distance between each cascaded dialog in y.
 	 */
 	// eslint-disable-next-line no-magic-numbers
-	CascadeDialogs: function(cascade_start=0, cascade_end=null, cascade_offset=80){
+	CascadeDialogs: function(cascade_start=0, cascade_end=null, offset_x=100, offset_y=80){
 		// cascade the last n dialogs
 		let g_dlg_selector = '.' + this._stage_dialog_class;
 		let dialogs = $(g_dlg_selector).dialog();
@@ -160,8 +161,8 @@ const LayoutManager = {
 			const nDiaglog = i - cascade_start;
 			
 			dialog.dialog('widget').css({
-				top: cascade_offset*nDiaglog,
-				right: cascade_offset*nDiaglog,
+				top: offset_y*nDiaglog,
+				right: offset_x*nDiaglog,
 				left: 'auto',
 				'z-index': parseInt(prev.css('z-index'))+this._cascade_dialog_base_z_index + 1
 			});
