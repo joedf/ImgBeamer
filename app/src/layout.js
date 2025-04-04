@@ -39,6 +39,7 @@ const LayoutManager = {
 	// the class of a stage's parent element
 	_stageContainer_class: "stageContainer",
 	_stages_per_row: 3,
+	_stages_per_column: 2,
 	
 	/** a reference to the main body container that holds the boxes/stages. */
 	_main_container: $('#main-container'),
@@ -47,7 +48,8 @@ const LayoutManager = {
 	_cascade_dialog_base_z_index: 100,
 
 	Initialize: function(){
-		this.box_size = this.__GetOptimalBoxWidth(true);
+		// eslint-disable-next-line no-magic-numbers
+		this.box_size = this.__GetOptimalBoxWidth(true, 30);
 		this.Stages = this.__SetupStages();
 	},
 
@@ -167,32 +169,43 @@ const LayoutManager = {
 	},
 
 	/**
+	 * 
 	 * Calculated the size to use for each drawing box/stage.
 	 * Edit the values in the functions to change the box sizing.
+	 * @param {Boolean} considerViewportHeight Whether or not the box height can be reduced to fit the client area.
+	 * @param {Number} vpFootOffset The amount of space to further offset at the bottom of the client area.
+	 * @param {Number} titlebarHeight The height of a dialog's titlebar (used for calculations).
 	 * @returns The size to use.
 	 */
 	// eslint-disable-next-line no-magic-numbers
-	__GetOptimalBoxWidth: function(considerViewportHeight=false, titlebarHeight=30){
+	__GetOptimalBoxWidth: function(considerViewportHeight=false, vpFootOffset=0, titlebarHeight=30){
 		// Values used to calculate the size of each box/stage
-		var boxesPerPageWidth = this._stages_per_row;
+		let boxesPerPageWidth = this._stages_per_row;
 		// count-in the width of the borders of the boxes
-		var boxBorderW = 2 * (parseInt($('.box:first').css('border-width')) || 1);
-		var scrollBarW = 15; // scroll bar width
-		var boxSizeMax = this.maxSize - titlebarHeight; //max width for the boxes
+		let boxBorderW = 2 * (parseInt($('.box:first').css('border-width')) || 1);
+		let scrollBarW = 15; // scroll bar width
+		let boxSizeMax = this.maxSize - titlebarHeight; //max width for the boxes
+
+		// calculate the box width based on how many we want per page-width
+		let calculatedBoxSize = Math.min(
+			(document.body.clientWidth / boxesPerPageWidth) - boxBorderW - scrollBarW,
+			boxSizeMax);
+
+		// optionally limit size further to fit at least n rows of boxes
+		if (considerViewportHeight) {
+			let boxMaxH = Math.floor((window.innerHeight / this._stages_per_column) - titlebarHeight);
+			calculatedBoxSize = Math.min(calculatedBoxSize, boxMaxH);
+
+			// further, reduce if we want a larger foot margin space
+			calculatedBoxSize = calculatedBoxSize - (vpFootOffset / this._stages_per_column);
+		}
 
 		// make sure to have an integer value to prevent slight sizing differences between each box
-		var calculatedBoxSize = Math.ceil(Math.min(
-			(document.body.clientWidth / boxesPerPageWidth) - boxBorderW - scrollBarW,
-			boxSizeMax));
-
-		if (considerViewportHeight) {
-			let boxMaxH = Math.floor((window.innerHeight / 2) - titlebarHeight);
-			calculatedBoxSize = Math.min(calculatedBoxSize, boxMaxH);
-		}
+		calculatedBoxSize = Math.ceil(calculatedBoxSize);
 
 		// bound/clamp the number to the size limits
 		calculatedBoxSize = Utils.clampValue(calculatedBoxSize, this.minSize, this.maxSize);
-		
+
 		return calculatedBoxSize;
 	},
 
