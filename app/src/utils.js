@@ -874,6 +874,17 @@ const Utils = {
 			isAdvModeON = G_GUI_Controller.advancedMode;
 		}
 		
+		// Ensure advanced-mode dialogs appear on top
+		if (isAdvModeON) {
+			let dlgs = $('.ui-dialog.advancedMode .ui-dialog-content');
+			if (dlgs.length > 0){
+				let initialized = typeof (dlgs.dialog("instance")) != 'undefined';
+				if (initialized){
+					dlgs.dialog("moveToTop");
+				}
+			}
+		}
+
 		$('.advancedMode').toggle(isAdvModeON);
 	},
 
