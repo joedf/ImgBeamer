@@ -253,9 +253,9 @@ function OnImageLoaded(eImg, stages){
 	// draw Spot Content
 	// -----------------------------------------------------------
 	$(spotContentStage.getContainer())
-		.addClass('advancedMode')
 		.addClass('grabCursor')
 		.attr('note', 'Scroll to adjust spot size\nHold [Shift] for half rate');
+	LayoutManager.DialogAddClass(spotContentStage, 'advancedMode');
 	var spotContentBeam = beam.clone();
 	// make a clone without copying over the event bindings
 	var imageCopy = subregionImage.clone().off();
@@ -264,9 +264,8 @@ function OnImageLoaded(eImg, stages){
 	// -----------------------------------------------------------
 	// draw Spot Signal
 	// -----------------------------------------------------------
-	$(spotSignalStage.getContainer())
-		.addClass('advancedMode')
-		.addClass('note_colored');
+	$(spotSignalStage.getContainer()).addClass('note_colored');
+	LayoutManager.DialogAddClass(spotSignalStage, 'advancedMode');
 	var spotSignalBeam = beam.clone();
 	var updateSpotSignal = drawSpotSignal(spotContentStage, spotSignalStage, spotSignalBeam);
 
@@ -280,8 +279,7 @@ function OnImageLoaded(eImg, stages){
 	// draw Sampled Subregion
 	// -----------------------------------------------------------
 	// compute resampled image
-	$(layoutSampledStage.getContainer())
-		.addClass('advancedMode');
+	LayoutManager.DialogAddClass(layoutSampledStage, 'advancedMode');
 	var layoutSampledBeam = beam.clone();
 	var updateProbeLayoutSamplingPreview = drawProbeLayoutSampling(
 		layoutSampledStage,

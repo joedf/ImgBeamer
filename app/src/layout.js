@@ -29,8 +29,14 @@ const LayoutManager = {
 	/** The maximum size of a stage */
 	maxSize: 800,
 	
+	// -----------------------------------------------------
 	// UI and layout related values
+	// -----------------------------------------------------
+	// the class of the element used for jquery dialog objects
 	_stage_dialog_class: "stage-dlg",
+	// the class of the entire dialog element
+	_dialog_parent_class: "stage-dialog",
+	// the class of a stage's parent element
 	_stageContainer_class: "stageContainer",
 	_stages_per_row: 3,
 	
@@ -38,7 +44,7 @@ const LayoutManager = {
 	_main_container: $('#main-container'),
 
 	/** The base z-index to use for cascading dialogs */
-	_cascade_dialog_base_z_index: 1000,
+	_cascade_dialog_base_z_index: 100,
 
 	Initialize: function(){
 		this.box_size = this.__GetOptimalBoxWidth(true);
@@ -67,6 +73,29 @@ const LayoutManager = {
 				}
 			}
 		}
+	},
+
+	/**
+	 * Adds the given class to the dialog element associated to the given stage.
+	 * @param {*} stage the stage
+	 * @param {*} className the class name
+	 */
+	DialogAddClass: function(stage, className){
+		let dlg = this.GetDialogForStage(stage);
+		if (dlg.length) {
+			dlg.addClass(className);
+		}
+	},
+
+	/**
+	 * Gets the dialog element for the given stage.
+	 * @param {*} stage the stage
+	 * @returns The associated dialog element for the given stage.
+	 */
+	GetDialogForStage: function(stage){
+		let stageContainer = stage.getContainer();
+		let dialog = $(stageContainer).closest("." + this._dialog_parent_class);
+		return dialog;
 	},
 
 	/**
@@ -203,9 +232,14 @@ const LayoutManager = {
 			.append('<div class="' + this._stageContainer_class + '"/>');
 	},
 
+	// eslint-disable-next-line no-unused-vars
 	__ShouldStageDialogStartMinimized: function(i){
 		// eslint-disable-next-line no-magic-numbers
-		return (i > 5);
+		// return (i > 5);
+		
+		// Start none as minimized for now
+		// see https://github.com/joedf/ImgBeamer/issues/53#issuecomment-2776922914
+		return false;
 	},
 
 	__SetupDialogs: function(stages_count){
@@ -240,7 +274,7 @@ const LayoutManager = {
 			width: me.box_size,
 			height: me.box_size + _titlebar_h_offset_,
 			resizable: false,
-			classes: { "ui-dialog": "stage-dialog" },
+			classes: { "ui-dialog": me._dialog_parent_class },
 			drag: function( event, ui ) {
 				// https://stackoverflow.com/a/20712561/883015
 				var snapTolerance = drag_snap.x;
