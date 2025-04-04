@@ -92,11 +92,17 @@ const LayoutManager = {
 	/**
 	 * Gets the dialog element for the given stage.
 	 * @param {*} stage the stage
+	 * @param {Boolean} inner Specify true to get the inner element that is used for jQuery.dialog().
 	 * @returns The associated dialog element for the given stage.
 	 */
-	GetDialogForStage: function(stage){
+	GetDialogForStage: function(stage, inner=false){
 		let stageContainer = stage.getContainer();
 		let dialog = $(stageContainer).closest("." + this._dialog_parent_class);
+
+		if (inner) {
+			dialog = dialog.find('.ui-dialog-content');
+		}
+
 		return dialog;
 	},
 
