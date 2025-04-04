@@ -1829,7 +1829,11 @@ const Utils = {
 			and the virtual <q>grains</q> images.
 			</li>
 			</ul>
-			<p>All images belong to their respective owners and are used here with permission.</p>
+			<p>All sample images belong to their respective owners and are used here with permission.</p>
+			<p>The background pattern is based on <q>escheresque_ste.png</q> (darkened to #1a1a1a) from 
+				<a href="https://github.com/atlemo/SubtlePatterns">SubtlePatterns</a> licensed under
+				<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a>.
+			</p>
 			</details>
 
 			<details>
