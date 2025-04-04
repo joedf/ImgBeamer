@@ -80,7 +80,7 @@ const LayoutManager = {
 	/**
 	 * Adds the given class to the dialog element associated to the given stage.
 	 * @param {*} stage the stage
-	 * @param {*} className the class name
+	 * @param {string} className the class name
 	 */
 	DialogAddClass: function(stage, className){
 		let dlg = this.GetDialogForStage(stage);
@@ -103,8 +103,8 @@ const LayoutManager = {
 	/**
 	 * Positions dialogs in a tiled layout.
 	 * All dialogs by default, otherwise for a given range.
-	 * @param {*} tile_start the dialog to start tiling with.
-	 * @param {*} tile_end the last dialog to tile.
+	 * @param {integer} tile_start the dialog to start tiling with.
+	 * @param {integer} tile_end the last dialog to tile.
 	 */
 	TileDialogs: function(tile_start=0, tile_end=null){
 		let g_dlg_selector = '.' + this._stage_dialog_class;
@@ -138,9 +138,9 @@ const LayoutManager = {
 	/**
 	 * Positions dialogs in a cascaded layout from the top right to the bottom left.
 	 * All dialogs by default, otherwise for a given range.
-	 * @param {*} cascade_start the dialog to start cascading with.
-	 * @param {*} cascade_end the last dialog to cascade.
-	 * @param {*} cascade_offset the distance between each cascaded dialog in x and y.
+	 * @param {integer} cascade_start the dialog to start cascading with.
+	 * @param {integer} cascade_end the last dialog to cascade.
+	 * @param {Number} cascade_offset the distance between each cascaded dialog in x and y.
 	 */
 	// eslint-disable-next-line no-magic-numbers
 	CascadeDialogs: function(cascade_start=0, cascade_end=null, cascade_offset=80){
