@@ -874,13 +874,20 @@ const Utils = {
 			isAdvModeON = G_GUI_Controller.advancedMode;
 		}
 		
-		// Ensure advanced-mode dialogs appear on top
+		// Ensure advanced-mode dialogs appear on top and restored/uncollapsed
 		if (isAdvModeON) {
 			let dlgs = $('.ui-dialog.advancedMode .ui-dialog-content');
 			if (dlgs.length > 0){
 				let initialized = typeof (dlgs.dialog("instance")) != 'undefined';
 				if (initialized){
 					dlgs.dialog("moveToTop");
+					// this doesnt apply to all for some reason
+					// dlgs.dialogExtend('restore');
+					// so we do a loop
+					for (let i = 0; i < dlgs.length; i++) {
+						const dlg = dlgs.eq(i);
+						dlg.dialogExtend('restore');
+					}
 				}
 			}
 		}
