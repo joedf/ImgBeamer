@@ -153,7 +153,12 @@ gui_io.add(G_GUI_Controller, 'groundTruthImg', G_PRELOADED_IMAGES).listen().onCh
 		$(document.body).trigger('OnGroundtruthImageChange');
 	}
 });
-gui_io.add(G_GUI_Controller, 'importImage').name('Import image');
+
+// add the import image button / option
+let __importImgBtn = gui_io.add(G_GUI_Controller, 'importImage').name('Import image');
+// make it more obvious to the user
+$(__importImgBtn.domElement).parent().find('.property-name').addClass('datgui-btn-primary');
+
 gui_io.add(G_GUI_Controller, 'exportResultImg').name('Export image (as displayed)');
 gui_io.add(G_GUI_Controller, 'exportResultTrueImage').name('Export image (actual size)');
 gui.add(G_GUI_Controller, 'aboutMessage').name("About " + G_APP_NAME + " / Credits");
