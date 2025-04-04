@@ -117,7 +117,7 @@ summary {
 #options-anchor {
 	display: inline-block;
 	position: fixed;
-	bottom: 230px;
+	bottom: 0px;
 	right: 0;
 	z-index: 11000;
 	user-select: none;
