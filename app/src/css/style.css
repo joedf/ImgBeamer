@@ -179,6 +179,7 @@ summary {
 /* Menubar customization */
 .menubar {
 	z-index: 8000;
+	background-color: #555;
 }
 #main-container {
 	box-sizing: border-box;
