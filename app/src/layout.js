@@ -117,9 +117,13 @@ const LayoutManager = {
 		let dialogs = $(g_dlg_selector).dialog();
 
 		tile_end = (tile_end==null) ? dialogs.length : tile_end;
+
+		let parentPos = this._main_container.position();
+		let start_x = parentPos.left;
+		let start_y = parentPos.top;
 		
 		// position first one
-		$(g_dlg_selector).dialog('widget').eq(tile_start).css({top:0, left:0});
+		$(g_dlg_selector).dialog('widget').eq(tile_start).css({top:start_y, left:start_x});
 
 		// position the rest
 		for (let i = tile_start + 1; i < tile_end; i++) {
@@ -158,7 +162,15 @@ const LayoutManager = {
 		cascade_end = (cascade_end==null) ? dialogs.length : cascade_end;
 
 		// position first one
-		$(g_dlg_selector).eq(cascade_start).dialog({position: {my:"right top", at:"right top", of:'body'}});
+		let first = $(g_dlg_selector).eq(cascade_start).dialog({
+			position: {
+				my: "right top",
+				at: "right top",
+				of: this._main_container
+			}
+		});
+
+		let firstPos = first.position();
 
 		// position the rest
 		for (let i = cascade_start + 1; i < cascade_end; i++) {
@@ -167,8 +179,8 @@ const LayoutManager = {
 			const nDiaglog = i - cascade_start;
 			
 			dialog.dialog('widget').css({
-				top: offset_y*nDiaglog,
-				right: offset_x*nDiaglog,
+				top: offset_y*nDiaglog + firstPos.top,
+				right: offset_x*nDiaglog + firstPos.left,
 				left: 'auto',
 				'z-index': parseInt(prev.css('z-index'))+this._cascade_dialog_base_z_index + 1
 			});
@@ -266,6 +278,8 @@ const LayoutManager = {
 		var me = this;
 		let g_dlg_selector = '.' + this._stage_dialog_class;
 		let parentContainer = this._main_container;
+
+		let parentTop = parentContainer.position().top;
 		
 		var _em_ = 12.96; //px
 		var _border_w_ = (2/3);
@@ -276,7 +290,7 @@ const LayoutManager = {
 			// eslint-disable-next-line no-magic-numbers
 			x: (me.box_size/10) + 0.2,
 			// eslint-disable-next-line no-magic-numbers
-			y: (me.box_size + _titlebar_h_offset_) / 10,
+			y: (me.box_size + _titlebar_h_offset_ + parentTop) / 10,
 		};
 
 		// create the containers for the dialogs
@@ -307,7 +321,9 @@ const LayoutManager = {
 				var leftRemainder = ui.position.left % grid.x;
 		
 				if (topRemainder <= snapTolerance) {
-					ui.position.top = ui.position.top - topRemainder;
+					let newTop = ui.position.top - topRemainder;
+					// dont allow position height than the parent container
+					ui.position.top = Math.max(newTop, parentTop);
 				}
 		
 				if (leftRemainder <= snapTolerance) {
@@ -354,6 +370,9 @@ const LayoutManager = {
 			"collapse": me.__onDialogHide.bind(me),
 			"minimize": me.__onDialogHide.bind(me),
 		});
+
+		// Contain the dialog within the parent container
+		$("."+this._dialog_parent_class).draggable( "option", "containment", parentContainer );
 	},
 
 	__onDialogShow: function(evt) {

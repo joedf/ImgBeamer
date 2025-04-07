@@ -174,3 +174,22 @@ summary {
 	background: #000;
 	overflow: hidden;
 }
+
+/* ---------------------------------------------------------- */
+/* Menubar customization */
+.menubar {
+	z-index: 8000;
+}
+#main-container {
+	box-sizing: border-box;
+	display: block;
+	border: none;
+	padding: 0;
+	margin: 0;
+	
+	position: absolute;
+	top: calc(1.625em + 2px);
+	bottom: 0;
+	left: 0;
+	right: 0;
+}

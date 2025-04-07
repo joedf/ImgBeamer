@@ -10,17 +10,55 @@
 		<link rel="icon" href="src/img/favicon.ico" type="image/x-icon" />
 
 		<link rel="stylesheet" href="src/3rd-party/jquery-ui-1.13.2.custom/jquery-ui.min.css">
+		<link rel="stylesheet" href="src/3rd-party/jquery-ui-menubar/menubar.css">
 		<link rel="stylesheet" href="src/css/style.css">
 
 		<script src="src/3rd-party/konva/v9.3.2/konva.min.js"></script>
 		<script src="src/3rd-party/jquery-3.6.1.min.js"></script>
 		<script src="src/3rd-party/jquery-ui-1.13.2.custom/jquery-ui.min.js"></script>
 		<script src="src/3rd-party/jquery-dialogextend/jquery.dialogextend.v2.0.4.min.js"></script>
+		<script src="src/3rd-party/jquery-ui-menubar/menubar.js"></script>
 		<script src="src/3rd-party/dat.gui/dat.gui.min.js"></script>
 		<script src="src/3rd-party/UTIF.js"></script>
 		<script src="src/3rd-party/image-ms-ssim.js"></script>
 	</head>
 	<body>
+		<ul id="menubar" class="menubar">
+			<li>
+				<div>File</div>
+				<ul>
+					<li><div><span class="ui-icon ui-icon-folder-open"></span>Open</div></li>
+					<li class="ui-state-disabled"><div>Open (disabled)</div></li>
+					<li>
+						<div><span class="ui-icon ui-icon-clock"></span>Open Recent...</div>
+						<ul>
+							<li><div><span class="ui-icon ui-icon-document"></span>File A</div></li>
+							<li><div><span class="ui-icon ui-icon-document"></span>File B</div></li>
+							<li><div><span class="ui-icon ui-icon-document"></span>File C</div></li>
+						</ul>
+					</li>
+					<li class="divider"></li>
+					<li><div><span class="ui-icon ui-icon-power"></span>Quit</div></li>
+				</ul>
+			</li>
+			<li>
+				<div>Help</div>
+				<ul>
+					<li><div>Some option</div></li>
+					<li>
+						<div>
+							<label>
+								<input type="checkbox" name="checkbox" value="value">
+								Toggle me
+							</label>
+						</div>
+					</li>
+					<li class="divider"></li>
+					<li><div><span class="ui-icon ui-icon-info"></span>About</div></li>
+				</ul>
+			</li>
+		</ul>
+
 		<div class="layout" id="main-container"></div>
 
 		<div id="options-anchor">
