@@ -145,13 +145,16 @@ gui_do.add(G_GUI_Controller, 'doImageMetric').onChange(function(){
 gui_do.add(G_GUI_Controller, 'imageMetricAlgo', G_IMG_METRICS);
 
 var gui_io = gui.addFolder('Input / Export Image');
-gui_io.add(G_GUI_Controller, 'groundTruthImg', G_PRELOADED_IMAGES).listen().onChange(function(){
-	var fname = Utils.getGroundtruthImage();
-	if (fname.length > 0) {
-		G_INPUT_IMAGE = G_PRELOADED_IMAGES_ROOT + fname;
-		console.log("Ground Truth Image changed to: "+G_INPUT_IMAGE);
-		$(document.body).trigger('OnGroundtruthImageChange');
-	}
+
+const G_PRELOADED_SELECTMENU = gui_io.add(G_GUI_Controller, 'groundTruthImg', G_PRELOADED_IMAGES)
+	.listen()
+	.onChange(function(){
+		var fname = Utils.getGroundtruthImage();
+		if (fname.length > 0) {
+			G_INPUT_IMAGE = G_PRELOADED_IMAGES_ROOT + fname;
+			console.log("Ground Truth Image changed to: "+G_INPUT_IMAGE);
+			$(document.body).trigger('OnGroundtruthImageChange');
+		}
 });
 
 // add the import image button / option

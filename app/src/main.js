@@ -1,6 +1,7 @@
 /* globals
 LayoutManager
 Utils
+G_INPUT_IMAGE
 */
 
 // global functions from drawsteps.js
@@ -27,9 +28,6 @@ G_VSEM_STAGE
 G_SHOW_SUBREGION_OVERLAY
 G_IMG_METRIC_ENABLED
 G_APP_NAME
-G_INPUT_IMAGE
-G_PRELOADED_IMAGES
-G_PRELOADED_IMAGES_ROOT
 G_IMG_METRICS
 */
 
@@ -52,41 +50,6 @@ var G_SHOW_SUBREGION_OVERLAY = true;
 
 /** Toggle value to pause/hide the image quality metric calculation of the Resulting Image / Virtual SEM view */
 var G_IMG_METRIC_ENABLED = true;
-
-/** The root folder for all the preloaded images specified by {@link G_PRELOADED_IMAGES}. */
-const G_PRELOADED_IMAGES_ROOT = "src/testimages/";
-
-/**
- * The list of default/preloaded images to use with the application.
- * @see G_PRELOADED_IMAGES_ROOT
- */
-const G_PRELOADED_IMAGES = [
-	'grains1.png',
-	'grains2full.png',
-	'grains2tl.png',
-	'grains2nc.png',
-	'APT_needle.png',
-	'tephra_448nm.png',
-	'tephra_200nm.png',
-];
-
-/** global variable to set the input ground truth image */
-// var G_INPUT_IMAGE = Utils.getGroundtruthImage();
-var G_INPUT_IMAGE = G_PRELOADED_IMAGES_ROOT + 'grains2tl.png';
-
-// Preload the larger image files in the background
-// without blocking the UI for improved responsiveness
-window.addEventListener('load', function(){
-	// https://stackoverflow.com/a/59861857/883015
-	// var images = G_PRELOADED_IMAGES;
-	var images = ['grains2full.png', 'APT_needle.png', 'tephra_448nm.png', 'tephra_200nm.png'];
-	var preload = '';
-	for(let i = 0; i < images.length; i++) {
-		preload += '<link rel="preload" href="' + G_PRELOADED_IMAGES_ROOT
-		+ images[i] + '" as="image">\n';
-	}
-	$('head').append(preload);
-});
 
 /** The list of image quality metrics supported by the application. */
 const G_IMG_METRICS = [

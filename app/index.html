@@ -27,37 +27,87 @@
 			<li>
 				<div>File</div>
 				<ul>
-					<li><div><span class="ui-icon ui-icon-folder-open"></span>Open</div></li>
-					<li class="ui-state-disabled"><div>Open (disabled)</div></li>
+					<li><div><span class="ui-icon ui-icon-folder-open"></span>Import Image</div></li>
+					<!-- <li class="ui-state-disabled"><div>Open (disabled)</div></li> -->
 					<li>
-						<div><span class="ui-icon ui-icon-clock"></span>Open Recent...</div>
-						<ul>
-							<li><div><span class="ui-icon ui-icon-document"></span>File A</div></li>
-							<li><div><span class="ui-icon ui-icon-document"></span>File B</div></li>
-							<li><div><span class="ui-icon ui-icon-document"></span>File C</div></li>
+						<div></span>Open Preloaded...</div>
+						<ul id="menu_preloaded_images">
+							<!-- <li><div><span class="ui-icon ui-icon-document"></span>File A</div></li> -->
+							<!-- <li><div><span class="ui-icon ui-icon-document"></span>File B</div></li> -->
+							<!-- <li><div><span class="ui-icon ui-icon-document"></span>File C</div></li> -->
 						</ul>
 					</li>
-					<li class="divider"></li>
+					<li>----</li>
+					<li><div><span class="ui-icon ui-icon-disk"></span>Save Image</div></li>
+					<li><div><span class="ui-icon ui-icon-disk"></span>Save Image (actual size)</div></li>
+					<li>----</li>
 					<li><div><span class="ui-icon ui-icon-power"></span>Quit</div></li>
 				</ul>
 			</li>
 			<li>
 				<div>Help</div>
 				<ul>
-					<li><div>Some option</div></li>
+					<li><div>Quick-Start Guide</div></li>
+					<li><div>Homepage</div></li>
+					<li>----</li>
 					<li>
 						<div>
 							<label>
-								<input type="checkbox" name="checkbox" value="value">
-								Toggle me
+								<input type="checkbox" name="checkbox" autocomplete="off" id="cb_hide_options">
+								Hide Options Window
 							</label>
 						</div>
 					</li>
-					<li class="divider"></li>
+					<li>----</li>
 					<li><div><span class="ui-icon ui-icon-info"></span>About</div></li>
 				</ul>
 			</li>
 		</ul>
+		<script>
+			/**
+			 * The list of default/preloaded images to use with the application.
+			 * @see G_PRELOADED_IMAGES_ROOT
+			 */
+			const G_PRELOADED_IMAGES = [
+				'grains1.png',
+				'grains2full.png',
+				'grains2tl.png',
+				'grains2nc.png',
+				'APT_needle.png',
+				'tephra_448nm.png',
+				'tephra_200nm.png',
+			];
+
+			/** The root folder for all the preloaded images specified by {@link G_PRELOADED_IMAGES}. */
+			const G_PRELOADED_IMAGES_ROOT = "src/testimages/";
+
+			/** global variable to set the input ground truth image */
+			// var G_INPUT_IMAGE = Utils.getGroundtruthImage();
+			var G_INPUT_IMAGE = G_PRELOADED_IMAGES_ROOT + 'grains2tl.png';
+
+			// Preload the larger image files in the background
+			// without blocking the UI for improved responsiveness
+			window.addEventListener('load', function(){
+				// https://stackoverflow.com/a/59861857/883015
+				// var images = G_PRELOADED_IMAGES;
+				var images = ['grains2full.png', 'APT_needle.png', 'tephra_448nm.png', 'tephra_200nm.png'];
+				var preload = '';
+				for(let i = 0; i < images.length; i++) {
+					preload += '<link rel="preload" href="' + G_PRELOADED_IMAGES_ROOT
+					+ images[i] + '" as="image">\n';
+				}
+				$('head').append(preload);
+			});
+
+			// Add the preloaded images to the menubar
+			let _menu_preloaded_images = $('#menu_preloaded_images');
+			for (let i = 0; i < G_PRELOADED_IMAGES.length; i++) {
+				const img = G_PRELOADED_IMAGES[i];
+				const _html = '<li><div><span class="ui-icon ui-icon-image"></span>' + img + '</div></li>';
+				_menu_preloaded_images.append(_html);
+			}
+
+		</script>
 
 		<div class="layout" id="main-container"></div>
 

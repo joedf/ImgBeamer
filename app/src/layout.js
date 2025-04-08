@@ -36,6 +36,8 @@ const LayoutManager = {
 	_stage_dialog_class: "stage-dlg",
 	// the class of the entire dialog element
 	_dialog_parent_class: "stage-dialog",
+	// the id for the menubar / topbar
+	_menubar_id: "#menubar",
 	// the class of a stage's parent element
 	_stageContainer_class: "stageContainer",
 	_stages_per_row: 3,
@@ -48,9 +50,18 @@ const LayoutManager = {
 	_cascade_dialog_base_z_index: 100,
 
 	Initialize: function(){
+		var me = this;
+		$(document).ready(function(){
+			me.__onDocReady();
+		});
+
 		// eslint-disable-next-line no-magic-numbers
 		this.box_size = this.__GetOptimalBoxWidth(true, 30);
 		this.Stages = this.__SetupStages();
+	},
+	
+	__onDocReady: function(){
+		this.__SetupMenubar();
 	},
 
 	/**
@@ -446,5 +457,61 @@ const LayoutManager = {
 			stages.push(stage);
 		}
 		return stages;
+	},
+
+	__SetupMenubar: function(){
+		let el = $(this._menubar_id);
+		let gui = G_GUI_Controller;
+		el.menu('option', 'select', function(event){
+			// console.log(event);
+
+			let target = event.currentTarget;
+			let textraw = target.innerText;
+			let text = textraw.toLocaleLowerCase();
+			let keyword = text.split(' ')[0];
+
+			if (text.indexOf('.png')>1) { keyword = '__preloaded'; }
+			
+			switch(keyword){
+				case 'import':
+					gui.importImage();
+					break;
+				case '__preloaded': //preloaded images
+				// TODO: clean up global var?
+					G_GUI_Controller.groundTruthImg = textraw;
+					G_PRELOADED_SELECTMENU.__onChange();
+					break;
+				case 'save':
+					if (text.indexOf('actual') >= 0) {
+						gui.exportResultTrueImage();
+					} else{
+						gui.exportResultImg();
+					}
+					break;
+				case 'homepage':
+					// TODO: use global var?
+					window.open('https://joedf.github.io/ImgBeamer','_blank').focus();
+					break;
+					case 'quick-start':
+						// TODO: use global var?
+						window.open('https://joedf.github.io/ImgBeamer/misc/ImgBeamer_QS_guide.pdf','_blank').focus();
+						break;
+						case 'hide': // Hide Options
+					// TODO: use global vars?
+					var __isChecked = $('#cb_hide_options').is(':checked');
+					$('#options-anchor').toggle(!__isChecked);
+					break;
+					case 'about':
+						gui.aboutMessage();
+					break;
+					case 'quit':
+						// doesnt work for user-opened origin pages
+						// window.close();
+						// instead replace page (in history) with repo page for now
+						// TODO: use global var?
+						window.location.replace('https://github.com/joedf/ImgBeamer');
+					break;
+			}
+		});
 	},
 };
