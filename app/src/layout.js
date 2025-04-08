@@ -471,6 +471,10 @@ const LayoutManager = {
 			let keyword = text.split(' ')[0];
 
 			if (text.indexOf('.png')>1) { keyword = '__preloaded'; }
+			// prevent handling erroneous drag-clicking
+			if (keyword == '__preloaded' && textraw.indexOf('\n')>=0) {
+				return;
+			}
 			
 			switch(keyword){
 				case 'import':
