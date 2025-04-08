@@ -9,6 +9,9 @@
 
 // Iinitialize menubar
 $(document).ready(function () {
+	// change internal default for menu delay
+	// https://stackoverflow.com/a/79562039/883015
+	$.ui.menu.prototype.delay = 10;
 	$('.menubar').menu({
 		position: { my: 'left top', at: 'left bottom' },
 		focus: function (e, ui) {
