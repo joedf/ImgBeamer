@@ -530,7 +530,14 @@ const LayoutManager = {
 					break;
 			}
 		});
-		el.menu('option', 'focus', function(){
+		// don't overwrite the focus handler from jquery-ui-menubar
+		let _onFocus = el.menu('option', 'focus').bind(el);
+		// we want to add to it
+		el.menu('option', 'focus', function(event, ui){
+			// call original handler first
+			// which positions submenus correctly
+			_onFocus(event, ui);
+
 			// ensure advanced mode checkbox is updated
 			// TODO: use global vars?
 			var __checked = G_GUI_ADVANCE_MODE_CB.getValue();
