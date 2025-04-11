@@ -181,6 +181,7 @@ summary {
 	z-index: 8000;
 	background-color: #555;
 }
+.menubar label { cursor: pointer; }
 #main-container {
 	box-sizing: border-box;
 	display: block;
