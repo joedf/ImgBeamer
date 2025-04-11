@@ -530,7 +530,7 @@ const LayoutManager = {
 					break;
 			}
 		});
-		el.menu('option', 'focus', function(event){
+		el.menu('option', 'focus', function(){
 			// ensure advanced mode checkbox is updated
 			// TODO: use global vars?
 			var __checked = G_GUI_ADVANCE_MODE_CB.getValue();
