@@ -4,6 +4,8 @@ G_Update_Stages_Global
 G_VSEM_STAGE
 G_VSEM_PAUSED
 G_GUI_Controller
+G_GUI_PRELOADED_IMGS_SELECTMENU
+G_GUI_ADVANCE_MODE_CB
 */
 
 /* exported LayoutManager, G_VSEM_PAUSED */
@@ -37,7 +39,10 @@ const LayoutManager = {
 	// the class of the entire dialog element
 	_dialog_parent_class: "stage-dialog",
 	// the id for the menubar / topbar
-	_menubar_id: "#menubar",
+	_menubar_id: "menubar",
+	// ids for menubar checkboxes
+	_cb_hide_options: "cb_hide_options",
+	_cb_advanced_mode: "cb_advanced_mode",
 	// the class of a stage's parent element
 	_stageContainer_class: "stageContainer",
 	_stages_per_row: 3,
@@ -45,13 +50,22 @@ const LayoutManager = {
 	
 	/** a reference to the main body container that holds the boxes/stages. */
 	_main_container: $('#main-container'),
-
+	
 	/** The base z-index to use for cascading dialogs */
 	_cascade_dialog_base_z_index: 100,
-
+	
 	// advanced mode stages start at this index for the stages array
 	__advanced_dialogs_start: 6,
-
+	
+	// -----------------------------------------------------
+	// URLs
+	// -----------------------------------------------------
+	_URLs: {
+		home: 'https://joedf.github.io/ImgBeamer',
+		guide: 'https://joedf.github.io/ImgBeamer/misc/ImgBeamer_QS_guide.pdf',
+	},
+	
+	// -----------------------------------------------------
 	Initialize: function(){
 		var me = this;
 		$(document).ready(function(){
@@ -462,7 +476,7 @@ const LayoutManager = {
 	},
 
 	__SetupMenubar: function(){
-		let el = $(this._menubar_id);
+		let el = $('#'+this._menubar_id);
 		let gui = G_GUI_Controller;
 		var me = this;
 		el.menu('option', 'select', function(event){
@@ -484,8 +498,9 @@ const LayoutManager = {
 					gui.importImage();
 					break;
 				case '__preloaded': //preloaded images
-					// TODO: clean up global var?
-					G_PRELOADED_SELECTMENU.setValue(textraw);
+					// set the selected preloaded image, by using the options GUI controller
+					// simulates as if the user click that option, so other things trigger correctly
+					G_GUI_PRELOADED_IMGS_SELECTMENU.setValue(textraw);
 					break;
 				case 'save':
 					if (text.indexOf('actual') >= 0) {
@@ -495,10 +510,9 @@ const LayoutManager = {
 					}
 					break;
 				case 'advanced': //mode
-					// TODO: use global vars?
-					var __isChecked = $('#cb_advanced_mode').is(':checked');
-					G_GUI_ADVANCE_MODE_CB.setValue(__isChecked);
-					// Utils.updateAdvancedMode();
+					// get the check state in the menubar
+					var _cbchk_am = $('#'+me._cb_advanced_mode).is(':checked');
+					G_GUI_ADVANCE_MODE_CB.setValue(_cbchk_am);
 					break;
 				case 'tile': // displays/dialogs
 					// Ensure no dialog is collapsed before tiling, otherwise it won't work right...
@@ -506,17 +520,14 @@ const LayoutManager = {
 					me.TileDialogs(0, me.__advanced_dialogs_start);
 					break;
 				case 'homepage':
-					// TODO: use global var?
-					window.open('https://joedf.github.io/ImgBeamer','_blank').focus();
+					window.open(me._URLs.home,'_blank').focus();
 					break;
 				case 'quick-start':
-					// TODO: use global var?
-					window.open('https://joedf.github.io/ImgBeamer/misc/ImgBeamer_QS_guide.pdf','_blank').focus();
+					window.open(me._URLs.guide,'_blank').focus();
 					break;
 				case 'hide': // Hide Options
-					// TODO: use global vars?
-					var __isChecked = $('#cb_hide_options').is(':checked');
-					$('#options-anchor').toggle(!__isChecked);
+					var _cbchk_ho = $('#'+me._cb_hide_options).is(':checked');
+					$('#options-anchor').toggle(!_cbchk_ho);
 					break;
 				case 'about':
 						gui.aboutMessage();
@@ -525,8 +536,7 @@ const LayoutManager = {
 						// doesnt work for user-opened origin pages
 						// window.close();
 						// instead replace page (in history) with repo page for now
-						// TODO: use global var?
-						window.location.replace('https://github.com/joedf/ImgBeamer');
+						window.location.replace(me._URLs.home);
 					break;
 			}
 		});
@@ -539,9 +549,8 @@ const LayoutManager = {
 			_onFocus(event, ui);
 
 			// ensure advanced mode checkbox is updated
-			// TODO: use global vars?
 			var __checked = G_GUI_ADVANCE_MODE_CB.getValue();
-			$('#cb_advanced_mode').prop('checked', __checked);
+			$('#'+me._cb_advanced_mode).prop('checked', __checked);
 		});
 	},
 };

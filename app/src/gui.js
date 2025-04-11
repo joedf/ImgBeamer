@@ -27,6 +27,8 @@ G_SHOW_SUBREGION_OVERLAY
 /* exported
 G_GUI_Controller
 G_Export_img_count
+G_GUI_ADVANCE_MODE_CB
+G_GUI_PRELOADED_IMGS_SELECTMENU
 */
 
 /* allow global reassign and magic number as this where
@@ -146,7 +148,7 @@ gui_do.add(G_GUI_Controller, 'imageMetricAlgo', G_IMG_METRICS);
 
 var gui_io = gui.addFolder('Input / Export Image');
 
-const G_PRELOADED_SELECTMENU = gui_io.add(G_GUI_Controller, 'groundTruthImg', G_PRELOADED_IMAGES)
+const G_GUI_PRELOADED_IMGS_SELECTMENU = gui_io.add(G_GUI_Controller, 'groundTruthImg', G_PRELOADED_IMAGES)
 	.listen()
 	.onChange(function(){
 		var fname = Utils.getGroundtruthImage();
