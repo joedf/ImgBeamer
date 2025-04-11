@@ -22,7 +22,7 @@ The source code is available [here](https://github.com/joedf/ImgBeamer).
 9. **Resulting Image** (full, "virtual SEM"): the resulting image full where the imaging process, as shown in the Resulting Subregion, is continued for the full extent of the Sample Ground Truth image.
  
 ### Screenshot
-![screenshot](misc/screenshot4.png)
+![screenshot](misc/screenshot5.png)
 
 ### Notes
 - Minor pixel value differences in virtualSEM; improved, but could be due to sampling from downsized sampling of the larger full image
