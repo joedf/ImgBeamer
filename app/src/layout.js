@@ -139,6 +139,20 @@ const LayoutManager = {
 	},
 
 	/**
+	 * Restores dialogs.
+	 * All dialogs by default, otherwise for a given range.
+	 * @param {integer} start the dialog to start tiling with.
+	 * @param {integer} end the last dialog to tile.
+	 */
+	RestoreDialogs: function(start=0, end=null){
+		let dialogs = $("."+this._stage_dialog_class);
+		let last = (end==null) ? dialogs.length : Utils.clampValue(end, 0, dialogs.length);
+		for (let i = start; i < last; i++) {
+			dialogs.eq(i).dialogExtend("restore");
+		}
+	},
+
+	/**
 	 * Positions dialogs in a tiled layout.
 	 * All dialogs by default, otherwise for a given range.
 	 * @param {integer} tile_start the dialog to start tiling with.
@@ -520,7 +534,7 @@ const LayoutManager = {
 					break;
 				case 'tile': // displays/dialogs
 					// Ensure no dialog is collapsed before tiling, otherwise it won't work right...
-					$("."+me._stage_dialog_class).dialogExtend("restore");
+					me.RestoreDialogs(0, me.__advanced_dialogs_start);
 					me.TileDialogs(0, me.__advanced_dialogs_start);
 					break;
 				case 'homepage':
