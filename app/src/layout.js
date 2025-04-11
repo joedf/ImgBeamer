@@ -49,6 +49,9 @@ const LayoutManager = {
 	/** The base z-index to use for cascading dialogs */
 	_cascade_dialog_base_z_index: 100,
 
+	// advanced mode stages start at this index for the stages array
+	__advanced_dialogs_start: 6,
+
 	Initialize: function(){
 		var me = this;
 		$(document).ready(function(){
@@ -132,7 +135,7 @@ const LayoutManager = {
 		let parentPos = this._main_container.position();
 		let start_x = parentPos.left;
 		let start_y = parentPos.top;
-		
+
 		// position first one
 		$(g_dlg_selector).dialog('widget').eq(tile_start).css({top:start_y, left:start_x});
 
@@ -278,7 +281,7 @@ const LayoutManager = {
 	// eslint-disable-next-line no-unused-vars
 	__ShouldStageDialogStartMinimized: function(i){
 		// eslint-disable-next-line no-magic-numbers
-		// return (i > 5);
+		// return (i >= this.__advanced_dialogs_start);
 		
 		// Start none as minimized for now
 		// see https://github.com/joedf/ImgBeamer/issues/53#issuecomment-2776922914
@@ -444,9 +447,8 @@ const LayoutManager = {
 
 		// optionally, tile the dialogs
 		if (layoutDialogs) {
-			let advanced_dialogs_start = 6;
-			this.TileDialogs(0, advanced_dialogs_start);
-			this.CascadeDialogs(advanced_dialogs_start, this.stages_count);
+			this.TileDialogs(0, this.__advanced_dialogs_start);
+			this.CascadeDialogs(this.__advanced_dialogs_start, this.stages_count);
 		}
 		
 		// then create the stages and plug them in
@@ -462,6 +464,7 @@ const LayoutManager = {
 	__SetupMenubar: function(){
 		let el = $(this._menubar_id);
 		let gui = G_GUI_Controller;
+		var me = this;
 		el.menu('option', 'select', function(event){
 			// console.log(event);
 
@@ -481,7 +484,7 @@ const LayoutManager = {
 					gui.importImage();
 					break;
 				case '__preloaded': //preloaded images
-				// TODO: clean up global var?
+					// TODO: clean up global var?
 					G_GUI_Controller.groundTruthImg = textraw;
 					G_PRELOADED_SELECTMENU.__onChange();
 					break;
@@ -492,23 +495,34 @@ const LayoutManager = {
 						gui.exportResultImg();
 					}
 					break;
+				case 'advanced': //mode
+					// TODO: use global vars?
+					var __isChecked = $('#cb_advanced_mode').is(':checked');
+					G_GUI_ADVANCE_MODE_CB.setValue(__isChecked);
+					// Utils.updateAdvancedMode();
+					break;
+				case 'tile': // displays/dialogs
+					// Ensure no dialog is collapsed before tiling, otherwise it won't work right...
+					$("."+me._stage_dialog_class).dialogExtend("restore");
+					me.TileDialogs(0, me.__advanced_dialogs_start);
+					break;
 				case 'homepage':
 					// TODO: use global var?
 					window.open('https://joedf.github.io/ImgBeamer','_blank').focus();
 					break;
-					case 'quick-start':
-						// TODO: use global var?
-						window.open('https://joedf.github.io/ImgBeamer/misc/ImgBeamer_QS_guide.pdf','_blank').focus();
-						break;
-						case 'hide': // Hide Options
+				case 'quick-start':
+					// TODO: use global var?
+					window.open('https://joedf.github.io/ImgBeamer/misc/ImgBeamer_QS_guide.pdf','_blank').focus();
+					break;
+				case 'hide': // Hide Options
 					// TODO: use global vars?
 					var __isChecked = $('#cb_hide_options').is(':checked');
 					$('#options-anchor').toggle(!__isChecked);
 					break;
-					case 'about':
+				case 'about':
 						gui.aboutMessage();
 					break;
-					case 'quit':
+				case 'quit':
 						// doesnt work for user-opened origin pages
 						// window.close();
 						// instead replace page (in history) with repo page for now
@@ -516,6 +530,12 @@ const LayoutManager = {
 						window.location.replace('https://github.com/joedf/ImgBeamer');
 					break;
 			}
+		});
+		el.menu('option', 'focus', function(event){
+			// ensure advanced mode checkbox is updated
+			// TODO: use global vars?
+			var __checked = G_GUI_ADVANCE_MODE_CB.getValue();
+			$('#cb_advanced_mode').prop('checked', __checked);
 		});
 	},
 };

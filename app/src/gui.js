@@ -122,7 +122,7 @@ gui_ip.add(G_GUI_Controller, 'showRuler').onChange(function(){
 gui_ip.open();
 
 var gui_do = gui.addFolder('Display Options');
-gui_do.add(G_GUI_Controller, 'advancedMode').onChange(function(){
+const G_GUI_ADVANCE_MODE_CB = gui_do.add(G_GUI_Controller, 'advancedMode').onChange(function(){
 	Utils.updateAdvancedMode();
 });
 gui_do.add(G_GUI_Controller, 'pause_vSEM').onChange(function(){
