@@ -4,21 +4,125 @@
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<meta http-equiv="X-UA-Compatible" content="ie=edge">
+		
 		<title>ImgBeamer</title>
 
 		<link rel="icon" href="src/img/favicon.ico" type="image/x-icon" />
 
 		<link rel="stylesheet" href="src/3rd-party/jquery-ui-1.13.2.custom/jquery-ui.min.css">
-
+		<link rel="stylesheet" href="src/3rd-party/jquery-ui-menubar/menubar.css">
 		<link rel="stylesheet" href="src/css/style.css">
+
 		<script src="src/3rd-party/konva/v9.3.2/konva.min.js"></script>
 		<script src="src/3rd-party/jquery-3.6.1.min.js"></script>
 		<script src="src/3rd-party/jquery-ui-1.13.2.custom/jquery-ui.min.js"></script>
+		<script src="src/3rd-party/jquery-dialogextend/jquery.dialogextend.v2.0.4.min.js"></script>
+		<script src="src/3rd-party/jquery-ui-menubar/menubar.js"></script>
 		<script src="src/3rd-party/dat.gui/dat.gui.min.js"></script>
 		<script src="src/3rd-party/UTIF.js"></script>
 		<script src="src/3rd-party/image-ms-ssim.js"></script>
 	</head>
 	<body>
+		<ul id="menubar" class="menubar">
+			<li>
+				<div>File</div>
+				<ul>
+					<li><div><span class="ui-icon ui-icon-folder-open"></span>Import Image</div></li>
+					<!-- <li class="ui-state-disabled"><div>Open (disabled)</div></li> -->
+					<li>
+						<div><span class="ui-icon ui-icon-bookmark"></span>Open Preloaded...</div>
+						<ul id="menu_preloaded_images">
+							<!-- <li><div><span class="ui-icon ui-icon-document"></span>File A</div></li> -->
+							<!-- <li><div><span class="ui-icon ui-icon-document"></span>File B</div></li> -->
+							<!-- <li><div><span class="ui-icon ui-icon-document"></span>File C</div></li> -->
+						</ul>
+					</li>
+					<li>----</li>
+					<li><div><span class="ui-icon ui-icon-disk"></span>Save Image</div></li>
+					<li><div><span class="ui-icon ui-icon-disk"></span>Save Image (actual size)</div></li>
+					<li>----</li>
+					<li><div><span class="ui-icon ui-icon-power"></span>Quit</div></li>
+				</ul>
+			</li>
+			<li>
+				<div>View</div>
+				<ul>
+					<li>
+						<div>
+							<label>
+								<input type="checkbox" autocomplete="off" id="cb_hide_options">
+								Hide Options Window
+							</label>
+						</div>
+					</li>
+					<li>
+						<div>
+							<label>
+								<input type="checkbox" autocomplete="off" id="cb_advanced_mode">
+								Advanced Mode
+							</label>
+						</div>
+					</li>
+					<li>----</li>
+					<li><div><span class="ui-icon ui-icon-newwin"></span>Tile Displays</div></li>
+				</ul>
+			</li>
+			<li>
+				<div>Help</div>
+				<ul>
+					<li><div><span class="ui-icon ui-icon-help"></span>Quick-Start Guide</div></li>
+					<li><div><span class="ui-icon ui-icon-home"></span>Homepage</div></li>
+					<li>----</li>
+					<li><div><span class="ui-icon ui-icon-info"></span>About</div></li>
+				</ul>
+			</li>
+		</ul>
+		<script>
+			/**
+			 * The list of default/preloaded images to use with the application.
+			 * @see G_PRELOADED_IMAGES_ROOT
+			 */
+			const G_PRELOADED_IMAGES = [
+				'grains1.png',
+				'grains2full.png',
+				'grains2tl.png',
+				'grains2nc.png',
+				'APT_needle.png',
+				'tephra_448nm.png',
+				'tephra_200nm.png',
+			];
+
+			/** The root folder for all the preloaded images specified by {@link G_PRELOADED_IMAGES}. */
+			const G_PRELOADED_IMAGES_ROOT = "src/testimages/";
+
+			/** global variable to set the input ground truth image */
+			// var G_INPUT_IMAGE = Utils.getGroundtruthImage();
+			var G_INPUT_IMAGE = G_PRELOADED_IMAGES_ROOT + 'grains2tl.png';
+
+			// Preload the larger image files in the background
+			// without blocking the UI for improved responsiveness
+			window.addEventListener('load', function(){
+				// https://stackoverflow.com/a/59861857/883015
+				// var images = G_PRELOADED_IMAGES;
+				var images = ['grains2full.png', 'APT_needle.png', 'tephra_448nm.png', 'tephra_200nm.png'];
+				var preload = '';
+				for(let i = 0; i < images.length; i++) {
+					preload += '<link rel="preload" href="' + G_PRELOADED_IMAGES_ROOT
+					+ images[i] + '" as="image">\n';
+				}
+				$('head').append(preload);
+			});
+
+			// Add the preloaded images to the menubar
+			let _menu_preloaded_images = $('#menu_preloaded_images');
+			for (let i = 0; i < G_PRELOADED_IMAGES.length; i++) {
+				const img = G_PRELOADED_IMAGES[i];
+				const _html = '<li><div><span class="ui-icon ui-icon-image"></span>' + img + '</div></li>';
+				_menu_preloaded_images.append(_html);
+			}
+
+		</script>
+
 		<div class="layout" id="main-container"></div>
 
 		<div id="options-anchor">
@@ -78,6 +182,7 @@
 		</div>
 
 		<script src="src/utils.js"></script>
+		<script src="src/layout.js"></script>
 		<script src="src/drawsteps.js"></script>
 		<script src="src/img_metrics.js"></script>
 		<script src="src/main.js"></script>

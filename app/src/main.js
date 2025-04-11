@@ -1,4 +1,8 @@
-/* globals Utils, GetOptimalBoxWidth */
+/* globals
+LayoutManager
+Utils
+G_INPUT_IMAGE
+*/
 
 // global functions from drawsteps.js
 /* globals
@@ -17,16 +21,14 @@ G_update_ImgMetrics
 G_UpdateRuler
 G_UpdateFilters
 G_UpdateStageSettings
+G_Update_Stages_Global
 G_AUTO_PREVIEW_LIMIT
 G_VSEM_PAUSED
+G_VSEM_STAGE
 G_SHOW_SUBREGION_OVERLAY
 G_IMG_METRIC_ENABLED
 G_APP_NAME
-G_INPUT_IMAGE
-G_PRELOADED_IMAGES
-G_PRELOADED_IMAGES_ROOT
 G_IMG_METRICS
-G_STAGES
 */
 
 /** Name of the application */
@@ -48,41 +50,6 @@ var G_SHOW_SUBREGION_OVERLAY = true;
 
 /** Toggle value to pause/hide the image quality metric calculation of the Resulting Image / Virtual SEM view */
 var G_IMG_METRIC_ENABLED = true;
-
-/** The root folder for all the preloaded images specified by {@link G_PRELOADED_IMAGES}. */
-const G_PRELOADED_IMAGES_ROOT = "src/testimages/";
-
-/**
- * The list of default/preloaded images to use with the application.
- * @see G_PRELOADED_IMAGES_ROOT
- */
-const G_PRELOADED_IMAGES = [
-	'grains1.png',
-	'grains2full.png',
-	'grains2tl.png',
-	'grains2nc.png',
-	'APT_needle.png',
-	'tephra_448nm.png',
-	'tephra_200nm.png',
-];
-
-/** global variable to set the input ground truth image */
-// var G_INPUT_IMAGE = Utils.getGroundtruthImage();
-var G_INPUT_IMAGE = G_PRELOADED_IMAGES_ROOT + 'grains2tl.png';
-
-// Preload the larger image files in the background
-// without blocking the UI for improved responsiveness
-window.addEventListener('load', function(){
-	// https://stackoverflow.com/a/59861857/883015
-	// var images = G_PRELOADED_IMAGES;
-	var images = ['grains2full.png', 'APT_needle.png', 'tephra_448nm.png', 'tephra_200nm.png'];
-	var preload = '';
-	for(let i = 0; i < images.length; i++) {
-		preload += '<link rel="preload" href="' + G_PRELOADED_IMAGES_ROOT
-		+ images[i] + '" as="image">\n';
-	}
-	$('head').append(preload);
-});
 
 /** The list of image quality metrics supported by the application. */
 const G_IMG_METRICS = [
@@ -113,27 +80,15 @@ var G_UpdateRuler = null;
 var G_UpdateFilters = null;
 /** global reference to update stage related settings */
 var G_UpdateStageSettings = null;
-
-/** a global reference to the main body container that holds the boxes/stages.
- * @todo do we still need this? Maybe remove... */
-var G_MAIN_CONTAINER = $('#main-container');
-
-
-/** The calculated size of each box/stage */
-var G_BOX_SIZE = GetOptimalBoxWidth();
-
-/** The number of stages to create */
-const nStages = 9;
-
-/** The array/list of all the stages. */
-var G_STAGES = [];
-// first create the stages
-for (let i = 0; i < nStages; i++) {
-	let stage = Utils.newStageTemplate(G_MAIN_CONTAINER, G_BOX_SIZE, G_BOX_SIZE);
-	G_STAGES.push(stage);
-}
+/** global reference to call main update routine (used for most stages, updates stage if visible) */
+var G_Update_Stages_Global = null;
+/** global reference to the resulting image stage */
+var G_VSEM_STAGE = null;
 
 /////////////////////
+
+// initialize, do calculations, create the stages, and setup UI
+LayoutManager.Initialize();
 
 /**Currently only used by {@link ResampleFullImage}
  * @todo Possibly, to be removed along with it. */
@@ -145,6 +100,8 @@ UpdateBaseImage();
 // update event for ground truth image change
 $(document.body).on('OnGroundtruthImageChange', UpdateBaseImage);
 
+/////////////////////
+
 /** Updates everything needed assuming that {@link G_INPUT_IMAGE} has changed,
  * updates/draws all the stages/boxes once. */
 function UpdateBaseImage(){
@@ -153,7 +110,7 @@ function UpdateBaseImage(){
 		var imageObj = event.target;
 		G_MAIN_IMAGE_OBJ = imageObj;
 		
-		OnImageLoaded(imageObj, G_STAGES);
+		OnImageLoaded(imageObj, LayoutManager.Stages);
 	});
 }
 
@@ -166,30 +123,48 @@ function UpdateBaseImage(){
 function OnImageLoaded(eImg, stages){
 	/* eslint-disable no-magic-numbers */
 	// Edit these numbers to change the display order
+	var groundtruthMapStage = stages[0];
 	var baseImageStage = stages[1];
 	var spotProfileStage = stages[2];
-	var spotContentStage = stages[3];
-	var spotSignalStage = stages[4];
+	var virtualSEMStage = stages[3];
+	var resampledStage = stages[4];
 	var probeLayoutStage = stages[5];
-	var layoutSampledStage = stages[6];
-	var resampledStage = stages[7];
-	var groundtruthMapStage = stages[0];
-	var virtualSEMStage = stages[8];
+	var spotContentStage = stages[6];
+	var spotSignalStage = stages[7];
+	var layoutSampledStage = stages[8];
 	/* eslint-enable no-magic-numbers */
+
+	// Set dialog titles accordingly
+	LayoutManager.SetDialogTitle(spotProfileStage, 'Spot Profile');
+	LayoutManager.SetDialogTitle(baseImageStage, 'Subregion View / FOV');
+	LayoutManager.SetDialogTitle(spotContentStage, 'Spot Content');
+	LayoutManager.SetDialogTitle(spotSignalStage, 'Spot Signal (Integrated)');
+	LayoutManager.SetDialogTitle(probeLayoutStage, 'Spot Layout');
+	LayoutManager.SetDialogTitle(layoutSampledStage, 'Sampled Subregion');
+	LayoutManager.SetDialogTitle(resampledStage, 'Resulting Subregion');
+	LayoutManager.SetDialogTitle(groundtruthMapStage, 'Sample Ground Truth');
+	LayoutManager.SetDialogTitle(virtualSEMStage, 'Resulting Image');
+
+	// Update global reference to this stage, so that the GUI's image export button works...
+	G_VSEM_STAGE = virtualSEMStage;
 
 	/** called when a change occurs in the spot profile, subregion, or spot content */
 	function doUpdate(){
 		// don't update spot signal if not shown
-		if ($(spotSignalStage.getContainer()).is(':visible')) {
+		if (LayoutManager.IsStageVisible(spotSignalStage)) {
 			updateSpotSignal();
 		}
-		updateProbeLayout();
-		updateResamplingSteps();
-		updateGroundtruthMap();
-		updateVirtualSEM_Config();
 
+		updateResamplingSteps();
+
+		if (LayoutManager.IsStageVisible(groundtruthMapStage)) {
+			updateGroundtruthMap();
+		}
+
+		updateVirtualSEM_Config();
 		updateInfoDisplays();
 	}
+	G_Update_Stages_Global = doUpdate;
 
 	var updateImgMetrics = function(){
 		Utils.updateImageMetricsInfo(groundtruthMapStage, virtualSEMStage);
@@ -210,77 +185,64 @@ function OnImageLoaded(eImg, stages){
 	function promptForSpotWidth(){
 		var spotWidth = prompt("Spot width (%) - Default is 100%", 100);
 		if (spotWidth > 0) {
-			Utils_SetSpotWidth(spotWidth);
+			// we can use 'beam' or 'spotContentBeam' here, they both work...
+			// TODO: maybe just use 'beam' here or a clone?
+			Utils._SetSpotWidth(spotWidth, spotContentBeam, spotScaling, function(){
+				updateBeams();
+				doUpdate();
+			});
 		}
 	}
 
+	// -----------------------------------------------------------
 	// draw Spot Profile
+	// -----------------------------------------------------------
 	$(spotProfileStage.getContainer())
-		.attr('box_label', 'Spot Profile')
-		.attr('note', 'Press [R] to reset shape\nScroll to change size')
-		.css('border-color', 'red');
+		.attr('note', 'Press [R] to reset shape\nScroll to change size');
 	var _spotProfileInfo = drawSpotProfileEdit(spotProfileStage, doUpdate);
 	var beam = _spotProfileInfo.beam;
 	var spotScaling = _spotProfileInfo.spotSize;
 
+	// -----------------------------------------------------------
 	// Subregion View
+	// -----------------------------------------------------------
 	// draw base image (can pan & zoom)
 	$(baseImageStage.getContainer())
 		.addClass('grabCursor')
-		.attr('box_label', 'Subregion View / FOV')
-		.attr('note', 'Pan & Zoom: Drag and Scroll\nPress [R] to reset')
-		.css('border-color', 'blue');
-	var subregionImage = drawSubregionImage(baseImageStage, eImg, G_BOX_SIZE, doUpdate);
+		.attr('note', 'Pan & Zoom: Drag and Scroll\nPress [R] to reset');
+	var subregionImage = drawSubregionImage(baseImageStage, eImg, doUpdate);
 
+	// -----------------------------------------------------------
 	// draw Spot Content
+	// -----------------------------------------------------------
 	$(spotContentStage.getContainer())
-		.addClass('advancedMode')
 		.addClass('grabCursor')
-		.attr('box_label', 'Spot Content')
 		.attr('note', 'Scroll to adjust spot size\nHold [Shift] for half rate');
+	LayoutManager.DialogAddClass(spotContentStage, 'advancedMode');
 	var spotContentBeam = beam.clone();
 	// make a clone without copying over the event bindings
 	var imageCopy = subregionImage.clone().off();
 	drawSpotContent(spotContentStage, imageCopy, spotContentBeam, doUpdate);
 
-	/**(temporary) publicly exposed function to set the spot width
-	 * @param {number} spotWidth the spot width in percent (%), ex. use 130 for 130%.
-	 * @todo move into separate file if possible */
-	function Utils_SetSpotWidth(spotWidth=100){
-		var beam = spotContentBeam;
-		var spotScaler = spotScaling;
-		
-		// calculate the new scale for spot-content image, based on the given spot width
-		var cellSize = Utils.computeCellSize(spotScaler);
-		var maxScale = Math.max(beam.scaleX(), beam.scaleY());
-		var eccScaled = beam.scaleX() / maxScale;
-		var newScale = ((beam.width() * eccScaled) / (spotWidth/100)) / cellSize.w;
-
-		Utils.centeredScale(spotScaler, newScale);
-
-		// propagate changes and update stages
-		updateBeams();
-		doUpdate();
-	}
-
+	// -----------------------------------------------------------
 	// draw Spot Signal
-	$(spotSignalStage.getContainer())
-		.addClass('advancedMode')
-		.addClass('note_colored')
-		.attr('box_label', '(Integrated) Spot Signal');
+	// -----------------------------------------------------------
+	$(spotSignalStage.getContainer()).addClass('note_colored');
+	LayoutManager.DialogAddClass(spotSignalStage, 'advancedMode');
 	var spotSignalBeam = beam.clone();
 	var updateSpotSignal = drawSpotSignal(spotContentStage, spotSignalStage, spotSignalBeam);
 
+	// -----------------------------------------------------------
 	// draw Spot Layout
-	$(probeLayoutStage.getContainer()).attr('box_label', 'Spot Layout');
+	// -----------------------------------------------------------
 	var layoutBeam = beam.clone();
 	var updateProbeLayout = drawProbeLayout(probeLayoutStage, subregionImage, spotScaling, layoutBeam);
 	
+	// -----------------------------------------------------------
 	// draw Sampled Subregion
+	// -----------------------------------------------------------
 	// compute resampled image
-	$(layoutSampledStage.getContainer())
-		.addClass('advancedMode')
-		.attr('box_label', 'Sampled Subregion');
+	LayoutManager.DialogAddClass(layoutSampledStage, 'advancedMode');
 	var layoutSampledBeam = beam.clone();
 	var updateProbeLayoutSamplingPreview = drawProbeLayoutSampling(
 		layoutSampledStage,
@@ -289,10 +251,9 @@ function OnImageLoaded(eImg, stages){
 		layoutSampledBeam
 	);
 
+	// -----------------------------------------------------------
 	// draw Resulting Subregion
-	$(resampledStage.getContainer())
-		.attr('box_label', 'Resulting Subregion')
-		.css('border-color', 'lime');
+	// -----------------------------------------------------------
 	var resampledBeam = beam.clone();
 	var updateResampled = drawResampled(
 		layoutSampledStage,
@@ -303,11 +264,13 @@ function OnImageLoaded(eImg, stages){
 	);
 
 	var updateResamplingSteps = function(){
-		updateProbeLayout();
-		if ($(layoutSampledStage.getContainer()).is(':visible')) {
+		if (LayoutManager.IsStageVisible(probeLayoutStage)) {
+			updateProbeLayout();
+		}
+		if (LayoutManager.IsStageVisible(layoutSampledStage)) {
 			updateProbeLayoutSamplingPreview();
 		}
-		if ($(resampledStage.getContainer()).is(':visible')) {
+		if (LayoutManager.IsStageVisible(resampledStage)) {
 			updateResampled();
 		}
 
@@ -315,9 +278,10 @@ function OnImageLoaded(eImg, stages){
 	};
 	G_UpdateResampled = updateResamplingSteps;
 
+	// -----------------------------------------------------------
 	// draw Sample Ground Truth
-	$(groundtruthMapStage.getContainer()).attr('box_label', 'Sample Ground Truth');
-	var groundtruthMap = drawGroundtruthImage(groundtruthMapStage, eImg, subregionImage, G_BOX_SIZE, doUpdate);
+	// -----------------------------------------------------------
+	var groundtruthMap = drawGroundtruthImage(groundtruthMapStage, eImg, subregionImage, doUpdate);
 	var updateGroundtruthMap = groundtruthMap.updateFunc;
 	G_Update_GroundTruth = updateGroundtruthMap;
 
@@ -357,8 +321,9 @@ function OnImageLoaded(eImg, stages){
 	// update ruler once immediately
 	G_UpdateRuler();
 	
+	// -----------------------------------------------------------
 	// draw Resulting Image
-	$(virtualSEMStage.getContainer()).attr('box_label', 'Resulting Image');
+	// -----------------------------------------------------------
 	var vitualSEMBeam = beam.clone();
 	var updateVirtualSEM_Config = drawVirtualSEM(
 		virtualSEMStage,
@@ -402,6 +367,7 @@ function OnImageLoaded(eImg, stages){
 		doUpdate();
 	});
 
+	// TODO: can this go into Utils?
 	function updateFilters(){
 		var doBC = Utils.getGlobalBCInput();
 		if (doBC) {	
@@ -496,7 +462,7 @@ function ResampleFullImage() {
 		cv = document.createElement('canvas');
 		cv.id = 'finalCanvas';
 		cv.width = cols; cv.height = rows;
-		var cc = $('<div/>').addClass('box final').appendTo(G_MAIN_CONTAINER); cc.append(cv);
+		var cc = $('<div/>').addClass('box final').appendTo("#main-container"); cc.append(cv);
 	}
 
 	cv.width = cols;

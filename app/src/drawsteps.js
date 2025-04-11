@@ -1,6 +1,6 @@
 /* globals
  * Utils,
- * G_BOX_SIZE, G_DEBUG, G_AUTO_PREVIEW_LIMIT,
+ * G_DEBUG, G_AUTO_PREVIEW_LIMIT,
  * G_VSEM_PAUSED, G_MATH_TOFIXED,
  * G_SHOW_SUBREGION_OVERLAY,
  * G_update_ImgMetrics
@@ -231,14 +231,15 @@ function drawSpotProfileEdit(stage, updateCallback = null) {
  * Draws the subregion image display.
  * @param {*} stage The stage to draw it on.
  * @param {*} oImg The ground truth image.
- * @param {Number} size (to be removed) The max size (width or height) of the image to draw.
  * @param {Function} updateCallback 
  * @returns a reference to the subregion image object that can be panned and zoomed by the user.
  * 
  * @todo remove 'size' ... confusing and not useful.
  */
-function drawSubregionImage(stage, oImg, size, updateCallback = null) {
-	var max = size;
+function drawSubregionImage(stage, oImg, updateCallback = null) {
+	// The max size (width or height) of the image to draw.
+	var max = Math.min(stage.width(), stage.height());
+	
 	var imageSize = { w: oImg.naturalWidth, h: oImg.naturalHeight, };
 
 	if (G_DEBUG)
@@ -373,9 +374,6 @@ function drawSpotContent(stage, sImage, sBeam, updateCallback = null) {
 	layer.destroyChildren();  // avoid memory leaks
 	layer.listening(true);
 
-	// Give yellow box border to indicate interactive
-	$(stage.getContainer()).css('border-color','yellow');
-
 	var image = sImage.clone();
 	image.draggable(true);
 	
@@ -389,7 +387,7 @@ function drawSpotContent(stage, sImage, sBeam, updateCallback = null) {
 	var _tempCellSize = Utils.computeCellSize(sImage);
 	var initialSpotScale = sBeam.width() / _tempCellSize.w;
 	// get image proportions once scaled and fitted in the stages
-	var max = G_BOX_SIZE, oImg = sImage.image(), fillMode = Utils.getImageFillMode();
+	var max = Math.min(stage.width(), stage.height()), oImg = sImage.image(), fillMode = Utils.getImageFillMode();
 	var fitSize = Utils.fitImageProportions(oImg.naturalWidth, oImg.naturalHeight, max, fillMode);
 	var minScaleX = fitSize.w / oImg.naturalWidth;
 	// center the image copy based on the calculated center and initial scales
@@ -777,13 +775,15 @@ function drawResampled(sourceStage, destStage, originalImage, spotScale, sBeam) 
  * @param {*} stage the stage to draw on.
  * @param {*} imageObj the original/full-size image to draw
  * @param {*} subregionImage the subregion image (to get the bounds from)
- * @param {number} maxSize (to be removed) the maximum size (width or height) of the stage to fit the image?
  * @param {Function} updateCallback called when a change is made to the subregion
  * @returns an object with an update function to call for needed redraws and the subregion bounds.
  * @todo remove maxSize if possible?
  * @todo do we really need to return the subregionRect as well?
  */
-function drawGroundtruthImage(stage, imageObj, subregionImage, maxSize=G_BOX_SIZE, updateCallback = null){
+function drawGroundtruthImage(stage, imageObj, subregionImage, updateCallback = null){
+
+	// the maximum size (width or height) of the stage to fit the image
+	let maxSize = Math.min(stage.width(), stage.height());
 
 	var fillMode = Utils.getImageFillMode();
 	var fit = Utils.fitImageProportions(imageObj.naturalWidth, imageObj.naturalHeight, maxSize, fillMode);

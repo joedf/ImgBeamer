@@ -9,8 +9,6 @@
  G_APP_NAME
  */
 
-/* exported GetOptimalBoxWidth */
-
 /**
  * @global
  * @description Used for display, for `number.toFixed()` rounding.
@@ -23,27 +21,6 @@ const G_MATH_TOFIXED = {
 	SHORT: 2,
 	LONG: 4
 };
-
-/**
- * Calculated the size to use for each drawing box/stage.
- * Edit the values in the functions to change the box sizing.
- * @returns The size to use.
- */
-function GetOptimalBoxWidth(){
-	// Values used to calculate the size of each box/stage
-	var boxesPerPageWidth = 5;
-	// count-in the width of the borders of the boxes
-	var boxBorderW = 2 * (parseInt($('.box:first').css('border-width')) || 1);
-	var scrollBarW = 15; // scroll bar width
-	var boxSizeMax = 300; //max width for the boxes
-
-	// make sure to have an integer value to prevent slight sizing differences between each box
-	var calculatedBoxSize = Math.ceil(Math.max(
-		(document.body.clientWidth / boxesPerPageWidth) - boxBorderW - scrollBarW,
-		boxSizeMax));
-	
-	return calculatedBoxSize;
-}
 
 /**
  * Various utility and helper functions
@@ -197,6 +174,29 @@ const Utils = {
 	},
 
 	/**
+	 * Set the spot width used for sampling for the entire application
+	 * @param {number} spotWidth the spot width in percent (%), ex. use 130 for 130%.
+	 * @param {*} beam a reference to the beam/spot object to get the elliptical shape (relative to a unit circle).
+	 * @param {*} spotScaler a reference to the spot profile's (invisble) rectangle object that represents the image
+	 * being scaled the user inside the Spot Profile stage. This is used to calculate the scale of the spot.
+	 * @param {*} updateCallback a function to call when spotScaler has been updated and calculations are done.
+	 */
+	_SetSpotWidth: function(spotWidth, beam, spotScaler, updateCallback){
+		// calculate the new scale for spot-content image, based on the given spot width
+		var cellSize = Utils.computeCellSize(spotScaler);
+		var maxScale = Math.max(beam.scaleX(), beam.scaleY());
+		var eccScaled = beam.scaleX() / maxScale;
+		var newScale = ((beam.width() * eccScaled) / (spotWidth/100)) / cellSize.w;
+
+		Utils.centeredScale(spotScaler, newScale);
+
+		// propagate changes and update stages
+		if (typeof updateCallback == 'function') {
+			updateCallback();
+		}
+	},
+
+	/**
 	 * Creates a Zoom event handler to be used on a stage.
 	 * Holding the shift key scales at half the rate.
 	 * @param {object} stage the drawing stage
@@ -252,6 +252,7 @@ const Utils = {
 	/**
 	 * Creates and adds a pinch-Zoom (multi-touch touchscreens) event handler to be used on a shape.
 	 * for more info, see https://konvajs.org/docs/sandbox/Multi-touch_Scale_Shape.html
+	 * @param {*} stage the stage to the event handlers to.
 	 * @param {*} activeShape the shape or object to scale.
 	 * @param {function} callback a callback for when the zoom event handler is called.
 	 * @param {number} scaleMin the scale minimum allowed.
@@ -554,6 +555,7 @@ const Utils = {
 	 * @param {*} beam the beam used for the spot layout and sampling of the image (after scaling).
 	 * @param {*} cellSize the size of a cell in the raster grid of the resulting image.
 	 * @param {*} userImage the scaled image by the user (in spot content) used to size the beam.
+	 * @param {function} onDblClick callback for the doubleclick event
 	 */
 	updateDisplayBeamParams: function(stage, beam, cellSize, userImage, onDblClick) {
 		// calculate and display the values
@@ -872,6 +874,24 @@ const Utils = {
 			isAdvModeON = G_GUI_Controller.advancedMode;
 		}
 		
+		// Ensure advanced-mode dialogs appear on top and restored/uncollapsed
+		if (isAdvModeON) {
+			let dlgs = $('.ui-dialog.advancedMode .ui-dialog-content');
+			if (dlgs.length > 0){
+				let initialized = typeof (dlgs.dialog("instance")) != 'undefined';
+				if (initialized){
+					dlgs.dialog("moveToTop");
+					// this doesnt apply to all for some reason
+					// dlgs.dialogExtend('restore');
+					// so we do a loop
+					for (let i = 0; i < dlgs.length; i++) {
+						const dlg = dlgs.eq(i);
+						dlg.dialogExtend('restore');
+					}
+				}
+			}
+		}
+
 		$('.advancedMode').toggle(isAdvModeON);
 	},
 
@@ -1390,6 +1410,17 @@ const Utils = {
 	},
 
 	/**
+	 * Limits the given number to the given range.
+	 * @param {*} value The number to limit.
+	 * @param {*} min The minimum value.
+	 * @param {*} max The maximum value.
+	 * @returns A number within the defined range.
+	 */
+	clampValue: function(value, min, max) {
+		return Math.min(Math.max(value, min), max);
+	},
+
+	/**
 	 * Converts an angle in radians to degrees
 	 * @param {number} angle the angle in radians.
 	 * @returns the angle in degrees
@@ -1816,7 +1847,11 @@ const Utils = {
 			and the virtual <q>grains</q> images.
 			</li>
 			</ul>
-			<p>All images belong to their respective owners and are used here with permission.</p>
+			<p>All sample images belong to their respective owners and are used here with permission.</p>
+			<p>The background pattern is based on <q>escheresque_ste.png</q> (darkened to #1a1a1a) from 
+				<a href="https://github.com/atlemo/SubtlePatterns">SubtlePatterns</a> licensed under
+				<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a>.
+			</p>
 			</details>
 
 			<details>

@@ -13,7 +13,7 @@ ResampleFullImage
 
 G_APP_NAME
 G_DEBUG
-G_STAGES
+G_VSEM_STAGE
 G_INPUT_IMAGE
 G_VSEM_PAUSED
 G_VSEM_IMAGE_CACHE
@@ -27,6 +27,8 @@ G_SHOW_SUBREGION_OVERLAY
 /* exported
 G_GUI_Controller
 G_Export_img_count
+G_GUI_ADVANCE_MODE_CB
+G_GUI_PRELOADED_IMGS_SELECTMENU
 */
 
 /* allow global reassign and magic number as this where
@@ -122,7 +124,7 @@ gui_ip.add(G_GUI_Controller, 'showRuler').onChange(function(){
 gui_ip.open();
 
 var gui_do = gui.addFolder('Display Options');
-gui_do.add(G_GUI_Controller, 'advancedMode').onChange(function(){
+const G_GUI_ADVANCE_MODE_CB = gui_do.add(G_GUI_Controller, 'advancedMode').onChange(function(){
 	Utils.updateAdvancedMode();
 });
 gui_do.add(G_GUI_Controller, 'pause_vSEM').onChange(function(){
@@ -145,15 +147,23 @@ gui_do.add(G_GUI_Controller, 'doImageMetric').onChange(function(){
 gui_do.add(G_GUI_Controller, 'imageMetricAlgo', G_IMG_METRICS);
 
 var gui_io = gui.addFolder('Input / Export Image');
-gui_io.add(G_GUI_Controller, 'groundTruthImg', G_PRELOADED_IMAGES).listen().onChange(function(){
-	var fname = Utils.getGroundtruthImage();
-	if (fname.length > 0) {
-		G_INPUT_IMAGE = G_PRELOADED_IMAGES_ROOT + fname;
-		console.log("Ground Truth Image changed to: "+G_INPUT_IMAGE);
-		$(document.body).trigger('OnGroundtruthImageChange');
-	}
+
+const G_GUI_PRELOADED_IMGS_SELECTMENU = gui_io.add(G_GUI_Controller, 'groundTruthImg', G_PRELOADED_IMAGES)
+	.listen()
+	.onChange(function(){
+		var fname = Utils.getGroundtruthImage();
+		if (fname.length > 0) {
+			G_INPUT_IMAGE = G_PRELOADED_IMAGES_ROOT + fname;
+			console.log("Ground Truth Image changed to: "+G_INPUT_IMAGE);
+			$(document.body).trigger('OnGroundtruthImageChange');
+		}
 });
-gui_io.add(G_GUI_Controller, 'importImage').name('Import image');
+
+// add the import image button / option
+let __importImgBtn = gui_io.add(G_GUI_Controller, 'importImage').name('Import image');
+// make it more obvious to the user
+$(__importImgBtn.domElement).parent().find('.property-name').addClass('datgui-btn-primary');
+
 gui_io.add(G_GUI_Controller, 'exportResultImg').name('Export image (as displayed)');
 gui_io.add(G_GUI_Controller, 'exportResultTrueImage').name('Export image (actual size)');
 gui.add(G_GUI_Controller, 'aboutMessage').name("About " + G_APP_NAME + " / Credits");
@@ -173,8 +183,7 @@ function exportResultImage(){
 	// https://konvajs.org/docs/data_and_serialization/High-Quality-Export.html
 
 	// get the image without the row/draw indicator
-	var stageFinal = G_STAGES[G_STAGES.length - 1];
-	var finalImage = Utils.getVirtualSEM_KonvaImage(stageFinal);
+	var finalImage = Utils.getVirtualSEM_KonvaImage(G_VSEM_STAGE);
 
 	// export the image
 	var url = finalImage.toDataURL({pixelRatio:1});
