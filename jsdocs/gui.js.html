@@ -87,7 +87,7 @@ ResampleFullImage
 
 G_APP_NAME
 G_DEBUG
-G_STAGES
+G_VSEM_STAGE
 G_INPUT_IMAGE
 G_VSEM_PAUSED
 G_VSEM_IMAGE_CACHE
@@ -101,6 +101,8 @@ G_SHOW_SUBREGION_OVERLAY
 /* exported
 G_GUI_Controller
 G_Export_img_count
+G_GUI_ADVANCE_MODE_CB
+G_GUI_PRELOADED_IMGS_SELECTMENU
 */
 
 /* allow global reassign and magic number as this where
@@ -196,7 +198,7 @@ gui_ip.add(G_GUI_Controller, 'showRuler').onChange(function(){
 gui_ip.open();
 
 var gui_do = gui.addFolder('Display Options');
-gui_do.add(G_GUI_Controller, 'advancedMode').onChange(function(){
+const G_GUI_ADVANCE_MODE_CB = gui_do.add(G_GUI_Controller, 'advancedMode').onChange(function(){
 	Utils.updateAdvancedMode();
 });
 gui_do.add(G_GUI_Controller, 'pause_vSEM').onChange(function(){
@@ -219,15 +221,23 @@ gui_do.add(G_GUI_Controller, 'doImageMetric').onChange(function(){
 gui_do.add(G_GUI_Controller, 'imageMetricAlgo', G_IMG_METRICS);
 
 var gui_io = gui.addFolder('Input / Export Image');
-gui_io.add(G_GUI_Controller, 'groundTruthImg', G_PRELOADED_IMAGES).listen().onChange(function(){
-	var fname = Utils.getGroundtruthImage();
-	if (fname.length > 0) {
-		G_INPUT_IMAGE = G_PRELOADED_IMAGES_ROOT + fname;
-		console.log("Ground Truth Image changed to: "+G_INPUT_IMAGE);
-		$(document.body).trigger('OnGroundtruthImageChange');
-	}
+
+const G_GUI_PRELOADED_IMGS_SELECTMENU = gui_io.add(G_GUI_Controller, 'groundTruthImg', G_PRELOADED_IMAGES)
+	.listen()
+	.onChange(function(){
+		var fname = Utils.getGroundtruthImage();
+		if (fname.length > 0) {
+			G_INPUT_IMAGE = G_PRELOADED_IMAGES_ROOT + fname;
+			console.log("Ground Truth Image changed to: "+G_INPUT_IMAGE);
+			$(document.body).trigger('OnGroundtruthImageChange');
+		}
 });
-gui_io.add(G_GUI_Controller, 'importImage').name('Import image');
+
+// add the import image button / option
+let __importImgBtn = gui_io.add(G_GUI_Controller, 'importImage').name('Import image');
+// make it more obvious to the user
+$(__importImgBtn.domElement).parent().find('.property-name').addClass('datgui-btn-primary');
+
 gui_io.add(G_GUI_Controller, 'exportResultImg').name('Export image (as displayed)');
 gui_io.add(G_GUI_Controller, 'exportResultTrueImage').name('Export image (actual size)');
 gui.add(G_GUI_Controller, 'aboutMessage').name("About " + G_APP_NAME + " / Credits");
@@ -247,8 +257,7 @@ function exportResultImage(){
 	// https://konvajs.org/docs/data_and_serialization/High-Quality-Export.html
 
 	// get the image without the row/draw indicator
-	var stageFinal = G_STAGES[G_STAGES.length - 1];
-	var finalImage = Utils.getVirtualSEM_KonvaImage(stageFinal);
+	var finalImage = Utils.getVirtualSEM_KonvaImage(G_VSEM_STAGE);
 
 	// export the image
 	var url = finalImage.toDataURL({pixelRatio:1});
@@ -308,13 +317,13 @@ $(G_INPUT_IMG_CTRL_SELECTOR).change(function(){
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="NRMSE.html">NRMSE</a></li><li><a href="Utils.html">Utils</a></li></ul><h3>Global</h3><ul><li><a href="global.html#G_APP_NAME">G_APP_NAME</a></li><li><a href="global.html#G_AUTO_PREVIEW_LIMIT">G_AUTO_PREVIEW_LIMIT</a></li><li><a href="global.html#G_BOX_SIZE">G_BOX_SIZE</a></li><li><a href="global.html#G_GUI_Controller">G_GUI_Controller</a></li><li><a href="global.html#G_IMG_METRICS">G_IMG_METRICS</a></li><li><a href="global.html#G_IMG_METRIC_ENABLED">G_IMG_METRIC_ENABLED</a></li><li><a href="global.html#G_INPUT_IMAGE">G_INPUT_IMAGE</a></li><li><a href="global.html#G_MAIN_CONTAINER">G_MAIN_CONTAINER</a></li><li><a href="global.html#G_MAIN_IMAGE_OBJ">G_MAIN_IMAGE_OBJ</a></li><li><a href="global.html#G_MATH_TOFIXED">G_MATH_TOFIXED</a></li><li><a href="global.html#G_PRELOADED_IMAGES">G_PRELOADED_IMAGES</a></li><li><a href="global.html#G_PRELOADED_IMAGES_ROOT">G_PRELOADED_IMAGES_ROOT</a></li><li><a href="global.html#G_SHOW_SUBREGION_OVERLAY">G_SHOW_SUBREGION_OVERLAY</a></li><li><a href="global.html#G_STAGES">G_STAGES</a></li><li><a href="global.html#G_UpdateFilters">G_UpdateFilters</a></li><li><a href="global.html#G_UpdateResampled">G_UpdateResampled</a></li><li><a href="global.html#G_UpdateRuler">G_UpdateRuler</a></li><li><a href="global.html#G_UpdateStageSettings">G_UpdateStageSettings</a></li><li><a href="global.html#G_UpdateVirtualSEMConfig">G_UpdateVirtualSEMConfig</a></li><li><a href="global.html#G_Update_GroundTruth">G_Update_GroundTruth</a></li><li><a href="global.html#G_Update_InfoDisplays">G_Update_InfoDisplays</a></li><li><a href="global.html#G_VSEM_IMAGE_CACHE">G_VSEM_IMAGE_CACHE</a></li><li><a href="global.html#G_VSEM_PAUSED">G_VSEM_PAUSED</a></li><li><a href="global.html#G_update_ImgMetrics">G_update_ImgMetrics</a></li><li><a href="global.html#GetOptimalBoxWidth">GetOptimalBoxWidth</a></li><li><a href="global.html#OnImageLoaded">OnImageLoaded</a></li><li><a href="global.html#ResampleFullImage">ResampleFullImage</a></li><li><a href="global.html#UpdateBaseImage">UpdateBaseImage</a></li><li><a href="global.html#drawGroundtruthImage">drawGroundtruthImage</a></li><li><a href="global.html#drawProbeLayout">drawProbeLayout</a></li><li><a href="global.html#drawProbeLayoutSampling">drawProbeLayoutSampling</a></li><li><a href="global.html#drawResampled">drawResampled</a></li><li><a href="global.html#drawSpotContent">drawSpotContent</a></li><li><a href="global.html#drawSpotProfileEdit">drawSpotProfileEdit</a></li><li><a href="global.html#drawSpotSignal">drawSpotSignal</a></li><li><a href="global.html#drawSubregionImage">drawSubregionImage</a></li><li><a href="global.html#drawVirtualSEM">drawVirtualSEM</a></li><li><a href="global.html#nStages">nStages</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="LayoutManager.html">LayoutManager</a></li><li><a href="NRMSE.html">NRMSE</a></li><li><a href="Utils.html">Utils</a></li></ul><h3>Global</h3><ul><li><a href="global.html#G_APP_NAME">G_APP_NAME</a></li><li><a href="global.html#G_AUTO_PREVIEW_LIMIT">G_AUTO_PREVIEW_LIMIT</a></li><li><a href="global.html#G_GUI_Controller">G_GUI_Controller</a></li><li><a href="global.html#G_IMG_METRICS">G_IMG_METRICS</a></li><li><a href="global.html#G_IMG_METRIC_ENABLED">G_IMG_METRIC_ENABLED</a></li><li><a href="global.html#G_MAIN_IMAGE_OBJ">G_MAIN_IMAGE_OBJ</a></li><li><a href="global.html#G_MATH_TOFIXED">G_MATH_TOFIXED</a></li><li><a href="global.html#G_SHOW_SUBREGION_OVERLAY">G_SHOW_SUBREGION_OVERLAY</a></li><li><a href="global.html#G_UpdateFilters">G_UpdateFilters</a></li><li><a href="global.html#G_UpdateResampled">G_UpdateResampled</a></li><li><a href="global.html#G_UpdateRuler">G_UpdateRuler</a></li><li><a href="global.html#G_UpdateStageSettings">G_UpdateStageSettings</a></li><li><a href="global.html#G_UpdateVirtualSEMConfig">G_UpdateVirtualSEMConfig</a></li><li><a href="global.html#G_Update_GroundTruth">G_Update_GroundTruth</a></li><li><a href="global.html#G_Update_InfoDisplays">G_Update_InfoDisplays</a></li><li><a href="global.html#G_Update_Stages_Global">G_Update_Stages_Global</a></li><li><a href="global.html#G_VSEM_IMAGE_CACHE">G_VSEM_IMAGE_CACHE</a></li><li><a href="global.html#G_VSEM_PAUSED">G_VSEM_PAUSED</a></li><li><a href="global.html#G_VSEM_STAGE">G_VSEM_STAGE</a></li><li><a href="global.html#G_update_ImgMetrics">G_update_ImgMetrics</a></li><li><a href="global.html#OnImageLoaded">OnImageLoaded</a></li><li><a href="global.html#ResampleFullImage">ResampleFullImage</a></li><li><a href="global.html#UpdateBaseImage">UpdateBaseImage</a></li><li><a href="global.html#drawGroundtruthImage">drawGroundtruthImage</a></li><li><a href="global.html#drawProbeLayout">drawProbeLayout</a></li><li><a href="global.html#drawProbeLayoutSampling">drawProbeLayoutSampling</a></li><li><a href="global.html#drawResampled">drawResampled</a></li><li><a href="global.html#drawSpotContent">drawSpotContent</a></li><li><a href="global.html#drawSpotProfileEdit">drawSpotProfileEdit</a></li><li><a href="global.html#drawSpotSignal">drawSpotSignal</a></li><li><a href="global.html#drawSubregionImage">drawSubregionImage</a></li><li><a href="global.html#drawVirtualSEM">drawVirtualSEM</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Sat Mar 29 2025 12:17:00 GMT-0400 (Eastern Daylight Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Fri Apr 11 2025 17:35:45 GMT-0400 (Eastern Daylight Time)
 </footer>
 
 <a id="backtotop" href="#"><div>&uarr; Top</div></a>

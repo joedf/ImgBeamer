@@ -118,7 +118,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line48">line 48</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line25">line 25</a>
     </li></ul></dd>
     
 
@@ -195,7 +195,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1538">line 1538</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1569">line 1569</a>
     </li></ul></dd>
     
 
@@ -223,7 +223,7 @@
     
 
     
-    <h4 class="name" id=".AddPinchScaleHandlers"><span class="type-signature">(static) </span>AddPinchScaleHandlers<span class="signature">(activeShape, callback, scaleMin, scaleMax)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id=".AddPinchScaleHandlers"><span class="type-signature">(static) </span>AddPinchScaleHandlers<span class="signature">(stage, activeShape, callback, scaleMin, scaleMax)</span><span class="type-signature"></span></h4>
     
 
     
@@ -263,6 +263,29 @@
     </thead>
 
     <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>stage</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">*</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">the stage to the event handlers to.</td>
+        </tr>
+
     
 
         <tr>
@@ -393,7 +416,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line260">line 260</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line261">line 261</a>
     </li></ul></dd>
     
 
@@ -576,7 +599,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1547">line 1547</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1578">line 1578</a>
     </li></ul></dd>
     
 
@@ -838,7 +861,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line320">line 320</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line321">line 321</a>
     </li></ul></dd>
     
 
@@ -1075,7 +1098,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1529">line 1529</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1560">line 1560</a>
     </li></ul></dd>
     
 
@@ -1268,7 +1291,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line136">line 136</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line113">line 113</a>
     </li></ul></dd>
     
 
@@ -1624,7 +1647,213 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1771">line 1771</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1802">line 1802</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="._SetSpotWidth"><span class="type-signature">(static) </span>_SetSpotWidth<span class="signature">(spotWidth, beam, spotScaler, updateCallback)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Set the spot width used for sampling for the entire application
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>spotWidth</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">the spot width in percent (%), ex. use 130 for 130%.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>beam</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">*</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">a reference to the beam/spot object to get the elliptical shape (relative to a unit circle).</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>spotScaler</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">*</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">a reference to the spot profile's (invisble) rectangle object that represents the imagebeing scaled the user inside the Spot Profile stage. This is used to calculate the scale of the spot.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>updateCallback</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">*</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">a function to call when spotScaler has been updated and calculations are done.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line184">line 184</a>
     </li></ul></dd>
     
 
@@ -1784,7 +2013,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line113">line 113</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line90">line 90</a>
     </li></ul></dd>
     
 
@@ -1967,7 +2196,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1650">line 1650</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1681">line 1681</a>
     </li></ul></dd>
     
 
@@ -2127,7 +2356,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line969">line 969</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line989">line 989</a>
     </li></ul></dd>
     
 
@@ -2152,6 +2381,199 @@
 
 
 
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id=".clampValue"><span class="type-signature">(static) </span>clampValue<span class="signature">(value, min, max)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Limits the given number to the given range.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>value</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">*</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The number to limit.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>min</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">*</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The minimum value.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>max</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">*</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The maximum value.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1419">line 1419</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    A number within the defined range.
+</div>
+
+
+
+    
 
 
 
@@ -2310,7 +2732,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line600">line 600</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line602">line 602</a>
     </li></ul></dd>
     
 
@@ -2480,7 +2902,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line617">line 617</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line619">line 619</a>
     </li></ul></dd>
     
 
@@ -2744,7 +3166,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1202">line 1202</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1222">line 1222</a>
     </li></ul></dd>
     
 
@@ -3003,7 +3425,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1178">line 1178</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1198">line 1198</a>
     </li></ul></dd>
     
 
@@ -3423,7 +3845,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1294">line 1294</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1314">line 1314</a>
     </li></ul></dd>
     
 
@@ -3629,7 +4051,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1414">line 1414</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1445">line 1445</a>
     </li></ul></dd>
     
 
@@ -3799,7 +4221,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line541">line 541</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line542">line 542</a>
     </li></ul></dd>
     
 
@@ -4028,7 +4450,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1082">line 1082</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1102">line 1102</a>
     </li></ul></dd>
     
 
@@ -4282,7 +4704,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line886">line 886</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line906">line 906</a>
     </li></ul></dd>
     
 
@@ -4498,7 +4920,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line930">line 930</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line950">line 950</a>
     </li></ul></dd>
     
 
@@ -4675,7 +5097,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1504">line 1504</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1535">line 1535</a>
     </li></ul></dd>
     
 
@@ -4822,7 +5244,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1706">line 1706</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1737">line 1737</a>
     </li></ul></dd>
     
 
@@ -4972,7 +5394,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line164">line 164</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line141">line 141</a>
     </li></ul></dd>
     
 
@@ -5165,7 +5587,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1762">line 1762</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1793">line 1793</a>
     </li></ul></dd>
     
 
@@ -5335,7 +5757,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1733">line 1733</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1764">line 1764</a>
     </li></ul></dd>
     
 
@@ -5472,7 +5894,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line529">line 529</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line530">line 530</a>
     </li></ul></dd>
     
 
@@ -5619,7 +6041,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1719">line 1719</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1750">line 1750</a>
     </li></ul></dd>
     
 
@@ -5766,7 +6188,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1750">line 1750</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1781">line 1781</a>
     </li></ul></dd>
     
 
@@ -5913,7 +6335,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1046">line 1046</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1066">line 1066</a>
     </li></ul></dd>
     
 
@@ -6060,7 +6482,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line998">line 998</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1018">line 1018</a>
     </li></ul></dd>
     
 
@@ -6230,7 +6652,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1426">line 1426</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1457">line 1457</a>
     </li></ul></dd>
     
 
@@ -6446,7 +6868,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1490">line 1490</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1521">line 1521</a>
     </li></ul></dd>
     
 
@@ -6639,7 +7061,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line90">line 90</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line67">line 67</a>
     </li></ul></dd>
     
 
@@ -6822,7 +7244,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line60">line 60</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line37">line 37</a>
     </li></ul></dd>
     
 
@@ -7061,7 +7483,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1141">line 1141</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1161">line 1161</a>
     </li></ul></dd>
     
 
@@ -7267,7 +7689,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line980">line 980</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1000">line 1000</a>
     </li></ul></dd>
     
 
@@ -7473,7 +7895,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line955">line 955</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line975">line 975</a>
     </li></ul></dd>
     
 
@@ -7642,7 +8064,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1689">line 1689</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1720">line 1720</a>
     </li></ul></dd>
     
 
@@ -7848,7 +8270,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1476">line 1476</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1507">line 1507</a>
     </li></ul></dd>
     
 
@@ -8041,7 +8463,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1440">line 1440</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1471">line 1471</a>
     </li></ul></dd>
     
 
@@ -8188,7 +8610,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1397">line 1397</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1428">line 1428</a>
     </li></ul></dd>
     
 
@@ -8335,7 +8757,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1404">line 1404</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1435">line 1435</a>
     </li></ul></dd>
     
 
@@ -8528,7 +8950,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1461">line 1461</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1492">line 1492</a>
     </li></ul></dd>
     
 
@@ -8626,7 +9048,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line869">line 869</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line871">line 871</a>
     </li></ul></dd>
     
 
@@ -8662,7 +9084,7 @@
     
 
     
-    <h4 class="name" id=".updateDisplayBeamParams"><span class="type-signature">(static) </span>updateDisplayBeamParams<span class="signature">(stage, beam, cellSize, userImage)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id=".updateDisplayBeamParams"><span class="type-signature">(static) </span>updateDisplayBeamParams<span class="signature">(stage, beam, cellSize, userImage, onDblClick)</span><span class="type-signature"></span></h4>
     
 
     
@@ -8795,6 +9217,29 @@
         </tr>
 
     
+
+        <tr>
+            
+                <td class="name"><code>onDblClick</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">callback for the doubleclick event</td>
+        </tr>
+
+    
     </tbody>
 </table>
 
@@ -8832,7 +9277,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line558">line 558</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line560">line 560</a>
     </li></ul></dd>
     
 
@@ -8992,7 +9437,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line817">line 817</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line819">line 819</a>
     </li></ul></dd>
     
 
@@ -9152,7 +9597,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line646">line 646</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line648">line 648</a>
     </li></ul></dd>
     
 
@@ -9312,7 +9757,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line627">line 627</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line629">line 629</a>
     </li></ul></dd>
     
 
@@ -9449,7 +9894,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line834">line 834</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line836">line 836</a>
     </li></ul></dd>
     
 
@@ -9502,13 +9947,13 @@
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="NRMSE.html">NRMSE</a></li><li><a href="Utils.html">Utils</a></li></ul><h3>Global</h3><ul><li><a href="global.html#G_APP_NAME">G_APP_NAME</a></li><li><a href="global.html#G_AUTO_PREVIEW_LIMIT">G_AUTO_PREVIEW_LIMIT</a></li><li><a href="global.html#G_BOX_SIZE">G_BOX_SIZE</a></li><li><a href="global.html#G_GUI_Controller">G_GUI_Controller</a></li><li><a href="global.html#G_IMG_METRICS">G_IMG_METRICS</a></li><li><a href="global.html#G_IMG_METRIC_ENABLED">G_IMG_METRIC_ENABLED</a></li><li><a href="global.html#G_INPUT_IMAGE">G_INPUT_IMAGE</a></li><li><a href="global.html#G_MAIN_CONTAINER">G_MAIN_CONTAINER</a></li><li><a href="global.html#G_MAIN_IMAGE_OBJ">G_MAIN_IMAGE_OBJ</a></li><li><a href="global.html#G_MATH_TOFIXED">G_MATH_TOFIXED</a></li><li><a href="global.html#G_PRELOADED_IMAGES">G_PRELOADED_IMAGES</a></li><li><a href="global.html#G_PRELOADED_IMAGES_ROOT">G_PRELOADED_IMAGES_ROOT</a></li><li><a href="global.html#G_SHOW_SUBREGION_OVERLAY">G_SHOW_SUBREGION_OVERLAY</a></li><li><a href="global.html#G_STAGES">G_STAGES</a></li><li><a href="global.html#G_UpdateFilters">G_UpdateFilters</a></li><li><a href="global.html#G_UpdateResampled">G_UpdateResampled</a></li><li><a href="global.html#G_UpdateRuler">G_UpdateRuler</a></li><li><a href="global.html#G_UpdateStageSettings">G_UpdateStageSettings</a></li><li><a href="global.html#G_UpdateVirtualSEMConfig">G_UpdateVirtualSEMConfig</a></li><li><a href="global.html#G_Update_GroundTruth">G_Update_GroundTruth</a></li><li><a href="global.html#G_Update_InfoDisplays">G_Update_InfoDisplays</a></li><li><a href="global.html#G_VSEM_IMAGE_CACHE">G_VSEM_IMAGE_CACHE</a></li><li><a href="global.html#G_VSEM_PAUSED">G_VSEM_PAUSED</a></li><li><a href="global.html#G_update_ImgMetrics">G_update_ImgMetrics</a></li><li><a href="global.html#GetOptimalBoxWidth">GetOptimalBoxWidth</a></li><li><a href="global.html#OnImageLoaded">OnImageLoaded</a></li><li><a href="global.html#ResampleFullImage">ResampleFullImage</a></li><li><a href="global.html#UpdateBaseImage">UpdateBaseImage</a></li><li><a href="global.html#drawGroundtruthImage">drawGroundtruthImage</a></li><li><a href="global.html#drawProbeLayout">drawProbeLayout</a></li><li><a href="global.html#drawProbeLayoutSampling">drawProbeLayoutSampling</a></li><li><a href="global.html#drawResampled">drawResampled</a></li><li><a href="global.html#drawSpotContent">drawSpotContent</a></li><li><a href="global.html#drawSpotProfileEdit">drawSpotProfileEdit</a></li><li><a href="global.html#drawSpotSignal">drawSpotSignal</a></li><li><a href="global.html#drawSubregionImage">drawSubregionImage</a></li><li><a href="global.html#drawVirtualSEM">drawVirtualSEM</a></li><li><a href="global.html#nStages">nStages</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="LayoutManager.html">LayoutManager</a></li><li><a href="NRMSE.html">NRMSE</a></li><li><a href="Utils.html">Utils</a></li></ul><h3>Global</h3><ul><li><a href="global.html#G_APP_NAME">G_APP_NAME</a></li><li><a href="global.html#G_AUTO_PREVIEW_LIMIT">G_AUTO_PREVIEW_LIMIT</a></li><li><a href="global.html#G_GUI_Controller">G_GUI_Controller</a></li><li><a href="global.html#G_IMG_METRICS">G_IMG_METRICS</a></li><li><a href="global.html#G_IMG_METRIC_ENABLED">G_IMG_METRIC_ENABLED</a></li><li><a href="global.html#G_MAIN_IMAGE_OBJ">G_MAIN_IMAGE_OBJ</a></li><li><a href="global.html#G_MATH_TOFIXED">G_MATH_TOFIXED</a></li><li><a href="global.html#G_SHOW_SUBREGION_OVERLAY">G_SHOW_SUBREGION_OVERLAY</a></li><li><a href="global.html#G_UpdateFilters">G_UpdateFilters</a></li><li><a href="global.html#G_UpdateResampled">G_UpdateResampled</a></li><li><a href="global.html#G_UpdateRuler">G_UpdateRuler</a></li><li><a href="global.html#G_UpdateStageSettings">G_UpdateStageSettings</a></li><li><a href="global.html#G_UpdateVirtualSEMConfig">G_UpdateVirtualSEMConfig</a></li><li><a href="global.html#G_Update_GroundTruth">G_Update_GroundTruth</a></li><li><a href="global.html#G_Update_InfoDisplays">G_Update_InfoDisplays</a></li><li><a href="global.html#G_Update_Stages_Global">G_Update_Stages_Global</a></li><li><a href="global.html#G_VSEM_IMAGE_CACHE">G_VSEM_IMAGE_CACHE</a></li><li><a href="global.html#G_VSEM_PAUSED">G_VSEM_PAUSED</a></li><li><a href="global.html#G_VSEM_STAGE">G_VSEM_STAGE</a></li><li><a href="global.html#G_update_ImgMetrics">G_update_ImgMetrics</a></li><li><a href="global.html#OnImageLoaded">OnImageLoaded</a></li><li><a href="global.html#ResampleFullImage">ResampleFullImage</a></li><li><a href="global.html#UpdateBaseImage">UpdateBaseImage</a></li><li><a href="global.html#drawGroundtruthImage">drawGroundtruthImage</a></li><li><a href="global.html#drawProbeLayout">drawProbeLayout</a></li><li><a href="global.html#drawProbeLayoutSampling">drawProbeLayoutSampling</a></li><li><a href="global.html#drawResampled">drawResampled</a></li><li><a href="global.html#drawSpotContent">drawSpotContent</a></li><li><a href="global.html#drawSpotProfileEdit">drawSpotProfileEdit</a></li><li><a href="global.html#drawSpotSignal">drawSpotSignal</a></li><li><a href="global.html#drawSubregionImage">drawSubregionImage</a></li><li><a href="global.html#drawVirtualSEM">drawVirtualSEM</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Sat Mar 29 2025 12:17:00 GMT-0400 (Eastern Daylight Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Fri Apr 11 2025 17:35:45 GMT-0400 (Eastern Daylight Time)
 </footer>
 
 <a id="backtotop" href="#"><div>&uarr; Top</div></a>
