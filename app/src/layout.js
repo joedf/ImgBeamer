@@ -485,8 +485,7 @@ const LayoutManager = {
 					break;
 				case '__preloaded': //preloaded images
 					// TODO: clean up global var?
-					G_GUI_Controller.groundTruthImg = textraw;
-					G_PRELOADED_SELECTMENU.__onChange();
+					G_PRELOADED_SELECTMENU.setValue(textraw);
 					break;
 				case 'save':
 					if (text.indexOf('actual') >= 0) {
