@@ -11,7 +11,7 @@ G_GUI_ADVANCE_MODE_CB
 /* exported LayoutManager, G_VSEM_PAUSED */
 
 /**
- * Dialog and layout setup and helper functions
+ * Dialog and layout setup with helper functions
  * @namespace LayoutManager
  */
 const LayoutManager = {
@@ -66,6 +66,10 @@ const LayoutManager = {
 	},
 	
 	// -----------------------------------------------------
+
+	/**
+	 * Sets up the stage dialogs and menubar. This only needs to be called only once.
+	 */
 	Initialize: function(){
 		var me = this;
 		$(document).ready(function(){
