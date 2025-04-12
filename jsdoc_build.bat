@@ -24,7 +24,7 @@ echo running jsdoc ...
 call jsdoc -d "%JSDOC_OUTDIR%" -c .jsdoc.json
 echo Copy over the custom files and missing images for the readme ...
 xcopy app\src\img\icon.svg "%JSDOC_OUTDIR%\app\src\img\icon.svg*" /Y
-xcopy misc\screenshot4.png "%JSDOC_OUTDIR%\misc\screenshot*.png*" /Y
+xcopy misc\screenshot5.png "%JSDOC_OUTDIR%\misc\screenshot*.png*" /Y
 xcopy misc\gh-fork-ribbon.css "%JSDOC_OUTDIR%\styles\gh-fork-ribbon.css*" /Y
 echo.
 echo Done.
