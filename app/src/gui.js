@@ -28,6 +28,7 @@ G_SHOW_SUBREGION_OVERLAY
 G_GUI_Controller
 G_Export_img_count
 G_GUI_ADVANCE_MODE_CB
+G_GUI_IMG_SMOOTHING_CB
 G_GUI_PRELOADED_IMGS_SELECTMENU
 */
 
@@ -131,7 +132,7 @@ const G_GUI_ADVANCE_MODE_CB = gui_do.add(G_GUI_Controller, 'advancedMode').onCha
 gui_do.add(G_GUI_Controller, 'pause_vSEM').onChange(function(){
 	G_VSEM_PAUSED = G_GUI_Controller.pause_vSEM;
 });
-gui_do.add(G_GUI_Controller, 'imageSmoothing').onChange(function(){
+const G_GUI_IMG_SMOOTHING_CB = gui_do.add(G_GUI_Controller, 'imageSmoothing').onChange(function(){
 	G_UpdateStageSettings();
 });
 gui_do.add(G_GUI_Controller, 'subregionOverlay').onChange(function(){

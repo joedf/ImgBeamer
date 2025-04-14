@@ -6,6 +6,7 @@ G_VSEM_PAUSED
 G_GUI_Controller
 G_GUI_PRELOADED_IMGS_SELECTMENU
 G_GUI_ADVANCE_MODE_CB
+G_GUI_IMG_SMOOTHING_CB
 */
 
 /* exported LayoutManager, G_VSEM_PAUSED */
@@ -43,6 +44,7 @@ const LayoutManager = {
 	// ids for menubar checkboxes
 	_cb_hide_options: "cb_hide_options",
 	_cb_advanced_mode: "cb_advanced_mode",
+	_cb_use_image_smoothing: "cb_use_image_smoothing",
 	// the class of a stage's parent element
 	_stageContainer_class: "stageContainer",
 	_stages_per_row: 3,
@@ -542,6 +544,11 @@ const LayoutManager = {
 					var _cbchk_am = $('#'+me._cb_advanced_mode).is(':checked');
 					G_GUI_ADVANCE_MODE_CB.setValue(_cbchk_am);
 					break;
+				case 'use': //image smoothing
+					// get the check state in the menubar
+					var _cbchk_is = $('#'+me._cb_use_image_smoothing).is(':checked');
+					G_GUI_IMG_SMOOTHING_CB.setValue(_cbchk_is);
+					break;
 				case 'tile': // displays/dialogs
 					// Ensure no dialog is collapsed before tiling, otherwise it won't work right...
 					me.RestoreDialogs(0, me.__advanced_dialogs_start);
@@ -577,8 +584,12 @@ const LayoutManager = {
 			_onFocus(event, ui);
 
 			// ensure advanced mode checkbox is updated
-			var __checked = G_GUI_ADVANCE_MODE_CB.getValue();
-			$('#'+me._cb_advanced_mode).prop('checked', __checked);
+			var __checked_am = G_GUI_ADVANCE_MODE_CB.getValue();
+			$('#'+me._cb_advanced_mode).prop('checked', __checked_am);
+
+			// ensure image smoothing checkbox is updated
+			var __checked_is = G_GUI_IMG_SMOOTHING_CB.getValue();
+			$('#'+me._cb_use_image_smoothing).prop('checked', __checked_is);
 		});
 	},
 };
