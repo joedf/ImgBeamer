@@ -1,6 +1,9 @@
 {
 	"source": {
-		"include": "./app/src",
+		"include": [
+			"./app/src",
+			"./app/src/testimages/images.js"
+		],
 		"includePattern": ".js$",
 		"excludePattern": "(node_modules/|docs)"
 	},

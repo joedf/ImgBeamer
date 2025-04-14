@@ -578,8 +578,12 @@ const LayoutManager = {
 			let textraw = target.innerText;
 			let text = textraw.toLocaleLowerCase();
 			let keyword = text.split(' ')[0];
+			let data_filename = $(target).attr('data-image-filename');
+			let data_pixelsize = parseFloat($(target).attr('data-pixelsize-nm'));
 
-			if (text.indexOf('.png')>1) { keyword = '__preloaded'; }
+			// detect if a preloaded image menu item was clicked
+			if (typeof data_filename == 'string') { keyword = '__preloaded'; }
+
 			// prevent handling erroneous drag-clicking
 			if (keyword == '__preloaded' &amp;&amp; textraw.indexOf('\n')>=0) {
 				return;
@@ -592,7 +596,13 @@ const LayoutManager = {
 				case '__preloaded': //preloaded images
 					// set the selected preloaded image, by using the options GUI controller
 					// simulates as if the user click that option, so other things trigger correctly
-					G_GUI_PRELOADED_IMGS_SELECTMENU.setValue(textraw);
+					G_GUI_PRELOADED_IMGS_SELECTMENU.setValue(data_filename);
+					
+					// attempt to set pixel size accordingly if possible
+					if (!isNaN(data_pixelsize)) {
+						G_GUI_Controller.controls.pixelSize_nm.setValue(data_pixelsize);
+						console.log('Changed pixel size to '+data_pixelsize+' nm');
+					}
 					break;
 				case 'save':
 					if (text.indexOf('actual') >= 0) {
@@ -656,13 +666,13 @@ const LayoutManager = {
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="LayoutManager.html">LayoutManager</a></li><li><a href="NRMSE.html">NRMSE</a></li><li><a href="Utils.html">Utils</a></li></ul><h3>Global</h3><ul><li><a href="global.html#G_APP_NAME">G_APP_NAME</a></li><li><a href="global.html#G_AUTO_PREVIEW_LIMIT">G_AUTO_PREVIEW_LIMIT</a></li><li><a href="global.html#G_GUI_Controller">G_GUI_Controller</a></li><li><a href="global.html#G_IMG_METRICS">G_IMG_METRICS</a></li><li><a href="global.html#G_IMG_METRIC_ENABLED">G_IMG_METRIC_ENABLED</a></li><li><a href="global.html#G_MAIN_IMAGE_OBJ">G_MAIN_IMAGE_OBJ</a></li><li><a href="global.html#G_MATH_TOFIXED">G_MATH_TOFIXED</a></li><li><a href="global.html#G_SHOW_SUBREGION_OVERLAY">G_SHOW_SUBREGION_OVERLAY</a></li><li><a href="global.html#G_UpdateFilters">G_UpdateFilters</a></li><li><a href="global.html#G_UpdateResampled">G_UpdateResampled</a></li><li><a href="global.html#G_UpdateRuler">G_UpdateRuler</a></li><li><a href="global.html#G_UpdateStageSettings">G_UpdateStageSettings</a></li><li><a href="global.html#G_UpdateVirtualSEMConfig">G_UpdateVirtualSEMConfig</a></li><li><a href="global.html#G_Update_GroundTruth">G_Update_GroundTruth</a></li><li><a href="global.html#G_Update_InfoDisplays">G_Update_InfoDisplays</a></li><li><a href="global.html#G_Update_Stages_Global">G_Update_Stages_Global</a></li><li><a href="global.html#G_VSEM_IMAGE_CACHE">G_VSEM_IMAGE_CACHE</a></li><li><a href="global.html#G_VSEM_PAUSED">G_VSEM_PAUSED</a></li><li><a href="global.html#G_VSEM_STAGE">G_VSEM_STAGE</a></li><li><a href="global.html#G_update_ImgMetrics">G_update_ImgMetrics</a></li><li><a href="global.html#OnImageLoaded">OnImageLoaded</a></li><li><a href="global.html#ResampleFullImage">ResampleFullImage</a></li><li><a href="global.html#UpdateBaseImage">UpdateBaseImage</a></li><li><a href="global.html#drawGroundtruthImage">drawGroundtruthImage</a></li><li><a href="global.html#drawProbeLayout">drawProbeLayout</a></li><li><a href="global.html#drawProbeLayoutSampling">drawProbeLayoutSampling</a></li><li><a href="global.html#drawResampled">drawResampled</a></li><li><a href="global.html#drawSpotContent">drawSpotContent</a></li><li><a href="global.html#drawSpotProfileEdit">drawSpotProfileEdit</a></li><li><a href="global.html#drawSpotSignal">drawSpotSignal</a></li><li><a href="global.html#drawSubregionImage">drawSubregionImage</a></li><li><a href="global.html#drawVirtualSEM">drawVirtualSEM</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="LayoutManager.html">LayoutManager</a></li><li><a href="NRMSE.html">NRMSE</a></li><li><a href="Utils.html">Utils</a></li></ul><h3>Global</h3><ul><li><a href="global.html#G_APP_NAME">G_APP_NAME</a></li><li><a href="global.html#G_AUTO_PREVIEW_LIMIT">G_AUTO_PREVIEW_LIMIT</a></li><li><a href="global.html#G_GUI_Controller">G_GUI_Controller</a></li><li><a href="global.html#G_IMG_METRICS">G_IMG_METRICS</a></li><li><a href="global.html#G_IMG_METRIC_ENABLED">G_IMG_METRIC_ENABLED</a></li><li><a href="global.html#G_INPUT_IMAGE">G_INPUT_IMAGE</a></li><li><a href="global.html#G_MAIN_IMAGE_OBJ">G_MAIN_IMAGE_OBJ</a></li><li><a href="global.html#G_MATH_TOFIXED">G_MATH_TOFIXED</a></li><li><a href="global.html#G_PRELOADED_IMAGES">G_PRELOADED_IMAGES</a></li><li><a href="global.html#G_PRELOADED_IMAGES_ROOT">G_PRELOADED_IMAGES_ROOT</a></li><li><a href="global.html#G_SHOW_SUBREGION_OVERLAY">G_SHOW_SUBREGION_OVERLAY</a></li><li><a href="global.html#G_UpdateFilters">G_UpdateFilters</a></li><li><a href="global.html#G_UpdateResampled">G_UpdateResampled</a></li><li><a href="global.html#G_UpdateRuler">G_UpdateRuler</a></li><li><a href="global.html#G_UpdateStageSettings">G_UpdateStageSettings</a></li><li><a href="global.html#G_UpdateVirtualSEMConfig">G_UpdateVirtualSEMConfig</a></li><li><a href="global.html#G_Update_GroundTruth">G_Update_GroundTruth</a></li><li><a href="global.html#G_Update_InfoDisplays">G_Update_InfoDisplays</a></li><li><a href="global.html#G_Update_Stages_Global">G_Update_Stages_Global</a></li><li><a href="global.html#G_VSEM_IMAGE_CACHE">G_VSEM_IMAGE_CACHE</a></li><li><a href="global.html#G_VSEM_PAUSED">G_VSEM_PAUSED</a></li><li><a href="global.html#G_VSEM_STAGE">G_VSEM_STAGE</a></li><li><a href="global.html#G_update_ImgMetrics">G_update_ImgMetrics</a></li><li><a href="global.html#OnImageLoaded">OnImageLoaded</a></li><li><a href="global.html#ResampleFullImage">ResampleFullImage</a></li><li><a href="global.html#UpdateBaseImage">UpdateBaseImage</a></li><li><a href="global.html#drawGroundtruthImage">drawGroundtruthImage</a></li><li><a href="global.html#drawProbeLayout">drawProbeLayout</a></li><li><a href="global.html#drawProbeLayoutSampling">drawProbeLayoutSampling</a></li><li><a href="global.html#drawResampled">drawResampled</a></li><li><a href="global.html#drawSpotContent">drawSpotContent</a></li><li><a href="global.html#drawSpotProfileEdit">drawSpotProfileEdit</a></li><li><a href="global.html#drawSpotSignal">drawSpotSignal</a></li><li><a href="global.html#drawSubregionImage">drawSubregionImage</a></li><li><a href="global.html#drawVirtualSEM">drawVirtualSEM</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Sat Apr 12 2025 14:37:26 GMT-0400 (Eastern Daylight Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Mon Apr 14 2025 14:42:12 GMT-0400 (Eastern Daylight Time)
 </footer>
 
 <a id="backtotop" href="#"><div>&uarr; Top</div></a>
