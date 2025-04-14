@@ -77,51 +77,9 @@
 				</ul>
 			</li>
 		</ul>
-		<script>
-			/**
-			 * The list of default/preloaded images to use with the application.
-			 * @see G_PRELOADED_IMAGES_ROOT
-			 */
-			const G_PRELOADED_IMAGES = [
-				'grains1.png',
-				'grains2full.png',
-				'grains2tl.png',
-				'grains2nc.png',
-				'APT_needle.png',
-				'tephra_448nm.png',
-				'tephra_200nm.png',
-			];
 
-			/** The root folder for all the preloaded images specified by {@link G_PRELOADED_IMAGES}. */
-			const G_PRELOADED_IMAGES_ROOT = "src/testimages/";
-
-			/** global variable to set the input ground truth image */
-			// var G_INPUT_IMAGE = Utils.getGroundtruthImage();
-			var G_INPUT_IMAGE = G_PRELOADED_IMAGES_ROOT + 'grains2tl.png';
-
-			// Preload the larger image files in the background
-			// without blocking the UI for improved responsiveness
-			window.addEventListener('load', function(){
-				// https://stackoverflow.com/a/59861857/883015
-				// var images = G_PRELOADED_IMAGES;
-				var images = ['grains2full.png', 'APT_needle.png', 'tephra_448nm.png', 'tephra_200nm.png'];
-				var preload = '';
-				for(let i = 0; i < images.length; i++) {
-					preload += '<link rel="preload" href="' + G_PRELOADED_IMAGES_ROOT
-					+ images[i] + '" as="image">\n';
-				}
-				$('head').append(preload);
-			});
-
-			// Add the preloaded images to the menubar
-			let _menu_preloaded_images = $('#menu_preloaded_images');
-			for (let i = 0; i < G_PRELOADED_IMAGES.length; i++) {
-				const img = G_PRELOADED_IMAGES[i];
-				const _html = '<li><div><span class="ui-icon ui-icon-image"></span>' + img + '</div></li>';
-				_menu_preloaded_images.append(_html);
-			}
-
-		</script>
+		<!-- Needs to included here since it adds the images to the menubar and preloads some -->
+		<script src="src/testimages/images.js"></script>
 
 		<div class="layout" id="main-container"></div>
 

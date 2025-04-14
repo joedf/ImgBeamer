@@ -504,8 +504,12 @@ const LayoutManager = {
 			let textraw = target.innerText;
 			let text = textraw.toLocaleLowerCase();
 			let keyword = text.split(' ')[0];
+			let data_filename = $(target).attr('data-image-filename');
+			let data_pixelsize = parseFloat($(target).attr('data-pixelsize-nm'));
 
-			if (text.indexOf('.png')>1) { keyword = '__preloaded'; }
+			// detect if a preloaded image menu item was clicked
+			if (typeof data_filename == 'string') { keyword = '__preloaded'; }
+
 			// prevent handling erroneous drag-clicking
 			if (keyword == '__preloaded' && textraw.indexOf('\n')>=0) {
 				return;
@@ -518,7 +522,13 @@ const LayoutManager = {
 				case '__preloaded': //preloaded images
 					// set the selected preloaded image, by using the options GUI controller
 					// simulates as if the user click that option, so other things trigger correctly
-					G_GUI_PRELOADED_IMGS_SELECTMENU.setValue(textraw);
+					G_GUI_PRELOADED_IMGS_SELECTMENU.setValue(data_filename);
+					
+					// attempt to set pixel size accordingly if possible
+					if (!isNaN(data_pixelsize)) {
+						G_GUI_Controller.controls.pixelSize_nm.setValue(data_pixelsize);
+						console.log('Changed pixel size to '+data_pixelsize+' nm');
+					}
 					break;
 				case 'save':
 					if (text.indexOf('actual') >= 0) {
