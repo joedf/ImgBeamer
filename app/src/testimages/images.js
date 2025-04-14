@@ -66,7 +66,7 @@ window.addEventListener('load', function(){
 			let newFolder = img.split('/')[0];
 			if (newFolder != lastFolder) {
 				let id = '_menu_'+newFolder;
-				let _subHtml = '<li><div><span class="ui-icon ui-icon-bookmark"></span>'
+				let _subHtml = '<li><div><span class="ui-icon ui-icon-folder-collapsed"></span>'
 				+ newFolder +'</div><ul id="'+id+'"></ul></li>';
 				menu.append(_subHtml);
 				submenu = $('#'+id);
