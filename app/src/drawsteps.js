@@ -831,6 +831,7 @@ function drawGroundtruthImage(stage, imageObj, subregionImage, updateCallback = 
 		applyChangesFromNavRect();
 	});
 	var constrainRect = function(){
+		// return; //TODO: remove this
 		var rw = rect.width(), rh = rect.height();
 		var scx = stage.scaleX(), scy = stage.scaleY();
 		var sw = stage.width() / scx, sh = stage.height() / scy;
@@ -899,15 +900,22 @@ function drawGroundtruthImage(stage, imageObj, subregionImage, updateCallback = 
 		let iips = Utils.imagePixelScaling(imageStage, imageObj);
 
 		si.scale({
-			// x: (stage.width() / rect.width()) * imagePixelScaling.x,
-			// y: (stage.height() / rect.height()) * imagePixelScaling.y,
-			x: ((stage.width()) / (rect.width())) * iips.x,
-			y: ((stage.height()) / (rect.height())) * iips.y,
+			x: (stage.width() / rect.width()) * imagePixelScaling.x,
+			y: (stage.height() / rect.height()) * imagePixelScaling.y,
+			// x: ((stage.width()) / (rect.width())) * iips.x,
+			// y: ((stage.height()) / (rect.height())) * iips.y,
+			// x: (stage.width() / rect.width()) * iips.x,
+			// y: (stage.height() / rect.height()) * iips.y,
 		});
 		
 		si.position({
-			x: ((image.x() - rect.x()) * si.scaleX()) / ips.x,
-			y: ((image.y() - rect.y()) * si.scaleY()) / ips.y,
+			x: ((image.x() - rect.x()) * si.scaleX()) / imagePixelScaling.x,
+			y: ((image.y() - rect.y()) * si.scaleY()) / imagePixelScaling.y,
+
+			// x: ((image.x() - rect.x()) * si.scaleX()) / ips.x,
+			// y: ((image.y() - rect.y()) * si.scaleY()) / ips.y,
+			// x: ((stage.x() - rect.x()) * ips.x),
+			// y: ((stage.y() - rect.y()) * ips.y),
 		});
 
 		// this propagates the changes to the subregion to the rest of the app
@@ -928,6 +936,7 @@ function drawGroundtruthImage(stage, imageObj, subregionImage, updateCallback = 
 	layer.add(rect);
 
 	var update = function(){
+		return;
 		// calc location rect from subregionImage
 		// and update bounds drawn rectangle
 		var si = subregionImage;
