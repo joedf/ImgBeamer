@@ -283,8 +283,10 @@ function drawSubregionImage(stage, oImg, updateCallback = null) {
 		var x = kImage.x(), y = kImage.y();
 		var w = kImage.width() * scaleX, h = kImage.height() * scaleY;
 
-		var sx = stage.x(), sw = stage.width();
-		var sy = stage.y(), sh = stage.height();
+		var scx = stage.scaleX(), scy = stage.scaleY();
+		var sx = stage.x(), sw = stage.width() / scx;
+		var sy = stage.y(), sh = stage.height() / scy;
+		// console.log(sx, sy, sw*scx, sh*scy, scx, scy);
 		
 		if (x > sx) { kImage.x(sx); }
 		if (x < (sx - w + sw) ) { kImage.x(sx - w + sw); }
@@ -829,17 +831,17 @@ function drawGroundtruthImage(stage, imageObj, subregionImage, updateCallback = 
 		applyChangesFromNavRect();
 	});
 	var constrainRect = function(){
-		var rw = rect.width();
-		var rh = rect.height();
-		var ss = stage.size();
+		var rw = rect.width(), rh = rect.height();
+		var scx = stage.scaleX(), scy = stage.scaleY();
+		var sw = stage.width() / scx, sh = stage.height() / scy;
 
 		// top left corner limit
 		if (rect.x() < 0) { rect.x(0); }
 		if (rect.y() < 0) { rect.y(0); }
 
 		// bottom right limit
-		if (rect.x() > ss.width - rw) { rect.x(ss.width - rw); }
-		if (rect.y() > ss.height - rh) { rect.y(ss.height - rh); }
+		if (rect.x() > sw - rw) { rect.x(sw - rw); }
+		if (rect.y() > sh - rh) { rect.y(sh - rh); }
 	};
 
 	stage.off('wheel'); // prevent "eventHandler doubling" from subsequent calls
@@ -889,14 +891,23 @@ function drawGroundtruthImage(stage, imageObj, subregionImage, updateCallback = 
 		// to the nav-rect by the user
 		var si = subregionImage;
 
+		let scx = stage.scaleX(), scy = stage.scaleY();
+		let imageStage = si.getStage();
+		let iscx = imageStage.scaleX(), iscy = imageStage.scaleY();
+		// let sw = stage.width() / scx, sh = stage.height() / scy;
+		let ips = Utils.imagePixelScaling(subregionImage, imageObj);
+		let iips = Utils.imagePixelScaling(imageStage, imageObj);
+
 		si.scale({
-			x: (stage.width() / rect.width()) * imagePixelScaling.x,
-			y: (stage.height() / rect.height()) * imagePixelScaling.y,
+			// x: (stage.width() / rect.width()) * imagePixelScaling.x,
+			// y: (stage.height() / rect.height()) * imagePixelScaling.y,
+			x: ((stage.width()) / (rect.width())) * iips.x,
+			y: ((stage.height()) / (rect.height())) * iips.y,
 		});
 		
 		si.position({
-			x: ((image.x() - rect.x()) * si.scaleX()) / imagePixelScaling.x,
-			y: ((image.y() - rect.y()) * si.scaleY()) / imagePixelScaling.y,
+			x: ((image.x() - rect.x()) * si.scaleX()) / ips.x,
+			y: ((image.y() - rect.y()) * si.scaleY()) / ips.y,
 		});
 
 		// this propagates the changes to the subregion to the rest of the app

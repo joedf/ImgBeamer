@@ -340,6 +340,14 @@ const LayoutManager = {
 			// eslint-disable-next-line no-magic-numbers
 			y: (me.box_size + _titlebar_h_offset_ + parentTop) / 10,
 		};
+		
+		let resize_snap = {
+			// eslint-disable-next-line no-magic-numbers
+			w: (me.box_size)/10 + 3.7777777,
+			h: -1, // ignore
+			// TODO: clean this up
+			tolerance: (me.box_size)/10 + 12,
+		};
 
 		// create the containers for the dialogs
 		for (let i = 0; i < stages_count; i++) {
@@ -355,7 +363,7 @@ const LayoutManager = {
 			minWidth: me.minSize,
 			width: me.box_size,
 			height: me.box_size + _titlebar_h_offset_,
-			resizable: false,
+			resizable: true,
 			classes: { "ui-dialog": me._dialog_parent_class },
 			drag: function( event, ui ) {
 				// https://stackoverflow.com/a/20712561/883015
@@ -380,21 +388,80 @@ const LayoutManager = {
 			},
 			resize: function( event, ui ) {
 				// https://stackoverflow.com/a/20712561/883015
-				var snapTolerance = 80;
+
+				// TODO: clean this up
+				var snapTolerance = resize_snap.w;
 				var grid = {
-					x: 20,
-					y: 20,
+					x: resize_snap.w,
+					y: resize_snap.w,
 				};
 		
 				var widthRemainder = ui.size.width % grid.x;
 				var heightRemainder = ui.size.height % grid.y;
+
+				let neww = ui.size.width;
+				let newh = ui.size.height;
 				
+				// /*
 				if (widthRemainder <= snapTolerance) {
-					ui.size.width = ui.size.width - widthRemainder;
+					// ui.size.width = ui.size.width - widthRemainder;
+					neww = ui.size.width - widthRemainder;
 				}
 		
 				if (heightRemainder <= snapTolerance) {
-					ui.size.height = ui.size.height - heightRemainder;
+					// ui.size.height = ui.size.height - heightRemainder;
+					newh = ui.size.height - heightRemainder;
+				}
+				// */
+
+				let avg = Math.floor((neww + newh) / 2);
+				
+				// ui.size.width = neww;
+				// ui.size.height = newh;
+				ui.size.width = avg;
+				ui.size.height = avg + _titlebar_h_offset_;
+				// console.log(_titlebar_h_offset_);
+				
+				let dialog = $(this);
+				//TODO: clean up, maybe new method, gets stage from dialog
+				let stageContainer = dialog.find('.'+me._stageContainer_class);
+				let stage_index = parseInt(stageContainer.attr('stage-index'));
+
+				if (!isNaN(stage_index) && stage_index >= 0 && stage_index < me.Stages.length)
+				{
+					// console.log('stage index', stage_index);
+					const stage = me.Stages[stage_index];
+					
+					// ---------------------------------------------------------------------------
+					// based on this: https://konvajs.org/docs/sandbox/Responsive_Canvas.html
+
+					// Get the container element
+					// const container = stage.getContainer();
+					
+					// Make the container take up the full width
+					// container.style.width = '100%';
+					
+					// Get current container width
+					// const containerWidth = container.offsetWidth;
+					const containerWidth = avg;
+					// console.log(containerWidth, avg);
+					
+					// Get scene size
+					const sceneWidth = me.box_size;
+					const sceneHeight = me.box_size;
+
+					// Calculate scale based on virtual width vs actual width
+					const scale = containerWidth / sceneWidth;
+					
+					// Set stage dimensions and scale
+					stage.width(sceneWidth * scale);
+					stage.height(sceneHeight * scale);
+					stage.scale({ x: scale, y: scale });
+					
+					// Draw the layer to apply changes
+					// layer.draw();
+					stage.getLayers()[0].draw();
+					// ---------------------------------------------------------------------------
 				}
 			}
 		}).dialogExtend({
@@ -483,13 +550,29 @@ const LayoutManager = {
 		if (layoutDialogs) {
 			this.TileDialogs(0, this.__advanced_dialogs_start);
 			this.CascadeDialogs(this.__advanced_dialogs_start, this.stages_count);
+
+			// Inject css after inital tiling to avoid initial size and positioning issues.
+			// This is however needed, to avoid jquery's weird handling of content
+			// sizing inside inside dialogs...
+			// TODO: investigate what alternatives are possible
+			$('<style>').html(`
+				.stage-dlg {
+					width: 100% !important;
+					height: 100% !important;
+				}
+				.stage-dialog {
+					height: auto !important;
+				}
+			`).appendTo('body');
 		}
 		
 		// then create the stages and plug them in
 		let stages = [];
 		let g_stage_containers = $('.'+this._stageContainer_class);
 		for (let i = 0; i < this.stages_count; i++) {
-			let stage = Utils.newStageTemplate(g_stage_containers[i], this.box_size, this.box_size);
+			const container = g_stage_containers.eq(i);
+			const stage = Utils.newStageTemplate(container, this.box_size, this.box_size);
+			container.attr('stage-index', i); // so we can track what stage is in a given dialog
 			stages.push(stage);
 		}
 		return stages;

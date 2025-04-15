@@ -133,6 +133,17 @@ const Utils = {
 		});
 	},
 
+	//TODO: remove this?
+	__debug_insert_DOM_Ruler: function(){
+		let ruler = $('<div>').css({
+			width: 200,
+			height: 27,
+			'z-index': 40000,
+			background: 'pink',
+		}).appendTo('body').draggable().resizable();
+		console.log('ruler', ruler);
+	},
+
 	/**
 	 * Attempts to get the value or text within a given element/control.
 	 * @param {object|jQuery} $e the jquery wrapped DOM element.

@@ -49,7 +49,7 @@ var G_VSEM_PAUSED = false;
 var G_SHOW_SUBREGION_OVERLAY = true;
 
 /** Toggle value to pause/hide the image quality metric calculation of the Resulting Image / Virtual SEM view */
-var G_IMG_METRIC_ENABLED = true;
+var G_IMG_METRIC_ENABLED = false; //TODO: change this back when done debugging!
 
 /** The list of image quality metrics supported by the application. */
 const G_IMG_METRICS = [
