@@ -266,12 +266,14 @@ function drawSubregionImage(stage, oImg, updateCallback = null) {
 	// since part of it is very similar to drawGroundtruthImage()
 	var kImage = new Konva.Image({
 		image: oImg,
-		width: imageSize.w,
-		height: imageSize.h,
-		scale: {
-			x: fitScale.x,
-			y: fitScale.y,
-		},
+		// width: imageSize.w,
+		// height: imageSize.h,
+		// scale: {
+		// 	x: fitScale.x,
+		// 	y: fitScale.y,
+		// },
+		width: fitSize.w,
+		height: fitSize.h,
 		draggable: true,
 	});
 
@@ -891,6 +893,10 @@ function drawGroundtruthImage(stage, imageObj, subregionImage, updateCallback = 
 		// update the subregion view to the new position and zoom based on changes
 		// to the nav-rect by the user
 		var si = subregionImage;
+		var six = si.scaleX(), siy = si.scaleY();
+
+		var ssi = si.getStage();
+		var ssix = ssi.scaleX(), ssiy = ssi.scaleY();
 
 		let scx = stage.scaleX(), scy = stage.scaleY();
 		let imageStage = si.getStage();
@@ -900,22 +906,33 @@ function drawGroundtruthImage(stage, imageObj, subregionImage, updateCallback = 
 		let iips = Utils.imagePixelScaling(imageStage, imageObj);
 
 		si.scale({
-			x: (stage.width() / rect.width()) * imagePixelScaling.x,
-			y: (stage.height() / rect.height()) * imagePixelScaling.y,
+			// x: (stage.width() / rect.width()) * imagePixelScaling.x,
+			// y: (stage.height() / rect.height()* imagePixelScaling.x,
+			
 			// x: ((stage.width()) / (rect.width())) * iips.x,
 			// y: ((stage.height()) / (rect.height())) * iips.y,
 			// x: (stage.width() / rect.width()) * iips.x,
 			// y: (stage.height() / rect.height()) * iips.y,
+			// x: (stage.width() / rect.width()),
+			// y: (stage.height() / rect.height()),
+
+			x: (stage.width() / rect.width()) / scx * ssix,
+			y: (stage.height() / rect.height()) / scy * ssiy,
 		});
 		
 		si.position({
-			x: ((image.x() - rect.x()) * si.scaleX()) / imagePixelScaling.x,
-			y: ((image.y() - rect.y()) * si.scaleY()) / imagePixelScaling.y,
+			// x: ((image.x() - rect.x()) * si.scaleX()) / imagePixelScaling.x,
+			// y: ((image.y() - rect.y()) * si.scaleY()) / imagePixelScaling.x,
+			// x: ((image.x() - rect.x()) * si.scaleX()) / imagePixelScaling.x,
+			// y: ((image.y() - rect.y()) * si.scaleY()) / imagePixelScaling.y,
 
 			// x: ((image.x() - rect.x()) * si.scaleX()) / ips.x,
 			// y: ((image.y() - rect.y()) * si.scaleY()) / ips.y,
 			// x: ((stage.x() - rect.x()) * ips.x),
 			// y: ((stage.y() - rect.y()) * ips.y),
+
+			x: ((stage.x() - rect.x()) * six) / ssix,
+			y: ((stage.y() - rect.y()) * siy) / ssiy,
 		});
 
 		// this propagates the changes to the subregion to the rest of the app
