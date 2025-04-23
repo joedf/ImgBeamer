@@ -79,7 +79,7 @@ const LayoutManager = {
 		});
 
 		// eslint-disable-next-line no-magic-numbers
-		this.box_size = this.__GetOptimalBoxWidth(true, 30);
+		this.box_size = this.__GetOptimalBoxWidth(true, 50);
 		this.Stages = this.__SetupStages();
 	},
 	

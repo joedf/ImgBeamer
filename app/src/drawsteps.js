@@ -243,23 +243,23 @@ function drawSubregionImage(stage, oImg, updateCallback = null) {
 	var imageSize = { w: oImg.naturalWidth, h: oImg.naturalHeight, };
 
 	if (G_DEBUG)
-		console.log("img natural size:", oImg.naturalWidth, oImg.naturalHeight);
+		console.log("img natural size:", imageSize.w, imageSize.h);
 	
 	// get image ratios to "fit" in canvas
 	var fillMode = Utils.getImageFillMode();
-	var fitSize = Utils.fitImageProportions(oImg.naturalWidth, oImg.naturalHeight, max, fillMode);
+	var fitSize = Utils.fitImageProportions(imageSize.w, imageSize.h, max, fillMode);
 	var fitScale = {
-		x: fitSize.w / oImg.naturalWidth,
-		y: fitSize.h / oImg.naturalHeight,
+		x: 1, //fitSize.w / oImg.naturalWidth,
+		y: fitSize.h/fitSize.w, //fitSize.h / oImg.naturalHeight,
 	};
 
 	// force the image to be square by compressing it to the smallest dimension (w or h),
-	// if we have the 'squish' fill mode.
+	// if we have the 'squish' (or stretched) fill mode (into a square).
 	if (fillMode == 'squish') {
-		let maxScale = Math.max(fitScale.x, fitScale.y);
-		fitScale = { x: maxScale, y: maxScale };
-		let minDim = Math.min(oImg.naturalWidth, oImg.naturalHeight);
-		imageSize = { w: minDim, h: minDim };
+		// let maxScale = Math.max(fitScale.x, fitScale.y);
+		// fitScale = { x: maxScale, y: maxScale };
+		// let minDim = Math.min(imageSize.w, imageSize.h);
+		// imageSize = { w: minDim, h: minDim };
 	}
 	
 	// TODO: this should be in a helper likely,
@@ -822,8 +822,8 @@ function drawGroundtruthImage(stage, imageObj, subregionImage, updateCallback = 
 	var imagePixelScaling = Utils.imagePixelScaling(image, imageObj);
 
 	if (fillMode == 'squish') {
-		var maxScale = Math.max(imagePixelScaling.x, imagePixelScaling.y);
-		imagePixelScaling = { x: maxScale, y: maxScale };
+		// var maxScale = Math.max(imagePixelScaling.x, imagePixelScaling.y);
+		// imagePixelScaling = { x: maxScale, y: maxScale };
 	}
 
 	// Draggable nav-rect
@@ -867,11 +867,15 @@ function drawGroundtruthImage(stage, imageObj, subregionImage, updateCallback = 
 		// calculate new size
 		var rs = rect.size();
 		var newWidth = rs.width * scale;
-		var newHeigth = rs.height * scale;
+		var newHeight = rs.height * scale;
+
+		// stage size
+		let sw = stage.width() / stage.scaleX();
+		let sh = stage.height() / stage.scaleY();
 
 		// constrain size
-		var limitW = Math.min(Math.max(newWidth, 1), stage.width());
-		var limitH = Math.min(Math.max(newHeigth, 1), stage.height());
+		var limitW = Math.min(Math.max(newWidth, 1), sw);
+		var limitH = Math.min(Math.max(newHeight, 1), sh);
 
 		// get rect center point delta
 		var dx = rect.width() - limitW;
