@@ -80,7 +80,7 @@ const G_GUI_Controller = new function() {
 		cGui.contrast.setValue(0);
 		G_UpdateFilters();
 	},
-	this.groundTruthImg = 'grains2tl.png';
+	this.groundTruthImg = 'virtual2tl.png';
 	this.pause_vSEM = G_VSEM_PAUSED;
 	this.imageSmoothing = true;
 	this.doImageMetric = G_IMG_METRIC_ENABLED;

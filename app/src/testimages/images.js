@@ -9,12 +9,6 @@ G_PRELOADED_IMAGES_ROOT
  * @see G_PRELOADED_IMAGES_ROOT
  */
 const G_PRELOADED_IMAGES = [
-	"tephra_200nm.png",
-	"tephra_448nm.png",
-	"grains1.png",
-	"grains2full.png",
-	"grains2nc.png",
-	"grains2tl.png",
 	"bavley/APT_needle_8nm.png",
 	"bavley/dots_8nm.png",
 	"bavley/grid_34nm.png",
@@ -28,6 +22,12 @@ const G_PRELOADED_IMAGES = [
 	"caleb/overheads_018_19nm.png",
 	"caleb/sharpie_15nm.png",
 	"caleb/WG_036_131nm.png",
+	"tephra_200nm.png",
+	"tephra_448nm.png",
+	"virtual1.png",
+	"virtual2_4k.png",
+	"virtual2nc.png",
+	"virtual2tl.png",
 ];
 
 /** The root folder for all the preloaded images specified by {@link G_PRELOADED_IMAGES}. */
@@ -35,7 +35,7 @@ const G_PRELOADED_IMAGES_ROOT = "src/testimages/";
 
 /** global variable to set the input ground truth image */
 // var G_INPUT_IMAGE = Utils.getGroundtruthImage();
-var G_INPUT_IMAGE = G_PRELOADED_IMAGES_ROOT + 'grains2tl.png';
+var G_INPUT_IMAGE = G_PRELOADED_IMAGES_ROOT + 'virtual2tl.png';
 
 // Preload the larger image files in the background
 // without blocking the UI for improved responsiveness
@@ -73,6 +73,8 @@ window.addEventListener('load', function(){
 				lastFolder = newFolder;
 			}
 			name = img.split('/')[1];
+		} else {
+			submenu = null;
 		}
 
 		// check if filename has pixel size
