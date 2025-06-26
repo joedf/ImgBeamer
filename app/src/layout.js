@@ -30,7 +30,7 @@ const LayoutManager = {
 	minSize: 200,
 
 	/** The maximum size of a stage */
-	maxSize: 800,
+	maxSize: 600,
 	
 	// -----------------------------------------------------
 	// UI and layout related values
