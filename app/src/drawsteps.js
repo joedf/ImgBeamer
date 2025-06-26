@@ -1034,7 +1034,7 @@ function drawVirtualSEM(stage, beam, subregionRect, subregionRectStage, original
 	});
 	layer.add(indicator);
 
-	var context = canvas.getContext('2d');
+	var context = canvas.getContext('2d', { alpha: false, desynchronized: true });
 	context.imageSmoothingEnabled = false;
 
 	var beamRadius = {x : 0, y: 0};
