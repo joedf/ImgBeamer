@@ -1612,7 +1612,7 @@ const Utils = {
 		if (cv.width == 0 || cv.height == 0)
 			return 0;
 
-		var ctx = cv.getContext('2d');
+		var ctx = cv.getContext('2d', { alpha: true, willReadFrequently: true });
 		ctx.imageSmoothingEnabled = false;
 
 		// since we are reusing the offscreen canvas, we should clear it each time
