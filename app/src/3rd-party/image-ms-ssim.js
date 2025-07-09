@@ -191,7 +191,10 @@ var ImageSSIM;
                 sigsqy += Math.pow((lumaValues2[i] - averageLumaValue2), 2);
                 sigxy += (lumaValues1[i] - averageLumaValue1) * (lumaValues2[i] - averageLumaValue2);
             }
-            var numPixelsInWin = lumaValues1.length - 1;
+            // joedf: prevent divide-by-zero error
+            // see https://github.com/joedf/ImgBeamer/issues/57
+            // var numPixelsInWin = lumaValues1.length - 1;
+            var numPixelsInWin = Math.max(lumaValues1.length - 1, 1);
             sigsqx /= numPixelsInWin;
             sigsqy /= numPixelsInWin;
             sigxy /= numPixelsInWin;
