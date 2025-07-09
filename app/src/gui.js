@@ -104,7 +104,7 @@ var gui_ip = gui.addFolder('Imaging Parameters');
 gui_ip.add(G_GUI_Controller, 'pixelCountX', 1, 64, 1).onChange(G_GUI_Controller.updateViews);
 gui_ip.add(G_GUI_Controller, 'pixelCountY', 1, 64, 1).onChange(G_GUI_Controller.updateViews);
 G_GUI_Controller.controls.brightness = gui_ip
-	.add(G_GUI_Controller, 'brightness', -1, 1, 0.01)
+	.add(G_GUI_Controller, 'brightness', -100, 100, 0.1)
 	.onChange(G_GUI_Controller.updateFilters);
 G_GUI_Controller.controls.contrast = gui_ip
 	.add(G_GUI_Controller, 'contrast', -100, 100, 0.1)
