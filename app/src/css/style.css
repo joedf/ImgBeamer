@@ -107,6 +107,9 @@ summary {
 	background-color: #172542;
 }
 
+/* Ensure any select-box is not too wide for the options toolbox */
+#options select { max-width: 100%; }
+
 /* Ensure jQuery modals appear above all */
 .ui-front[aria-modal="true"],
 .ui-widget-overlay.ui-front
