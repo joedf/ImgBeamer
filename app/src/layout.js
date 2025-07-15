@@ -528,7 +528,7 @@ const LayoutManager = {
 					
 					// attempt to set pixel size accordingly if possible
 					if (!isNaN(data_pixelsize)) {
-						G_GUI_Controller.controls.pixelSize_nm.setValue(data_pixelsize);
+						Utils.setPixelSizeNmInput(data_pixelsize);
 						console.log('Changed pixel size to '+data_pixelsize+' nm');
 					}
 					break;
