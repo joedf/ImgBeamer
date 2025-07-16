@@ -301,15 +301,12 @@ function OnImageLoaded(eImg, stages){
 	);
 	ruler.element.on('dblclick', function(){
 		var um = ruler.getLengthNm() / 1E3;
-		var pixelWidth = prompt("Please enter the length of the ruler in micrometers (μm)."
+		var lengthUm = prompt("Please enter the length of the ruler in micrometers (μm)."
 			+ "\n\nTIP! Try holding the [Shift] key for horizontal lines or "
 			+ "[Ctrl] for vertical lines.", um, 0);
-		if (pixelWidth > 0) {
-			var pixelSize = ruler.getPixelSize(pixelWidth * 1E3);
-			
-			// TODO: support non-square pixel...
-			// currently only support it in x-direction;
-			Utils.setPixelSizeNmInput(pixelSize.x);
+		if (lengthUm > 0) {
+			var pixelSize = ruler.getPixelSize(lengthUm * 1E3);
+			Utils.setPixelSizeNmInput(pixelSize);
 			ruler.doUpdate();
 		}
 	});

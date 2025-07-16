@@ -484,7 +484,19 @@ const Utils = {
 			element: group,
 			getLengthNm: function(){ return lengthNm; },
 			getPixelSize: function(lengthNm){
-				return calculateNewPixelSize(lengthNm);
+				// Unless the input image has non-square pixels,
+				// the pixel size in x should be the same as in y.
+				let px = calculateNewPixelSize(lengthNm);
+				// console.log('px size (x,y) = ', px.x, px.y);
+				
+				// That said we need to avoid NaN or Infinity
+				// for perfectly vertical or horizontal rulers
+				if (px.x == Infinity) {
+					return px.y;
+				} else if (isNaN(px.y)) {
+					return px.x;
+				}
+				return Math.min(px.x, px.y);
 			},
 			doUpdate: function(){ updateLabel(); },
 		};
