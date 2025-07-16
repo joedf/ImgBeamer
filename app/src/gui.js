@@ -116,7 +116,7 @@ gui_ip.add(G_GUI_Controller, 'resetBC').name('Reset Brightness / Contrast');
 gui_ip.add(G_GUI_Controller, 'digitalMag').listen();
 // TODO: maybe use global var or use this pattern instead where we need access to getter/setter
 G_GUI_Controller.controls.pixelSize_nm = gui_ip
-.add(G_GUI_Controller, 'pixelSize_nm', 0.1, 2500, 0.001).onChange(function(){
+.add(G_GUI_Controller, 'pixelSize_nm', 0.1, 4000, 0.001).onChange(function(){
 	G_GUI_Controller.updateViews();
 	G_UpdateRuler();
 });
