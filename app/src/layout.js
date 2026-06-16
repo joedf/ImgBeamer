@@ -45,6 +45,7 @@ const LayoutManager = {
 	_cb_hide_options: "cb_hide_options",
 	_cb_advanced_mode: "cb_advanced_mode",
 	_cb_use_image_smoothing: "cb_use_image_smoothing",
+	_cb_snap_displays: "cb_snap_displays",
 	// the class of a stage's parent element
 	_stageContainer_class: "stageContainer",
 	_stages_per_row: 3,
@@ -58,6 +59,9 @@ const LayoutManager = {
 	
 	// advanced mode stages start at this index for the stages array
 	__advanced_dialogs_start: 6,
+
+	// whether or not to snap displays/windows when dragged or resized
+	__do_snap_displays: true,
 	
 	// -----------------------------------------------------
 	// URLs
@@ -358,6 +362,9 @@ const LayoutManager = {
 			resizable: false,
 			classes: { "ui-dialog": me._dialog_parent_class },
 			drag: function( event, ui ) {
+				// check if snapping is enabled
+				if (!me.__do_snap_displays) { return; }
+
 				// https://stackoverflow.com/a/20712561/883015
 				var snapTolerance = drag_snap.x;
 				var grid = {
@@ -549,6 +556,11 @@ const LayoutManager = {
 					var _cbchk_is = $('#'+me._cb_use_image_smoothing).is(':checked');
 					G_GUI_IMG_SMOOTHING_CB.setValue(_cbchk_is);
 					break;
+				case 'snap': // display/window snapping
+					// get the check state in the menubar
+					var _cbchk_sd = $('#'+me._cb_snap_displays).is(':checked');
+					me.__do_snap_displays = _cbchk_sd;
+					break;
 				case 'tile': // displays/dialogs
 					// Ensure no dialog is collapsed before tiling, otherwise it won't work right...
 					me.RestoreDialogs(0, me.__advanced_dialogs_start);
@@ -590,6 +602,9 @@ const LayoutManager = {
 			// ensure image smoothing checkbox is updated
 			var __checked_is = G_GUI_IMG_SMOOTHING_CB.getValue();
 			$('#'+me._cb_use_image_smoothing).prop('checked', __checked_is);
+
+			// ensure Snap Displays checkbox is updated
+			$('#'+me._cb_snap_displays).prop('checked', me.__do_snap_displays);
 		});
 	},
 };
