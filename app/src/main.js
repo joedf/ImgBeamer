@@ -175,7 +175,7 @@ function OnImageLoaded(eImg, stages){
 		// update spot/beam info: size, rotation, shape
 		var cellSize = Utils.computeCellSize(subregionImage.getStage());
 		Utils.updateDisplayBeamParams(spotProfileStage, layoutBeam, cellSize, spotScaling, promptForSpotWidth);
-		Utils.updateMagInfo(baseImageStage, subregionImage);
+		Utils.updateMagInfo(baseImageStage, subregionImage, promptForMagLevel);
 		Utils.updateSubregionPixelSize(resampledStage, subregionImage, eImg);
 		updateImgMetrics();
 	};
@@ -189,6 +189,15 @@ function OnImageLoaded(eImg, stages){
 			// TODO: maybe just use 'beam' here or a clone?
 			Utils._SetSpotWidth(spotWidth, spotContentBeam, spotScaling, function(){
 				updateBeams();
+				doUpdate();
+			});
+		}
+	}
+
+	function promptForMagLevel() {
+		var mag = prompt("Enter Magnification (default 1x)", 1);
+		if (mag >= 1) {
+			Utils._SetMagLevel(mag, subregionImage, function(){
 				doUpdate();
 			});
 		}

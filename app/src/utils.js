@@ -197,6 +197,23 @@ const Utils = {
 	},
 
 	/**
+	 * Set the scale on the given konva image or object.
+	 * @param {*} mag the scale factor.
+	 * @param {*} scaledImage Ideally, this is the subregionImage to scale.
+	 * @param {*} updateCallback function to call to update draws or whatever is need the change is done.
+	 */
+	_SetMagLevel: function(mag, scaledImage, updateCallback){
+
+		alert('TODO - this might not work')
+		_self.scaleCenteredOnPoint(pointer, konvaObj, oldScale, finalScale);
+
+		// propagate changes and update stages
+		if (typeof updateCallback == 'function') {
+			updateCallback();
+		}
+	}
+
+	/**
 	 * Creates a Zoom event handler to be used on a stage.
 	 * Holding the shift key scales at half the rate.
 	 * @param {object} stage the drawing stage
@@ -637,11 +654,14 @@ const Utils = {
 	 * Displays and updates the magnification.
 	 * @param {*} destStage The stage to display the info on.
 	 * @param {*} scaledRect The shape to calculate the magnification from compared to its stage.
+	 * @param {function} [onDblClick] Optional handle for double click event on the mag indicator
 	 */
-	updateMagInfo: function(destStage, scaledRect) {
+	updateMagInfo: function(destStage, scaledRect, onDblClick) {
 		// add/update the mag disp. text
 		const infoclass = "magDisplay";
-		var element = this.ensureInfoBox(destStage, infoclass);
+		const hoverText = "Double-click to set a specific magnification level."
+
+		var element = this.ensureInfoBox(destStage, infoclass, onDblClick, hoverText);
 		if (element) {
 			var magLevel = this.computeMagLevel(scaledRect.getStage(), scaledRect);
 			var fmtMag = magLevel.toFixed(G_MATH_TOFIXED.SHORT) + 'X';
