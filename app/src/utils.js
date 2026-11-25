@@ -212,6 +212,12 @@ const Utils = {
 		// console.log(`Mag = ${mag} \tscale = ${scale} \tnewScale = ${newScale}`)
 		this.centeredScale(scaledImage, newScale);
 
+		// Constrain objects to zoom/stage bounds, if possible
+		if (typeof scaledImage.constrainZoomBounds === 'function') {
+			scaledImage.constrainZoomBounds();
+			// console.log('Constrained zoom bounds after setting mag level.');
+		}
+
 		// propagate changes and update stages
 		if (typeof updateCallback == 'function') {
 			updateCallback();
