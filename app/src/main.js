@@ -175,7 +175,7 @@ function OnImageLoaded(eImg, stages){
 		// update spot/beam info: size, rotation, shape
 		var cellSize = Utils.computeCellSize(subregionImage.getStage());
 		Utils.updateDisplayBeamParams(spotProfileStage, layoutBeam, cellSize, spotScaling, promptForSpotWidth);
-		Utils.updateMagInfo(baseImageStage, subregionImage);
+		Utils.updateMagInfo(baseImageStage, subregionImage, promptForMagLevel);
 		Utils.updateSubregionPixelSize(resampledStage, subregionImage, eImg);
 		updateImgMetrics();
 	};
@@ -189,6 +189,18 @@ function OnImageLoaded(eImg, stages){
 			// TODO: maybe just use 'beam' here or a clone?
 			Utils._SetSpotWidth(spotWidth, spotContentBeam, spotScaling, function(){
 				updateBeams();
+				doUpdate();
+			});
+		}
+	}
+
+	function promptForMagLevel() {
+		// prompt with current mag as default
+		var currentMag = Math.max(1, Utils.computeMagLevel(subregionImage.getStage(), subregionImage)).toFixed(G_MATH_TOFIXED.SHORT);
+		var maxMag = Utils.computeMagLevelMax(subregionImage);
+		var mag = prompt(`Enter Magnification (maximum = ${maxMag})\n\nNote: You can scroll-zoom past this limit (for performance) as needed.`, currentMag);
+		if (mag >= 1) {
+			Utils._SetMagLevel(mag, subregionImage, function(){
 				doUpdate();
 			});
 		}

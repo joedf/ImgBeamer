@@ -292,6 +292,9 @@ function drawSubregionImage(stage, oImg, updateCallback = null) {
 		if (y < (sy - h + sh) ) { kImage.y(sy - h + sh); }
 	};
 
+	// expose constrainBounds() so it can be called elsewhere, like when setting Mag level
+	kImage.constrainZoomBounds = constrainBounds;
+
 	// optional event callback
 	var doUpdate = function(){
 		if (typeof updateCallback == 'function')
