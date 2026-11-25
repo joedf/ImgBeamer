@@ -1023,6 +1023,19 @@ const Utils = {
 	},
 
 	/**
+	 * Scales the given shaped while keeping it centered on itself.
+	 * @param {*} shape the shape to scale and position.
+	 * @param {*} newScale the shape's new scale
+	 */
+	scaleCenteredOnShape: function(shape, newScale) {
+		var shapeCenter = {
+			x: shape.width()/2 - shape.x(),
+			y: shape.height()/2 - shape.y()
+		};
+		this.scaleCenteredOnPoint(shapeCenter, shape, shape.scaleX(), newScale);
+	},
+
+	/**
 	 * Scales the given shaped while keeping it centered on the given point.
 	 * @param {*} point the centering point.
 	 * @param {*} shape the shape to scale and position.
