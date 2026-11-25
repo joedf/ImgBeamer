@@ -204,12 +204,17 @@ const Utils = {
 	 */
 	_SetMagLevel: function(mag, scaledImage, updateCallback) {
 		// Calculate the shape's new scale from the requested Mag level
-		var stage = scaledImage.getStage()
+		let stage = scaledImage.getStage()
 		// This is based on the reverse calculation of Utils.computeMagLevel()
-		var newScale = (mag * (stage.width() * stage.scaleX())) / scaledImage.width()
+		// let scale = (scaledImage.width() * scaledImage.scaleX()) / (stage.width() * stage.scaleX());
+		let newScale = (mag * (stage.width() * stage.scaleX())) / scaledImage.width()
 		
-		// var scale = (scaledImage.width() * scaledImage.scaleX()) / (stage.width() * stage.scaleX());
-		// console.log(`Mag = ${mag} \tscale = ${scale} \tnewScale = ${newScale}`)
+		// limit scale/mag, to the size of 1-pixel filling the FOV
+		let maxScale = this.computeMaxScale(scaledImage);
+		// console.log(`Mag = ${mag} \tscale = ${scale} \tnewScale = ${newScale} \tmaxScale = ${maxScale}`)
+
+		// update the scale
+		newScale = Math.min(newScale, maxScale);
 		this.centeredScale(scaledImage, newScale);
 
 		// Constrain objects to zoom/stage bounds, if possible
@@ -659,6 +664,27 @@ const Utils = {
 	computeMagLevel: function(rectBase, rectScaled) {
 		var rW = (rectScaled.width() * rectScaled.scaleX()) / (rectBase.width() * rectBase.scaleX());
 		return rW;
+	},
+
+	/**
+	 * Computes the maximum mag level for 1 pixel of a konva image to fill the field of view of its stage.
+	 * @param {*} scaledImage The Konva Image to evaluate
+	 */
+	computeMagLevelMax: function(scaledImage) {
+		let img = scaledImage.image();
+		let maxMag = Math.max(img.naturalWidth, img.naturalHeight)
+		return maxMag;
+	},
+
+	/**
+	 * Computes the maximum scale for 1 pixel of a konva image to fill the field of view of its stage.
+	 * @param {*} scaledImage The Konva Image to evaluate
+	 */
+	computeMaxScale: function(scaledImage) {
+		let maxMag = this.computeMagLevelMax(scaledImage);
+		let stage = scaledImage.getStage()
+		let maxScale = (maxMag * (stage.width() * stage.scaleX())) / scaledImage.width()
+		return maxScale;
 	},
 
 	/**

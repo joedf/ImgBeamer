@@ -197,7 +197,8 @@ function OnImageLoaded(eImg, stages){
 	function promptForMagLevel() {
 		// prompt with current mag as default
 		var currentMag = Math.max(1, Utils.computeMagLevel(subregionImage.getStage(), subregionImage)).toFixed(2);
-		var mag = prompt("Enter Magnification", currentMag);
+		var maxMag = Utils.computeMagLevelMax(subregionImage);
+		var mag = prompt("Enter Magnification (maximum = " + maxMag + ")", currentMag);
 		if (mag >= 1) {
 			Utils._SetMagLevel(mag, subregionImage, function(){
 				doUpdate();
