@@ -202,16 +202,16 @@ const Utils = {
 	 * @param {*} scaledImage Ideally, this is the subregionImage to scale.
 	 * @param {*} updateCallback function to call to update draws or whatever is need the change is done.
 	 */
-	_SetMagLevel: function(mag, scaledImage, updateCallback){
-
-		alert('TODO - this might not work')
-		_self.scaleCenteredOnPoint(pointer, konvaObj, oldScale, finalScale);
+	_SetMagLevel: function(mag, scaledImage, updateCallback) {
+		// alert('TODO - this might not work')
+		// need a better scale calc, or is it inconsistent?
+		this.scaleCenteredOnShape(scaledImage, mag);
 
 		// propagate changes and update stages
 		if (typeof updateCallback == 'function') {
 			updateCallback();
 		}
-	}
+	},
 
 	/**
 	 * Creates a Zoom event handler to be used on a stage.
@@ -965,6 +965,9 @@ const Utils = {
 			// ensure we remove all previous dblclick handlers so dont end up
 			// with multiple instances of the handler being triggered...
 			e.unbind('dblclick').on('dblclick', onDblClick);
+
+			// ensure we have pointer cursor if we a dblclick action
+			e.addClass('hasDblClickAction');
 		}
 
 		return element;

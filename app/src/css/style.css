@@ -18,6 +18,7 @@ body {
 	cursor: -webkit-grabbing;
 }
 
+.hasDblClickAction,
 summary {
 	cursor: pointer;
 }
