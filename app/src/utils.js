@@ -197,7 +197,7 @@ const Utils = {
 	},
 
 	/**
-	 * Set the scale on the given konva image or object.
+	 * Set the scale on the given konva image.
 	 * @param {*} mag the scale factor.
 	 * @param {*} scaledImage Ideally, this is the subregionImage to scale.
 	 * @param {*} updateCallback function to call to update draws or whatever is need the change is done.
