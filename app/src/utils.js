@@ -205,6 +205,7 @@ const Utils = {
 	_SetMagLevel: function(mag, scaledImage, updateCallback) {
 		// alert('TODO - this might not work')
 		// need a better scale calc, or is it inconsistent?
+		// TODO: need to calculate Mag from shape scale...
 		this.scaleCenteredOnShape(scaledImage, mag);
 
 		// propagate changes and update stages
