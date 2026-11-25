@@ -198,7 +198,7 @@ function OnImageLoaded(eImg, stages){
 		// prompt with current mag as default
 		var currentMag = Math.max(1, Utils.computeMagLevel(subregionImage.getStage(), subregionImage)).toFixed(2);
 		var maxMag = Utils.computeMagLevelMax(subregionImage);
-		var mag = prompt("Enter Magnification (maximum = " + maxMag + ")", currentMag);
+		var mag = prompt(`Enter Magnification (maximum = ${maxMag})\n\nNote: You can scroll-zoom past this limit (for performance) as needed.`, currentMag);
 		if (mag >= 1) {
 			Utils._SetMagLevel(mag, subregionImage, function(){
 				doUpdate();
