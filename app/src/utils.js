@@ -203,10 +203,14 @@ const Utils = {
 	 * @param {*} updateCallback function to call to update draws or whatever is need the change is done.
 	 */
 	_SetMagLevel: function(mag, scaledImage, updateCallback) {
-		// alert('TODO - this might not work')
-		// need a better scale calc, or is it inconsistent?
-		// TODO: need to calculate Mag from shape scale...
-		this.scaleCenteredOnShape(scaledImage, mag);
+		// Calculate the shape's new scale from the requested Mag level
+		var stage = scaledImage.getStage()
+		// This is based on the reverse calculation of Utils.computeMagLevel()
+		var newScale = (mag * (stage.width() * stage.scaleX())) / scaledImage.width()
+		
+		// var scale = (scaledImage.width() * scaledImage.scaleX()) / (stage.width() * stage.scaleX());
+		// console.log(`Mag = ${mag} \tscale = ${scale} \tnewScale = ${newScale}`)
+		this.centeredScale(scaledImage, newScale);
 
 		// propagate changes and update stages
 		if (typeof updateCallback == 'function') {
@@ -1024,19 +1028,6 @@ const Utils = {
 	 */
 	centeredScale: function(shape, newScale){
 		this.scaleOnCenter(shape.getStage(), shape, shape.scaleX(), newScale);
-	},
-
-	/**
-	 * Scales the given shaped while keeping it centered on itself.
-	 * @param {*} shape the shape to scale and position.
-	 * @param {*} newScale the shape's new scale
-	 */
-	scaleCenteredOnShape: function(shape, newScale) {
-		var shapeCenter = {
-			x: shape.width()/2 - shape.x(),
-			y: shape.height()/2 - shape.y()
-		};
-		this.scaleCenteredOnPoint(shapeCenter, shape, shape.scaleX(), newScale);
 	},
 
 	/**
